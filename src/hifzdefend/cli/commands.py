@@ -22,6 +22,7 @@ from ..rules.app_whitelist import ApplicationWhitelist
 from ..rules.engine import RulesEngine
 from ..threat_intel.manager import ThreatIntelligenceManager
 from ..utils.exceptions import HifzDefendError
+from ..utils.helpers import validate_path
 
 # AI imports (conditional - only if AI is enabled)
 try:
@@ -731,7 +732,8 @@ def add(rule_file: str):
         signatures_dir = Path(config.rules.custom_signatures_path)
         signatures_dir.mkdir(parents=True, exist_ok=True)
 
-        rule_path = Path(rule_file)
+        # Validate rule file path to prevent path traversal
+        rule_path = validate_path(Path(rule_file))
         dest_path = signatures_dir / rule_path.name
 
         shutil.copy2(rule_path, dest_path)
@@ -758,6 +760,9 @@ def remove(rule_name: str):
         # Remove rule file
         signatures_dir = Path(config.rules.custom_signatures_path)
         rule_path = signatures_dir / rule_name
+
+        # Validate rule path to prevent path traversal
+        rule_path = validate_path(rule_path, base_path=signatures_dir)
 
         if not rule_path.exists():
             console.print(f"[bold red]ERROR:[/bold red] Rule not found: {rule_name}")
@@ -871,8 +876,11 @@ def add(app_path: str):
     try:
         config = get_config()
 
+        # Validate app path to prevent path traversal
+        app_path_validated = validate_path(Path(app_path))
+
         console.print(f"\n[bold cyan]Adding to Whitelist[/bold cyan]")
-        console.print(f"Application: [yellow]{app_path}[/yellow]\n")
+        console.print(f"Application: [yellow]{app_path_validated}[/yellow]\n")
 
         # Note: This requires implementing whitelist persistence
         console.print("[yellow]Note:[/yellow] Configuration persistence not yet implemented")

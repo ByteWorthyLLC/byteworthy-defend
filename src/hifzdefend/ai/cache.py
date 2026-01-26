@@ -40,6 +40,17 @@ class ResponseCache:
         self.ttl = ttl
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
+        # Set restrictive permissions on cache directory (owner-only access)
+        # This prevents other users from reading cached AI responses
+        try:
+            import os
+            import stat
+
+            # Set permissions to 0o700 (rwx------)
+            os.chmod(self.cache_dir, stat.S_IRWXU)
+        except Exception as e:
+            logger.warning(f"Could not set restrictive permissions on cache directory: {e}")
+
     def _get_cache_key(self, prompt: str, model: str, temperature: float) -> str:
         """
         Generate cache key from prompt parameters.
@@ -116,9 +127,16 @@ class ResponseCache:
 
         # Atomic write
         try:
+            import os
+            import stat
+
             temp_file = cache_file.with_suffix(".tmp")
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(cache_data, f, indent=2)
+
+            # Set restrictive permissions on temp file before moving (owner read/write only)
+            os.chmod(temp_file, stat.S_IRUSR | stat.S_IWUSR)
+
             temp_file.replace(cache_file)
         except OSError as e:
             raise CacheError(f"Failed to write cache: {e}")
