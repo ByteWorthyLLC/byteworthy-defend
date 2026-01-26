@@ -26,6 +26,13 @@ def validate_directories(config: HifzDefendConfig, create: bool = True) -> None:
         ("quarantine_dir", config.quarantine.quarantine_dir_path),
     ]
 
+    # Add AI directories if enabled
+    if config.ai.enabled:
+        if config.ai.claude.enabled and config.ai.claude.cache_responses:
+            directories.append(("claude_cache_dir", config.ai.claude.cache_path_expanded))
+        if config.ai.natural_language.enabled:
+            directories.append(("vector_db_dir", config.ai.natural_language.vector_db_path_expanded))
+
     for name, path in directories:
         if not path.exists():
             if create:

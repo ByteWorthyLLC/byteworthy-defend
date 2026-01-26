@@ -12,7 +12,7 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 
 ## Features
 
-### Phase 1: MVP (Current)
+### Phase 1: Core Scanning (Complete ✅)
 - **CLI Scanner**: Scan files and directories for malware
 - **ClamAV Integration**: Enterprise-grade virus detection engine
 - **Quarantine Management**: Automatic quarantine of detected threats
@@ -21,12 +21,46 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 - **Rich Terminal Output**: Beautiful progress bars and tables
 - **EICAR Test Support**: Safe malware testing with encrypted samples
 
-### Phase 2: Real-Time Monitoring (Planned)
-- File system monitoring with watchdog
-- Auto-scan on file creation/modification
+### Phase 1.5: Advanced Threat Detection (Complete ✅)
+**Developer Security:**
+- 🛡️ **Package Manager Security**: npm/pip typosquatting & malicious package detection
+- 🐳 **Docker Security**: Container vulnerability scanning with Trivy
+- 💻 **IDE Monitoring**: VS Code extension security & Claude Code CLI protection
+- 📦 **Supply Chain Protection**: Dependency confusion prevention
+
+**Behavior-Based Detection:**
+- 📋 **Registry Monitor**: Windows Registry change tracking & rollback
+- ⚡ **PowerShell Monitor**: Malicious script & obfuscation detection
+- 🔒 **Ransomware Detection**: File encryption pattern detection & auto-backup
+- ⛏️ **Crypto-Miner Detection**: CPU/GPU mining activity detection
+
+**Network & Privacy:**
+- 🌐 **Network Monitor**: IP reputation & C2 beaconing detection
+- 🔍 **DNS Monitor**: DNS filtering & tunneling detection
+- 📥 **Download Monitor**: Auto-scan browser downloads with VirusTotal
+- 🕵️ **Spyware Detection**: Keylogger & RAT detection
+- 📋 **Clipboard Monitor**: Crypto address hijacking prevention
+- 📷 **Hardware Monitor**: Webcam/microphone access alerts
+
+**Custom Rules & Intelligence:**
+- 📜 **YARA Rules Engine**: Custom malware signatures
+- 🎯 **File Blocking**: Context-aware file type blocking
+- ✅ **Application Whitelist**: Trusted app verification
+- 🌍 **Threat Intelligence**: AbuseIPDB, VirusTotal, Snyk, Socket.dev integration
+
+### Phase 2: AI Integration (Complete ✅)
+- 🤖 **Claude-Powered Threat Analysis**: Script analysis with plain language explanations
+- 💬 **Natural Language Queries**: Ask questions about security logs
+- 🧠 **RAG on Security Logs**: Semantic search over logs using ChromaDB
+- 📊 **Incident Report Generation**: Auto-generate human-readable incident reports
+- 💰 **Cost Management**: Response caching, rate limiting, cost tracking
+
+### Phase 3: Real-Time Service (Planned)
+- Windows background service
+- System tray integration
 - Desktop notifications
 - Scheduled scans
-- Automatic virus definition updates
+- Auto-update virus definitions
 
 ### Phase 3: Web Dashboard (Planned)
 - REST API backend
@@ -120,6 +154,37 @@ hifzdefend quarantine path/to/suspicious.exe --threat-name "Suspicious.File"
 hifzdefend config-show
 ```
 
+### AI-Powered Analysis (Phase 2)
+
+#### Analyze Scripts with Claude AI
+```bash
+# Analyze PowerShell script
+hifzdefend analyze-script suspicious.ps1
+
+# Analyze with specific type
+hifzdefend analyze-script malware.bat --type batch
+
+# Save analysis report
+hifzdefend analyze-script script.py --save
+```
+
+#### Natural Language Queries
+```bash
+# Ask questions about security logs
+hifzdefend query "what threats were detected today?"
+hifzdefend query "show me all PowerShell alerts"
+
+# Interactive query mode
+hifzdefend query --interactive
+```
+
+#### Explain Threats
+```bash
+# Get plain language explanation
+hifzdefend explain THR-001
+hifzdefend explain "Trojan.Win32.Generic"
+```
+
 ## Configuration
 
 Configuration file location: `%LOCALAPPDATA%\HifzDefend\hifzdefend.toml`
@@ -148,13 +213,67 @@ See [config/hifzdefend.toml.example](config/hifzdefend.toml.example) for full co
 ## Architecture
 
 ```
-HifzDefend
-├── Core Scanner (ClamAV Integration)
-├── Configuration System (TOML + Pydantic)
-├── Logging (JSON Structured Logs)
-├── Scan Engine (Orchestration + Quarantine)
-├── CLI Interface (Click + Rich)
-└── Testing (Pytest + EICAR)
+HifzDefend (Phase 2)
+├── Core Scanner
+│   ├── ClamAV Integration
+│   ├── Quarantine Management
+│   └── Scan Engine
+│
+├── AI Integration (NEW - Phase 2)
+│   ├── Claude Analyzer
+│   │   ├── Script Analysis
+│   │   ├── Network Behavior Analysis
+│   │   ├── Incident Report Generation
+│   │   └── Plain Language Explanations
+│   ├── Natural Language Interface
+│   │   ├── ChromaDB Vector Store
+│   │   ├── Semantic Search (RAG)
+│   │   └── Interactive Query Mode
+│   └── Response Cache
+│       ├── TTL-based Expiration
+│       └── Cost Optimization
+│
+├── Event-Driven Monitoring
+│   ├── Event Bus (Central Hub)
+│   ├── 13 Security Monitors
+│   │   ├── Package Manager (npm/pip)
+│   │   ├── Docker Security
+│   │   ├── IDE & Code Editor
+│   │   ├── Registry Monitor
+│   │   ├── PowerShell Monitor
+│   │   ├── Ransomware Detector
+│   │   ├── Crypto-Miner Detector
+│   │   ├── Network Monitor
+│   │   ├── DNS Monitor
+│   │   ├── Download Monitor
+│   │   ├── Spyware Detector
+│   │   ├── Clipboard Monitor
+│   │   └── Hardware Monitor
+│   └── Monitor Manager
+│
+├── Custom Rules Engine
+│   ├── YARA Integration
+│   ├── File Blocker
+│   └── App Whitelist
+│
+├── Threat Intelligence
+│   ├── AbuseIPDB (IP reputation)
+│   ├── VirusTotal (file reputation)
+│   ├── Snyk (package vulnerabilities)
+│   ├── Socket.dev (supply chain)
+│   └── Threat Intel Cache
+│
+├── Configuration System
+│   └── TOML + Pydantic Validation
+│
+├── CLI Interface
+│   └── Click + Rich (30 commands)
+│
+└── Testing
+    ├── Unit Tests (85%+ coverage)
+    ├── Integration Tests
+    ├── Performance Benchmarks
+    └── False Positive Tests
 ```
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed design documentation.
@@ -233,15 +352,28 @@ See [SECURITY.md](docs/SECURITY.md) for comprehensive security documentation.
 
 ## Documentation
 
-- [Installation Guide](docs/INSTALLATION.md) - Detailed setup instructions
-- [Usage Guide](docs/USAGE.md) - Complete CLI reference and examples
+**Getting Started:**
+- [Installation Guide](docs/INSTALLATION.md) - Detailed setup instructions & API keys
+- [Usage Guide](docs/USAGE.md) - Complete CLI reference (30 commands)
+
+**Phase 2 - AI Integration:**
+- [AI Integration Guide](docs/AI_INTEGRATION.md) - Claude setup, usage, and cost management
+
+**Phase 1.5 - Advanced Features:**
+- [Threat Detection Guide](docs/THREAT_DETECTION.md) - How each detection mechanism works
+- [Customization Guide](docs/CUSTOMIZATION.md) - Custom YARA rules & whitelisting
+- [Developer Security](docs/DEVELOPER_SECURITY.md) - Protecting your development workflow
+- [API Integrations](docs/API_INTEGRATIONS.md) - Threat intelligence service setup
+
+**Development:**
 - [Development Guide](docs/DEVELOPMENT.md) - Contributing and development workflow
-- [Architecture Guide](docs/ARCHITECTURE.md) - System design and components
+- [Architecture Guide](docs/ARCHITECTURE.md) - Event bus design & monitor patterns
 - [Security Guide](docs/SECURITY.md) - Security considerations and best practices
+- [Testing Guide](docs/TESTING.md) - Writing tests & running benchmarks
 
 ## Roadmap
 
-- [x] **v0.1.0** - MVP CLI Scanner (Phase 1)
+- [x] **v0.1.0** - MVP CLI Scanner (Phase 1) ✅
   - [x] ClamAV integration
   - [x] File/directory scanning
   - [x] Quarantine management
@@ -249,26 +381,53 @@ See [SECURITY.md](docs/SECURITY.md) for comprehensive security documentation.
   - [x] Structured logging
   - [x] Test suite
 
-- [ ] **v0.2.0** - Real-Time Monitoring (Phase 2)
-  - [ ] File system monitoring
-  - [ ] Auto-scan on file events
+- [x] **v0.1.5** - Advanced Threat Detection (Phase 1.5) ✅
+  - [x] 13 Security monitors (Package, Docker, IDE, Registry, PowerShell, etc.)
+  - [x] Event-driven architecture with Event Bus
+  - [x] YARA custom signatures & rules engine
+  - [x] Threat intelligence integration (AbuseIPDB, VirusTotal, Snyk, Socket.dev)
+  - [x] Behavior-based detection (ransomware, crypto-miners, spyware)
+  - [x] Network security (DNS filtering, IP blocking)
+  - [x] Privacy protection (clipboard monitor, hardware access alerts)
+  - [x] Comprehensive test suite (unit, integration, performance, false positives)
+  - [x] Enhanced documentation (4 new guides)
+
+- [x] **v0.2.0** - AI Integration (Phase 2) ✅
+  - [x] Claude-powered threat analyzer
+  - [x] Script analysis (PowerShell, Batch, Python)
+  - [x] Network behavior analysis
+  - [x] Natural language query interface
+  - [x] RAG on security logs (ChromaDB)
+  - [x] Plain language explanations
+  - [x] Incident report generation
+  - [x] Response caching & cost management
+  - [x] CLI commands (query, analyze-script, explain)
+
+- [ ] **v0.3.0** - Real-Time Service (Phase 3)
+  - [ ] Windows background service
+  - [ ] System tray integration
   - [ ] Desktop notifications
   - [ ] Scheduled scans
   - [ ] Auto-update definitions
+  - [ ] Service management (start/stop/restart)
 
-- [ ] **v0.3.0** - Web Dashboard (Phase 3)
-  - [ ] REST API backend
+- [ ] **v0.4.0** - Web Dashboard (Phase 4)
+  - [ ] REST API backend (FastAPI)
   - [ ] Web UI (React)
-  - [ ] Real-time statistics
-  - [ ] Report viewer
-  - [ ] Configuration UI
+  - [ ] Real-time statistics & charts
+  - [ ] Threat report viewer
+  - [ ] Configuration management UI
+  - [ ] Remote monitor control
+  - [ ] AI chat interface
 
 - [ ] **v1.0.0** - Production Ready
-  - [ ] Performance optimization
-  - [ ] Windows service
-  - [ ] Installer package
-  - [ ] Documentation site
-  - [ ] CI/CD pipeline
+  - [ ] Performance optimization (<3% CPU idle)
+  - [ ] Windows installer (NSIS/Inno Setup)
+  - [ ] Auto-updater
+  - [ ] Documentation website
+  - [ ] CI/CD pipeline (GitHub Actions)
+  - [ ] Code signing
+  - [ ] Telemetry (opt-in)
 
 ## Contributing
 

@@ -49,3 +49,61 @@ report_format = "json"
 enabled = true
 quarantine_dir = "%LOCALAPPDATA%\\HifzDefend\\quarantine"
 auto_quarantine = true
+
+# ============================================================================
+# AI Integration (Phase 2)
+# ============================================================================
+
+[ai]
+enabled = true
+
+[ai.claude]
+# Claude AI-powered threat analysis
+enabled = true
+
+# API Key - Reads from CLAUDE_API_KEY environment variable
+# Set in PowerShell: $env:CLAUDE_API_KEY = "sk-ant-api03-your-key-here"
+# Or set permanently: [Environment]::SetEnvironmentVariable("CLAUDE_API_KEY", "your-key", "User")
+api_key = "${CLAUDE_API_KEY}"
+
+# Model settings
+model = "claude-sonnet-4-20250514"
+max_tokens = 2048
+temperature = 0.3
+timeout = 30
+
+# Caching (reduces API costs)
+cache_responses = true
+cache_ttl = 3600  # 1 hour in seconds
+cache_path = "%LOCALAPPDATA%\\HifzDefend\\data\\cache\\claude"
+
+# Cost controls
+max_requests_per_hour = 100
+warn_at_cost = 10.00   # USD
+stop_at_cost = 50.00   # USD
+log_api_costs = true
+
+# Error handling
+fallback_on_error = true  # Continue with ClamAV if Claude fails
+retry_attempts = 3
+retry_delay = 2  # seconds
+
+# Features
+script_analysis = true
+network_analysis = true
+file_analysis = true
+incident_reports = true
+plain_language_explanations = true
+
+[ai.natural_language]
+# Natural language query interface with RAG
+enabled = true
+embedding_model = "all-MiniLM-L6-v2"  # CPU-friendly, 22MB model
+vector_db_path = "%LOCALAPPDATA%\\HifzDefend\\data\\vector_db"
+max_context_results = 5
+interactive_mode = true
+
+[ai.natural_language.chromadb]
+collection_name = "security_logs"
+distance_metric = "cosine"
+persist_directory = "%LOCALAPPDATA%\\HifzDefend\\data\\vector_db"

@@ -33,16 +33,148 @@ excluded_paths = [
 excluded_extensions = [".log", ".tmp", ".temp"]
 
 [monitoring]
-# Real-time file system monitoring (Phase 2)
+# Phase 1.5: Advanced Threat Detection & Monitoring
+enabled = true
+check_interval = 60  # seconds
+max_events_per_minute = 100
+event_retention_days = 30
+
+[monitoring.event_bus]
+queue_size = 1000
+worker_threads = 4
+priority_enabled = true
+
+[monitoring.package_manager]
+enabled = true
+npm = true
+pip = true
+check_malicious_db = true
+typosquat_threshold = 3  # Levenshtein distance
+verify_signatures = true
+api_key_snyk = ""
+api_key_socket_dev = ""
+
+[monitoring.docker]
+enabled = true
+scan_images = true
+scan_before_run = true
+block_privileged = true
+scan_for_secrets = true
+trivy_enabled = true
+max_image_age_days = 30
+
+[monitoring.ide]
+enabled = true
+vscode = true
+claude_code_cli = true
+github_desktop = true
+check_extension_permissions = true
+alert_on_repo_clone = false
+whitelist_extensions = [
+    "ms-python.python",
+    "ms-vscode.cpptools",
+]
+
+[monitoring.registry]
+enabled = true
+protected_keys = [
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+    "HKLM\\System\\CurrentControlSet\\Services",
+]
+alert_on_new_service = true
+alert_on_startup_entry = true
+enable_rollback = true
+baseline_snapshot_on_start = true
+
+[monitoring.powershell]
+enabled = true
+detect_obfuscation = true
+monitor_event_log = true
+suspicious_cmdlets = [
+    "Invoke-Expression",
+    "DownloadString",
+    "Start-BitsTransfer",
+]
+whitelist_scripts = []
+alert_on_encoded_command = true
+
+[monitoring.ransomware]
+enabled = true
+file_modification_threshold = 50  # files per 10 seconds
+monitored_directories = [
+    "C:\\Users\\%USERNAME%\\Documents",
+    "C:\\Users\\%USERNAME%\\Desktop",
+    "C:\\Users\\%USERNAME%\\Pictures",
+]
+detect_shadow_copy_deletion = true
+auto_backup_on_detect = true
+backup_directory = "D:\\Backups\\HifzDefend"
+ransom_note_patterns = [
+    "encrypted",
+    "ransom",
+    "bitcoin",
+]
+
+[monitoring.cryptominer]
+enabled = true
+cpu_threshold = 80  # % sustained for 60 seconds
+gpu_monitoring = true
+network_check = true
+miner_signatures = [
+    "xmrig",
+    "coinhive",
+]
+whitelist_processes = []
+
+[monitoring.network]
+enabled = true
+block_bad_ips = true
+threat_intel_feeds = ["abuseipdb", "talos"]
+monitor_c2_beaconing = true
+
+[monitoring.dns]
+enabled = true
+dns_filtering = true
+detect_tunneling = true
+custom_blocklist = []
+
+[monitoring.downloads]
+enabled = true
+watch_directories = [
+    "C:\\Users\\%USERNAME%\\Downloads",
+]
+auto_scan = true
+virustotal_api_key = ""
+check_file_reputation = true
+suspicious_extensions = [".exe", ".scr", ".pif", ".bat", ".cmd"]
+
+[monitoring.spyware]
+enabled = true
+detect_keyloggers = true
+detect_screen_capture = true
+detect_process_injection = true
+
+[monitoring.clipboard]
+enabled = true
+alert_on_crypto_address_change = true
+detect_clipboard_hijacking = true
+
+[monitoring.hardware]
+enabled = true
+webcam_monitoring = true
+microphone_monitoring = true
+whitelist_apps = [
+    "zoom.exe",
+    "teams.exe",
+    "chrome.exe",
+]
+
+# Real-time file system monitoring (Phase 2 - legacy)
+[monitoring.filesystem]
 enabled = false
-
-# Directories to monitor for changes
 watch_paths = []
-
-# Scan files when created
 scan_on_create = true
-
-# Scan files when modified
 scan_on_modify = false
 
 [logging]
@@ -80,3 +212,39 @@ quarantine_dir = "%LOCALAPPDATA%\\HifzDefend\\quarantine"
 
 # Automatically quarantine detected threats
 auto_quarantine = true
+
+[rules]
+# Custom threat detection rules
+custom_signatures_path = "%LOCALAPPDATA%\\HifzDefend\\signatures\\custom"
+yara_rules_enabled = true
+
+[rules.file_blocking]
+enabled = true
+blocked_extensions = [".scr", ".pif"]
+context_aware = true  # Block .exe in Downloads, allow in Program Files
+
+[rules.app_whitelist]
+enabled = true
+whitelist_mode = false  # false = blacklist mode, true = whitelist mode
+whitelisted_apps = [
+    "C:\\Program Files\\Git\\cmd\\git.exe",
+]
+verify_signatures = true
+check_file_hash = true
+
+[threat_intel]
+# Threat intelligence integration
+enabled = true
+cache_ttl = 3600  # 1 hour
+rate_limit_per_minute = 60
+
+[threat_intel.api_keys]
+abuseipdb = ""
+virustotal = ""
+snyk = ""
+socket_dev = ""
+
+[threat_intel.cache]
+enabled = true
+max_entries = 10000
+eviction_policy = "lru"

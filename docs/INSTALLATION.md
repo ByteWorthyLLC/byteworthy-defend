@@ -220,6 +220,213 @@ pytest
 
 Expected: All tests pass (or skip if ClamAV not running).
 
+## Step 6: Configure Phase 1.5 Features (Optional)
+
+Phase 1.5 adds advanced threat detection with 13 security monitors, threat intelligence, and custom rules. These features are **optional** and require additional configuration.
+
+### 6.1 Threat Intelligence API Keys (Optional)
+
+HifzDefend integrates with external threat intelligence services to enhance detection. All services have free tiers.
+
+#### Obtaining API Keys
+
+**AbuseIPDB** (IP Reputation):
+1. Visit https://www.abuseipdb.com
+2. Sign up for free account
+3. Navigate to **Account** → **API**
+4. Click **Create Key**
+5. Copy API key
+
+**VirusTotal** (File Reputation):
+1. Visit https://www.virustotal.com
+2. Sign up or log in
+3. Click profile → **API Key**
+4. Copy API key
+
+**Snyk** (Package Vulnerabilities):
+1. Visit https://snyk.io
+2. Sign up for free account
+3. Navigate to **Settings** → **General**
+4. Copy API token
+
+**Socket.dev** (Supply Chain Security):
+1. Visit https://socket.dev
+2. Sign up for account
+3. Go to **Settings** → **API Keys**
+4. Generate new API key
+
+#### Configuring API Keys
+
+**Method 1: Configuration File** (Recommended)
+
+Edit `%LOCALAPPDATA%\HifzDefend\hifzdefend.toml`:
+
+```toml
+[threat_intel]
+enabled = true
+
+[threat_intel.api_keys]
+abuseipdb = "your_abuseipdb_key_here"
+virustotal = "your_virustotal_key_here"
+snyk = "your_snyk_token_here"
+socket_dev = "your_socket_dev_key_here"
+```
+
+**Method 2: Environment Variables**
+
+Windows PowerShell:
+```powershell
+[System.Environment]::SetEnvironmentVariable('HIFZDEFEND_ABUSEIPDB_KEY', 'your_key', 'User')
+[System.Environment]::SetEnvironmentVariable('HIFZDEFEND_VIRUSTOTAL_KEY', 'your_key', 'User')
+[System.Environment]::SetEnvironmentVariable('HIFZDEFEND_SNYK_TOKEN', 'your_token', 'User')
+[System.Environment]::SetEnvironmentVariable('HIFZDEFEND_SOCKET_DEV_KEY', 'your_key', 'User')
+```
+
+**Method 3: CLI Command**
+
+```bash
+hifzdefend config set threat_intel.api_keys.abuseipdb "your_key"
+hifzdefend config set threat_intel.api_keys.virustotal "your_key"
+hifzdefend config set threat_intel.api_keys.snyk "your_token"
+hifzdefend config set threat_intel.api_keys.socket_dev "your_key"
+```
+
+#### Verify API Keys
+
+```bash
+hifzdefend test-api-keys
+```
+
+Expected output:
+```
+Testing API connections...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AbuseIPDB:   ✓ Connected (1,000/1,000 requests remaining)
+VirusTotal:  ✓ Connected (500/500 daily remaining)
+Snyk:        ✓ Connected (200/200 tests remaining)
+Socket.dev:  ✗ Not configured (skipped)
+```
+
+### 6.2 Optional Dependencies for Advanced Features
+
+Some Phase 1.5 features require additional dependencies:
+
+#### Docker Security Scanner
+
+Requires Docker Desktop to be installed:
+1. Download from https://www.docker.com/products/docker-desktop/
+2. Install Docker Desktop
+3. Start Docker Desktop
+4. Verify: `docker --version`
+
+Enable Docker monitor:
+```toml
+[monitoring.docker]
+enabled = true
+scan_before_run = true
+```
+
+#### YARA Custom Signatures
+
+YARA is automatically installed with HifzDefend. To add custom signatures:
+
+```bash
+# Create custom signatures directory
+mkdir "%LOCALAPPDATA%\HifzDefend\signatures\custom"
+
+# Add your .yar files
+hifzdefend rules add "C:\Path\To\malware.yar"
+
+# List active rules
+hifzdefend rules list
+```
+
+See [CUSTOMIZATION.md](CUSTOMIZATION.md) for detailed YARA guide.
+
+#### Trivy (Docker Image Scanner)
+
+For Docker vulnerability scanning, install Trivy:
+
+Windows (using Chocolatey):
+```powershell
+choco install trivy
+```
+
+Or download from: https://github.com/aquasecurity/trivy/releases
+
+### 6.3 Enable Monitors
+
+Phase 1.5 monitors are disabled by default to reduce resource usage. Enable only what you need:
+
+```toml
+# config/hifzdefend.toml or %LOCALAPPDATA%\HifzDefend\hifzdefend.toml
+
+[monitoring]
+enabled = true
+check_interval = 60  # seconds
+
+# Developer Security (Recommended for developers)
+[monitoring.package_manager]
+enabled = true
+
+[monitoring.docker]
+enabled = true  # Requires Docker Desktop
+
+[monitoring.ide]
+enabled = true
+
+# Behavior-Based Detection (Recommended for all users)
+[monitoring.registry]
+enabled = true
+
+[monitoring.powershell]
+enabled = true
+
+[monitoring.ransomware]
+enabled = true
+
+# Network & Privacy (Recommended for all users)
+[monitoring.network]
+enabled = true
+
+[monitoring.dns]
+enabled = true
+
+[monitoring.hardware]
+enabled = true  # Webcam/mic access alerts
+```
+
+Start monitors:
+```bash
+hifzdefend monitor start
+hifzdefend monitor status
+```
+
+### 6.4 Verify Phase 1.5 Setup
+
+```bash
+# Check monitor status
+hifzdefend monitor status
+
+# Expected output:
+# Monitor Status
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Monitor           | Status  | Events
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# EventBus          | RUNNING | 0
+# PackageMonitor    | RUNNING | 0
+# RegistryMonitor   | RUNNING | 0
+# ...
+
+# Test threat detection
+hifzdefend check-package npm lodash
+
+# View recent alerts
+hifzdefend alerts list
+```
+
+See [USAGE.md](USAGE.md) for complete Phase 1.5 command reference.
+
 ## Advanced Setup
 
 ### Installing ClamAV as Windows Service
@@ -367,9 +574,19 @@ rm -r HifzDefend
 
 ## Next Steps
 
-- Read [USAGE.md](USAGE.md) for CLI usage guide
+**Getting Started:**
+- Read [USAGE.md](USAGE.md) for complete CLI usage guide (27 commands)
+- Review [THREAT_DETECTION.md](THREAT_DETECTION.md) to understand how detection works
+
+**Phase 1.5 Features:**
+- [CUSTOMIZATION.md](CUSTOMIZATION.md) - Add custom YARA rules & whitelists
+- [DEVELOPER_SECURITY.md](DEVELOPER_SECURITY.md) - Protect your development workflow
+- [API_INTEGRATIONS.md](API_INTEGRATIONS.md) - Configure threat intelligence APIs
+
+**Development:**
 - Review [DEVELOPMENT.md](DEVELOPMENT.md) if contributing
 - Check [SECURITY.md](SECURITY.md) for security best practices
+- Read [TESTING.md](TESTING.md) for writing tests
 
 ## Support
 

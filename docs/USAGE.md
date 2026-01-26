@@ -6,6 +6,13 @@ Complete guide to using HifzDefend for malware scanning and quarantine managemen
 - [CLI Commands](#cli-commands)
 - [Scanning](#scanning)
 - [Quarantine Management](#quarantine-management)
+- [Security Monitoring (Phase 1.5)](#security-monitoring-phase-15)
+  - [Monitor Management](#monitor-management)
+  - [Alert Management](#alert-management)
+  - [Custom Rules Management](#custom-rules-management)
+  - [Threat Intelligence Checks](#threat-intelligence-checks)
+  - [Application Whitelist](#application-whitelist)
+- [Status and Maintenance](#status-and-maintenance)
 - [Configuration](#configuration)
 - [Logs and Reports](#logs-and-reports)
 - [Tips and Best Practices](#tips-and-best-practices)
@@ -18,12 +25,44 @@ hifzdefend [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### Available Commands
+
+**Basic Commands:**
 - `scan` - Scan files or directories
 - `status` - Display system status
 - `update` - Update virus definitions
 - `quarantine` - Manually quarantine a file
 - `list-quarantine` - List quarantined files
 - `config-show` - Display current configuration
+
+**Monitoring Commands (Phase 1.5):**
+- `monitor` - Manage security monitors
+  - `monitor start` - Start all enabled monitors
+  - `monitor stop` - Stop all monitors
+  - `monitor status` - Display monitor status
+  - `monitor enable <name>` - Enable specific monitor
+  - `monitor disable <name>` - Disable specific monitor
+
+**Alert Commands:**
+- `alerts` - Manage security alerts
+  - `alerts list` - List recent security alerts
+  - `alerts clear` - Clear alert history
+
+**Rules Commands:**
+- `rules` - Manage custom detection rules
+  - `rules list` - List active detection rules
+  - `rules add <file>` - Add custom YARA rule
+  - `rules remove <name>` - Remove custom rule
+
+**Threat Intelligence Commands:**
+- `threat-intel` - Check threat intelligence
+  - `threat-intel check ip <address>` - Check IP reputation
+  - `threat-intel check file <hash>` - Check file hash reputation
+  - `threat-intel check package <name>` - Check package security
+
+**Whitelist Commands:**
+- `whitelist` - Manage application whitelist
+  - `whitelist add <path>` - Add application to whitelist
+  - `whitelist remove <path>` - Remove application from whitelist
 
 ### Global Options
 - `--version` - Show version and exit
@@ -166,6 +205,280 @@ Quarantined files:
 - Are read-only (chmod 0444)
 - Cannot be executed
 - Named with UUID for safety
+
+## Security Monitoring (Phase 1.5)
+
+### Monitor Management
+
+#### Start All Monitors
+```bash
+hifzdefend monitor start
+```
+
+**Output:**
+```
+Starting Security Monitors
+
+✓ All monitors started
+
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━┓
+┃ Monitor            ┃ Status   ┃ Events ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━┩
+│ package_monitor    │ Running  │ 0      │
+│ docker_monitor     │ Running  │ 0      │
+│ registry_monitor   │ Running  │ 0      │
+└────────────────────┴──────────┴────────┘
+
+Note: Monitors running in background. Use 'hifzdefend monitor stop' to stop.
+```
+
+#### Stop All Monitors
+```bash
+hifzdefend monitor stop
+```
+
+**Output:**
+```
+Stopping Security Monitors
+
+✓ All monitors stopped
+```
+
+#### Check Monitor Status
+```bash
+hifzdefend monitor status
+```
+
+**Output:**
+```
+Monitor Status
+
+Event Bus:
+  Status: Running
+  Events processed: 42
+  Queue size: 0
+
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Monitor              ┃ Status   ┃ Enabled ┃ Events ┃ Last Check       ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
+│ package_monitor      │ Running  │ Yes     │ 5      │ 2026-01-25 14:30 │
+│ docker_monitor       │ Running  │ Yes     │ 2      │ 2026-01-25 14:29 │
+│ registry_monitor     │ Running  │ Yes     │ 0      │ 2026-01-25 14:28 │
+│ powershell_monitor   │ Stopped  │ No      │ 0      │ Never            │
+└──────────────────────┴──────────┴─────────┴────────┴──────────────────┘
+```
+
+#### Enable/Disable Monitors
+```bash
+# Enable a monitor
+hifzdefend monitor enable package_monitor
+
+# Disable a monitor
+hifzdefend monitor disable powershell_monitor
+```
+
+**Note:** Currently requires manual configuration file editing. Future versions will support runtime configuration.
+
+### Alert Management
+
+#### List Recent Alerts
+```bash
+# List all recent alerts
+hifzdefend alerts list
+
+# Limit number of alerts
+hifzdefend alerts list --limit 10
+
+# Filter by severity
+hifzdefend alerts list --severity critical
+```
+
+**Output:**
+```
+Security Alerts
+
+2026-01-25 14:30:45 WARNING package_monitor: Potentially malicious package installed: evil-package@1.0.0
+2026-01-25 14:25:12 CRITICAL ransomware_monitor: Mass file encryption detected in C:\Users\YourName\Documents
+2026-01-25 14:20:33 INFO docker_monitor: Container started: nginx:latest
+```
+
+**Note:** Alerts are currently logged to `hifzdefend.log`. Future versions will have dedicated alert storage.
+
+#### Clear Alert History
+```bash
+hifzdefend alerts clear
+```
+
+### Custom Rules Management
+
+#### List Active Rules
+```bash
+hifzdefend rules list
+```
+
+**Output:**
+```
+Active Detection Rules
+
+YARA Rules:
+  Custom signatures path: C:\Users\...\HifzDefend\signatures\custom
+
+File Blocking Rules:
+  Status: Enabled
+  Blocked extensions: .scr, .pif, .bat
+  Context-aware: True
+
+Application Whitelist:
+  Mode: Blacklist
+  Whitelisted apps: 3
+```
+
+#### Add Custom YARA Rule
+```bash
+hifzdefend rules add path/to/custom_rule.yar
+```
+
+**Example YARA Rule:**
+```yara
+rule SuspiciousPowerShell {
+    meta:
+        description = "Detects obfuscated PowerShell"
+        author = "Your Name"
+        date = "2026-01-25"
+
+    strings:
+        $s1 = "IEX" ascii
+        $s2 = "DownloadString" ascii
+        $s3 = "New-Object Net.WebClient" ascii
+
+    condition:
+        2 of ($s*)
+}
+```
+
+**Output:**
+```
+Adding Custom Rule
+Rule file: path/to/custom_rule.yar
+
+✓ Rule added: custom_rule.yar
+
+Note: Restart monitors for changes to take effect
+```
+
+#### Remove Custom Rule
+```bash
+hifzdefend rules remove custom_rule.yar
+```
+
+**Output:**
+```
+Removing Custom Rule
+Rule: custom_rule.yar
+
+✓ Rule removed: custom_rule.yar
+
+Note: Restart monitors for changes to take effect
+```
+
+### Threat Intelligence Checks
+
+#### Check IP Reputation
+```bash
+hifzdefend threat-intel check ip 1.2.3.4
+```
+
+**Output:**
+```
+Threat Intelligence Check
+Type: ip
+Value: 1.2.3.4
+
+Results:
+Source: abuseipdb
+Threat Level: CRITICAL
+Threat Score: 90/100
+
+Details:
+  is_whitelisted: False
+  is_tor: False
+  total_reports: 150
+  country_code: XX
+  isp: Unknown ISP
+```
+
+#### Check File Hash Reputation
+```bash
+hifzdefend threat-intel check file a1b2c3d4e5f6...
+```
+
+**Output:**
+```
+Threat Intelligence Check
+Type: file
+Value: a1b2c3d4e5f6...
+
+Results:
+Source: virustotal
+Threat Level: MALICIOUS
+Threat Score: 75/100
+
+Details:
+  malicious: 45
+  suspicious: 5
+  undetected: 20
+  total_engines: 70
+```
+
+#### Check Package Security
+```bash
+# Check npm package
+hifzdefend threat-intel check package lodash@4.17.0
+
+# Check PyPI package
+hifzdefend threat-intel check package requests==2.28.0
+```
+
+**Output:**
+```
+Threat Intelligence Check
+Type: package
+Value: lodash@4.17.0
+
+Results:
+Source: snyk
+Threat Level: MALICIOUS
+Threat Score: 60/100
+
+Details:
+  vulnerability_count: 2
+  severity_counts: {'high': 1, 'medium': 1}
+```
+
+### Application Whitelist
+
+#### Add Application to Whitelist
+```bash
+hifzdefend whitelist add "C:\Program Files\TrustedApp\app.exe"
+```
+
+**Output:**
+```
+Adding to Whitelist
+Application: C:\Program Files\TrustedApp\app.exe
+
+Note: Configuration persistence not yet implemented
+To whitelist, add to your configuration file:
+  [rules.app_whitelist]
+  whitelisted_apps = [
+    "C:\Program Files\TrustedApp\app.exe",
+  ]
+```
+
+#### Remove Application from Whitelist
+```bash
+hifzdefend whitelist remove "C:\Program Files\TrustedApp\app.exe"
+```
 
 ## Status and Maintenance
 

@@ -1,17 +1,25 @@
 """
 Pytest configuration and fixtures.
+
+Provides common fixtures for both Phase 1 and Phase 1.5 testing:
+- Phase 1: Scanner, engine, EICAR test files
+- Phase 1.5: Event bus, monitors, threat intelligence, rules engine
 """
 
+import asyncio
 import os
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import Any, Dict
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from hifzdefend.config.loader import HifzDefendConfig, ClamAVConfig
 from hifzdefend.core.scanner import ClamAVScanner
 from hifzdefend.core.engine import ScanEngine
+from hifzdefend.monitoring.event_bus import Event, EventBus, EventType
 
 
 @pytest.fixture
@@ -111,6 +119,165 @@ def mock_clamav_config():
     return ClamAVConfig(host="localhost", port=3310, timeout=30)
 
 
+# Phase 1.5 Fixtures
+
+@pytest.fixture
+def monitoring_config(temp_dir):
+    """Configuration with monitoring enabled."""
+    config = HifzDefendConfig()
+
+    # Override paths
+    config.logging.log_dir = str(temp_dir / "logs")
+    config.reporting.report_dir = str(temp_dir / "reports")
+    config.quarantine.quarantine_dir = str(temp_dir / "quarantine")
+
+    # Enable monitoring
+    config.monitoring.enabled = True
+    config.monitoring.check_interval = 1  # Fast interval for tests
+
+    return config
+
+
+@pytest.fixture
+def event_bus():
+    """Event bus instance for testing."""
+    bus = EventBus()
+    yield bus
+
+    # Cleanup
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.create_task(bus.stop())
+        else:
+            asyncio.run(bus.stop())
+    except Exception:
+        pass
+
+
+@pytest.fixture
+async def async_event_bus():
+    """Async event bus fixture."""
+    bus = EventBus()
+    yield bus
+    await bus.stop()
+
+
+@pytest.fixture
+def sample_event() -> Event:
+    """Sample event for testing."""
+    return Event(
+        event_type=EventType.THREAT_DETECTED,
+        severity="warning",
+        source_monitor="test_monitor",
+        data={"test": "data"},
+        threat_score=50,
+    )
+
+
+@pytest.fixture
+def sample_threat_event() -> Event:
+    """Sample high-threat event."""
+    return Event(
+        event_type=EventType.THREAT_DETECTED,
+        severity="critical",
+        source_monitor="test_monitor",
+        data={
+            "threat_type": "malware",
+            "file_path": "/tmp/malicious.exe",
+        },
+        threat_score=95,
+    )
+
+
+@pytest.fixture
+def sample_clean_event() -> Event:
+    """Sample clean event."""
+    return Event(
+        event_type=EventType.FILE_MODIFIED,
+        severity="info",
+        source_monitor="file_monitor",
+        data={"file_path": "/tmp/document.txt"},
+        threat_score=0,
+    )
+
+
+@pytest.fixture
+def mock_threat_intel_manager():
+    """Mock ThreatIntelligenceManager."""
+    manager = MagicMock()
+    manager.check_ip_reputation = AsyncMock(return_value={
+        "source": "test",
+        "threat_level": "clean",
+        "threat_score": 0,
+    })
+    manager.check_file_reputation = AsyncMock(return_value={
+        "source": "test",
+        "threat_level": "clean",
+        "threat_score": 0,
+    })
+    manager.check_package_security = AsyncMock(return_value={
+        "source": "test",
+        "threat_level": "clean",
+        "threat_score": 0,
+    })
+    manager.close = AsyncMock()
+    return manager
+
+
+@pytest.fixture
+def mock_rules_engine():
+    """Mock RulesEngine."""
+    engine = MagicMock()
+    engine.compile_rules = MagicMock()
+    engine.scan_with_rules = MagicMock(return_value=[])
+    engine.should_block_file = MagicMock(return_value=False)
+    engine.is_whitelisted_app = MagicMock(return_value=False)
+    return engine
+
+
+@pytest.fixture
+def mock_monitor_manager():
+    """Mock MonitorManager."""
+    manager = MagicMock()
+    manager.start_all = AsyncMock()
+    manager.stop_all = AsyncMock()
+    manager.get_status = MagicMock(return_value={
+        "event_bus": {"running": True, "events_processed": 0},
+        "package_monitor": {"running": True, "enabled": True, "events_generated": 0},
+    })
+    return manager
+
+
+class EventCollector:
+    """Helper class to collect events in tests."""
+
+    def __init__(self):
+        self.events: list[Event] = []
+
+    def handle_event(self, event: Event):
+        self.events.append(event)
+
+    def clear(self):
+        self.events.clear()
+
+    def get_by_type(self, event_type: EventType) -> list[Event]:
+        return [e for e in self.events if e.event_type == event_type]
+
+    def get_by_severity(self, severity: str) -> list[Event]:
+        return [e for e in self.events if e.severity == severity]
+
+
+@pytest.fixture
+def event_collector():
+    """Event collector for testing."""
+    return EventCollector()
+
+
+# EICAR test string (standard antivirus test)
+EICAR_STRING = r"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+
+
 # Markers
 def pytest_configure(config):
     """Register custom markers."""
@@ -123,4 +290,16 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         "requires_clamav: marks tests that require ClamAV daemon running",
+    )
+    config.addinivalue_line(
+        "markers", "benchmark: marks tests as performance benchmarks"
+    )
+    config.addinivalue_line(
+        "markers", "requires_admin: marks tests requiring administrator privileges"
+    )
+    config.addinivalue_line(
+        "markers", "requires_docker: marks tests requiring Docker to be running"
+    )
+    config.addinivalue_line(
+        "markers", "requires_api_keys: marks tests requiring external API keys"
     )
