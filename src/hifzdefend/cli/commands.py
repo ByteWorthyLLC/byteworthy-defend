@@ -142,6 +142,81 @@ def print_api_error_with_hints(error: Exception, context: str = ""):
     console.print("\n[cyan]Still need help?[/cyan] See docs/TROUBLESHOOTING.md")
 
 
+def validate_resource_value(resource_type: str, resource_value: str) -> tuple[bool, str]:
+    """
+    Validate resource value based on type (IP, file hash, or package).
+
+    Args:
+        resource_type: Type of resource (ip, file, package)
+        resource_value: Value to validate
+
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    import re
+
+    if resource_type == "ip":
+        # Validate IPv4 address
+        ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
+        if not re.match(ipv4_pattern, resource_value):
+            return False, "Invalid IPv4 address format (expected: x.x.x.x)"
+
+        # Validate octets are in range 0-255
+        octets = resource_value.split('.')
+        if not all(0 <= int(octet) <= 255 for octet in octets):
+            return False, "IPv4 octets must be between 0 and 255"
+
+    elif resource_type == "file":
+        # Validate file hash (SHA256 = 64 hex chars, MD5 = 32 hex chars, SHA1 = 40 hex chars)
+        if not re.match(r'^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$', resource_value):
+            return False, "Invalid file hash (expected: MD5, SHA1, or SHA256 hex string)"
+
+    elif resource_type == "package":
+        # Validate package name format (name@version or @scope/name@version)
+        # Allow alphanumeric, hyphens, underscores, dots, slashes for scoped packages
+        package_pattern = r'^(@?[a-zA-Z0-9_\-\.\/]+)(@[a-zA-Z0-9_\-\.]+)?$'
+        if not re.match(package_pattern, resource_value):
+            return False, "Invalid package format (expected: package@version or @scope/package@version)"
+
+        # Check for suspicious patterns
+        suspicious_patterns = ['..', '//', '\\', '<', '>', '|', '&', ';', '`']
+        if any(pattern in resource_value for pattern in suspicious_patterns):
+            return False, "Package name contains suspicious characters"
+
+    return True, ""
+
+
+def validate_threat_name(threat_name: str) -> tuple[bool, str]:
+    """
+    Validate threat name to prevent path traversal and command injection.
+
+    Args:
+        threat_name: Threat name to validate
+
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    import re
+
+    # Limit length
+    if len(threat_name) > 200:
+        return False, "Threat name too long (max 200 characters)"
+
+    # Check for path traversal patterns
+    if '..' in threat_name or '/' in threat_name or '\\' in threat_name:
+        return False, "Threat name cannot contain path separators or '..'"
+
+    # Allow only alphanumeric, spaces, hyphens, underscores, dots, parentheses
+    if not re.match(r'^[a-zA-Z0-9 _\-\.\(\)]+$', threat_name):
+        return False, "Threat name contains invalid characters (only alphanumeric, spaces, -_.() allowed)"
+
+    # Check for null bytes
+    if '\x00' in threat_name:
+        return False, "Threat name contains null bytes"
+
+    return True, ""
+
+
 @click.group()
 @click.version_option(version="0.2.0", prog_name="HifzDefend")
 def cli():
@@ -337,6 +412,14 @@ def update():
 def quarantine(file_path: str, threat_name: str):
     """Manually quarantine a file."""
     try:
+        # Validate threat name to prevent path traversal and injection
+        is_valid, error_msg = validate_threat_name(threat_name)
+        if not is_valid:
+            console.print(f"[bold red]ERROR:[/bold red] Invalid threat name: {error_msg}")
+            console.print("\n[yellow]Example:[/yellow]")
+            console.print("  hifzdefend quarantine suspicious.exe --threat-name \"Trojan.Generic\"")
+            return
+
         config = get_config()
 
         console.print(f"\n[bold cyan]Quarantine File[/bold cyan]")
@@ -799,6 +882,19 @@ def check(resource_type: str, resource_value: str):
     import asyncio
 
     try:
+        # Validate resource value before processing
+        is_valid, error_msg = validate_resource_value(resource_type, resource_value)
+        if not is_valid:
+            console.print(f"[bold red]ERROR:[/bold red] {error_msg}")
+            console.print("\n[yellow]Examples:[/yellow]")
+            if resource_type == "ip":
+                console.print("  hifzdefend threat-intel check ip 1.2.3.4")
+            elif resource_type == "file":
+                console.print("  hifzdefend threat-intel check file a1b2c3d4...")
+            elif resource_type == "package":
+                console.print("  hifzdefend threat-intel check package lodash@4.17.21")
+            return
+
         config = get_config()
 
         console.print(f"\n[bold cyan]Threat Intelligence Check[/bold cyan]")

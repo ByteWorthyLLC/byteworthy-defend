@@ -209,10 +209,24 @@ class ClaudeConfig(BaseModel):
         Returns:
             Resolved API key
         """
+        import logging
+
         api_key = self.api_key
+
+        # Check if using environment variable (recommended)
         if api_key.startswith("${") and api_key.endswith("}"):
             env_var = api_key[2:-1]
             api_key = os.environ.get(env_var, "")
+        else:
+            # Warn if API key is hardcoded in config file (security risk)
+            if api_key and api_key.startswith("sk-ant-"):
+                logger = logging.getLogger(__name__)
+                logger.warning(
+                    "API key is stored directly in config file. "
+                    "This is less secure than using environment variables. "
+                    "Recommended: Set api_key='${CLAUDE_API_KEY}' in config and use environment variable instead."
+                )
+
         return api_key
 
 
@@ -300,6 +314,33 @@ def find_config_file() -> Optional[Path]:
     return None
 
 
+def _ensure_config_permissions(config_path: Path) -> None:
+    """
+    Ensure config file has restrictive permissions (owner read/write only).
+
+    Args:
+        config_path: Path to configuration file
+
+    Note:
+        This is a best-effort operation. Warnings are logged on failure.
+    """
+    import logging
+    import stat
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Set permissions to 0o600 (rw-------)
+        # Owner can read/write, no access for group/others
+        os.chmod(config_path, stat.S_IRUSR | stat.S_IWUSR)
+        logger.debug(f"Set restrictive permissions on config file: {config_path}")
+    except Exception as e:
+        logger.warning(
+            f"Could not set restrictive permissions on config file {config_path}: {e}. "
+            f"Consider setting file permissions manually to prevent unauthorized access."
+        )
+
+
 def load_config(config_path: Optional[Path] = None) -> HifzDefendConfig:
     """
     Load configuration from TOML file.
@@ -331,6 +372,9 @@ def load_config(config_path: Optional[Path] = None) -> HifzDefendConfig:
         raise ConfigurationError(f"Permission denied reading config: {config_path}")
     except Exception as e:
         raise ConfigurationError(f"Failed to parse TOML config: {e}")
+
+    # Enforce restrictive permissions on config file (security best practice)
+    _ensure_config_permissions(config_path)
 
     # Validate with Pydantic
     try:
