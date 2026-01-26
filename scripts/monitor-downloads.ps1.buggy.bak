@@ -1,0 +1,67 @@
+﻿# Monitor Downloads Folder for New Files
+$downloadsPath = Join-Path $env:USERPROFILE "Downloads"
+$hifzDefendScript = "C:\Users\richa\Documents\HifzDefend\hifzdefend.ps1"
+$logFile = "$env:LOCALAPPDATA\HifzDefend\logs\downloads-monitor.log"
+
+# Ensure log directory exists
+$logDir = Split-Path -Parent $logFile
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+}
+
+# Log function
+function Write-Log {
+    param($Message)
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    "$timestamp - $Message" | Out-File -Append -FilePath $logFile
+}
+
+Write-Log "Starting downloads folder monitoring..."
+
+# Get files modified in last hour
+$cutoffTime = (Get-Date).AddHours(-1)
+$newFiles = Get-ChildItem -Path $downloadsPath -File -Recurse -ErrorAction SilentlyContinue |
+    Where-Object { $_.LastWriteTime -gt $cutoffTime }
+
+if ($newFiles) {
+    Write-Log "Found $($newFiles.Count) new files in Downloads folder"
+
+    foreach ($file in $newFiles) {
+        Write-Log "Analyzing: $($file.Name)"
+
+        # Analyze executable files, scripts, and archives
+        if ($file.Extension -match '\.(exe|msi|ps1|bat|cmd|vbs|js|py|zip|rar|7z)$') {
+            try {
+                # Run analysis (suppress output, log to file)
+                $result = & powershell.exe -ExecutionPolicy Bypass -File $hifzDefendScript analyze-script $file.FullName 2>&1
+
+                # Check for threats in output
+                if ($result -match 'MALICIOUS|SUSPICIOUS') {
+                    Write-Log "WARNING: Potential threat detected in $($file.Name)!"
+
+                    # Send Windows notification
+                    $notificationParams = @{
+                        ToastTitle = "HifzDefend Alert"
+                        ToastText = "Suspicious file detected: $($file.Name)"
+                    }
+                    # Note: Would use BurntToast module in production
+
+                    # Quarantine file
+                    & powershell.exe -ExecutionPolicy Bypass -File $hifzDefendScript quarantine $file.FullName --threat-name "Auto-detected-threat"
+                    Write-Log "File quarantined: $($file.Name)"
+                }
+                else {
+                    Write-Log "File appears safe: $($file.Name)"
+                }
+            }
+            catch {
+                Write-Log "ERROR analyzing $($file.Name): $_"
+            }
+        }
+    }
+}
+else {
+    Write-Log "No new files in Downloads folder"
+}
+
+Write-Log "Monitoring complete"
