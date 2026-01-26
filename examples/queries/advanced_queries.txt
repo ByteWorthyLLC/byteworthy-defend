@@ -1,0 +1,246 @@
+# ============================================================================
+# HifzDefend - Advanced Natural Language Queries
+# ============================================================================
+# Complex, multi-part queries for experienced users who want detailed analysis.
+#
+# Usage: hifzdefend query "<question>"
+# ============================================================================
+
+# ==========================
+# Complex Threat Analysis
+# ==========================
+
+analyze the correlation between PowerShell alerts and network anomalies today
+show me all threats that used obfuscation techniques this week
+identify malware families detected in the last 30 days
+what's the attack chain for threats detected today?
+correlate file downloads with subsequent malicious activity
+
+# ==========================
+# Behavioral Analysis
+# ==========================
+
+show me all scripts that attempted to disable security features
+what processes exhibited cryptominer-like behavior?
+identify scripts with ransomware characteristics
+show me obfuscated commands that were executed
+what processes tried to establish C2 connections?
+
+# ==========================
+# Pattern Detection
+# ==========================
+
+identify common IoCs across multiple threats this month
+what persistence mechanisms were used by detected malware?
+show me all scripts using base64 encoding
+what network patterns indicate data exfiltration?
+identify threats using similar TTPs (Tactics, Techniques, Procedures)
+
+# ==========================
+# Forensic Investigation
+# ==========================
+
+trace the infection vector for today's malware detections
+show me the timeline of events leading to the ransomware detection
+what files were modified by the detected trojan?
+reconstruct the attack path from initial compromise to detection
+analyze the lateral movement attempts in the last incident
+
+# ==========================
+# Risk Assessment
+# ==========================
+
+what's the risk score distribution of detected threats?
+identify the most targeted assets this month
+what vulnerabilities were exploited by detected threats?
+assess the potential impact of quarantined threats
+which threats posed the highest data loss risk?
+
+# ==========================
+# Threat Intelligence
+# ==========================
+
+what external IPs contacted my system today?
+show me threats matching known APT campaigns
+identify zero-day exploitation attempts
+what malware variants were detected this week?
+correlate my detections with global threat intelligence
+
+# ==========================
+# Anomaly Detection
+# ==========================
+
+show me unusual PowerShell execution patterns
+identify abnormal network traffic spikes
+what processes ran with elevated privileges unexpectedly?
+detect outliers in file access patterns
+show me anomalous registry modifications
+
+# ==========================
+# Advanced Filtering
+# ==========================
+
+show me high-severity PowerShell threats that established network connections
+list all quarantined files larger than 1MB from today
+show me threats detected between 2AM and 6AM this week
+filter alerts by signature confidence score above 90%
+show me cryptominers running on more than 4 CPU cores
+
+# ==========================
+# Comparative Analysis
+# ==========================
+
+compare today's threat landscape with the 30-day average
+show me which threat types increased in frequency this month
+analyze the effectiveness of detection rules over time
+compare AI detection accuracy vs signature-based detection
+show me which attack vectors are trending upward
+
+# ==========================
+# Incident Response
+# ==========================
+
+generate an incident summary for all threats detected in the last hour
+what containment actions were taken for the latest ransomware?
+show me the blast radius of the cryptominer infection
+identify all affected systems from today's compromise
+generate IOC list for external sharing
+
+# ==========================
+# Performance Analysis
+# ==========================
+
+what's the average detection latency for PowerShell scripts?
+show me false positive rates by detection method
+analyze resource consumption of AI analysis
+compare scan times for different file sizes
+evaluate cache hit rates for AI queries
+
+# ==========================
+# Advanced Statistics
+# ==========================
+
+calculate threat detection rate per hour over the last week
+show me the distribution of threats by MITRE ATT&CK techniques
+analyze the seasonal variation in crypto miner detections
+generate a threat frequency histogram by day of week
+calculate mean time to detect (MTTD) for different threat types
+
+# ==========================
+# Multi-Criteria Analysis
+# ==========================
+
+show me PowerShell scripts from untrusted sources that accessed sensitive directories and established network connections in the last 24 hours
+
+identify threats that:
+- Used obfuscation
+- Attempted persistence
+- Contacted external IPs
+- Were detected in the last week
+
+list all high-severity alerts where:
+- Detection confidence > 85%
+- Multiple security products flagged the file
+- File was not signed
+- Originated from downloads folder
+
+# ==========================
+# Predictive Queries
+# ==========================
+
+based on recent trends, what threats should I watch for?
+predict the likelihood of ransomware attacks this month
+identify systems most vulnerable to future attacks
+what attack vectors are likely to be exploited soon?
+forecast resource requirements for next month's threat landscape
+
+# ==========================
+# Root Cause Analysis
+# ==========================
+
+what was the initial access vector for the malware campaign?
+trace back the origin of the obfuscated PowerShell execution
+identify the vulnerability that led to the compromise
+show me the privilege escalation path used by the attacker
+what configuration weakness enabled the malware installation?
+
+# ==========================
+# Advanced Correlation
+# ==========================
+
+correlate user behavior with threat detections
+link file downloads to subsequent malicious execution
+connect registry changes with malware persistence
+associate network anomalies with data exfiltration attempts
+map process relationships for detected threats
+
+# ==========================
+# Optimization Queries
+# ==========================
+
+which detection rules have the highest false positive rates?
+what file types consume the most analysis resources?
+identify redundant security checks
+suggest optimization for scan performance
+analyze cost vs accuracy tradeoffs in current configuration
+
+# ==========================
+# Compliance and Reporting
+# ==========================
+
+generate a compliance report for SOC2 audit requirements
+show me all security events that require GDPR notification
+create an executive summary of this month's security posture
+list all threats that would trigger regulatory reporting
+generate evidence collection for forensic analysis
+
+# ==========================
+# Threat Hunting
+# ==========================
+
+hunt for signs of living-off-the-land (LOTL) techniques
+search for indicators of fileless malware
+identify suspicious PowerShell remoting activity
+look for signs of reconnaissance activities
+detect lateral movement patterns
+
+# ==========================
+# USAGE NOTES
+# ==========================
+
+# These queries are more computationally expensive:
+# - May cost $0.005-0.015 per query
+# - May take 10-30 seconds to process
+# - Require more context and historical data
+# - Benefit greatly from caching
+
+# Best practices:
+# 1. Be as specific as possible
+# 2. Include time ranges to scope the query
+# 3. Combine multiple criteria for better insights
+# 4. Use follow-up queries to drill down
+# 5. Cache common analytical queries
+
+# ==========================
+# SAMPLE WORKFLOW
+# ==========================
+
+# Investigation workflow example:
+
+# Step 1: Broad overview
+# "show me all threats detected today"
+
+# Step 2: Identify patterns
+# "what's common between the PowerShell threats?"
+
+# Step 3: Deep dive
+# "analyze the obfuscation techniques used in script XYZ"
+
+# Step 4: Correlation
+# "did any of these threats communicate with the same C2 server?"
+
+# Step 5: Risk assessment
+# "what's the potential impact if this malware had not been detected?"
+
+# Step 6: Recommendations
+# "what additional protections should I implement based on these findings?"

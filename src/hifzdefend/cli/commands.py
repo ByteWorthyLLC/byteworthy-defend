@@ -41,7 +41,104 @@ except (ImportError, Exception):
     NaturalLanguageInterface = None  # type: ignore
 
 
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
+
+
+# Helper functions for consistent error messaging
+def print_ai_not_available_error():
+    """Print error message when AI features are not available."""
+    console.print("[bold red]ERROR:[/bold red] AI features not available")
+    console.print("\n[yellow]To enable AI features:[/yellow]")
+    console.print("  1. Install dependencies:")
+    console.print("     pip install anthropic chromadb sentence-transformers")
+    console.print("  2. Get Claude API key from:")
+    console.print("     https://console.anthropic.com/settings/keys")
+    console.print("  3. Set environment variable:")
+    console.print("     $env:CLAUDE_API_KEY = 'sk-ant-api03-...'")
+    console.print("\n[cyan]Need help?[/cyan] See docs/AI_USAGE.md")
+
+
+def print_api_key_not_set_error():
+    """Print error message when Claude API key is not set."""
+    console.print("[bold red]ERROR:[/bold red] Claude API key not set")
+    console.print("\n[yellow]To set your API key:[/yellow]")
+    console.print("  1. Get a key from: https://console.anthropic.com/settings/keys")
+    console.print("  2. Set it temporarily:")
+    console.print("     $env:CLAUDE_API_KEY = 'sk-ant-api03-...'")
+    console.print("  3. Or set it permanently (Windows):")
+    console.print("     [Environment]::SetEnvironmentVariable('CLAUDE_API_KEY', 'sk-ant-api03-...', 'User')")
+    console.print("\n[cyan]Need help?[/cyan] See docs/QUICKSTART.md")
+
+
+def validate_api_key(api_key: str) -> tuple[bool, str]:
+    """
+    Validate Claude API key format.
+
+    Returns:
+        (is_valid, error_message)
+    """
+    if not api_key:
+        return False, "API key is empty"
+
+    if not api_key.startswith("sk-ant-"):
+        return False, "API key must start with 'sk-ant-'"
+
+    if len(api_key) < 20:
+        return False, "API key is too short (seems invalid)"
+
+    return True, ""
+
+
+def print_api_key_invalid_error(reason: str):
+    """Print error message when API key format is invalid."""
+    console.print(f"[bold red]ERROR:[/bold red] Invalid API key format: {reason}")
+    console.print("\n[yellow]Valid API key format:[/yellow]")
+    console.print("  - Must start with: sk-ant-")
+    console.print("  - Example: sk-ant-api03-...")
+    console.print("\n[yellow]Get a valid key from:[/yellow]")
+    console.print("  https://console.anthropic.com/settings/keys")
+    console.print("\n[cyan]Need help?[/cyan] See docs/TROUBLESHOOTING.md")
+
+
+def print_api_error_with_hints(error: Exception, context: str = ""):
+    """Print API error with troubleshooting hints."""
+    error_str = str(error).lower()
+
+    console.print(f"[bold red]ERROR:[/bold red] {context}: {error}")
+    console.print("\n[yellow]Troubleshooting:[/yellow]")
+
+    # Authentication errors
+    if "authentication" in error_str or "401" in error_str or "unauthorized" in error_str:
+        console.print("  • Your API key is invalid or expired")
+        console.print("  • Get a new key: https://console.anthropic.com/settings/keys")
+        console.print("  • Verify with: hifzdefend ai test")
+
+    # Rate limit errors
+    elif "rate limit" in error_str or "429" in error_str:
+        console.print("  • You've exceeded the API rate limit")
+        console.print("  • Wait a few minutes and try again")
+        console.print("  • Check usage: hifzdefend ai stats")
+        console.print("  • Adjust rate limit in config: max_requests_per_hour")
+
+    # Network errors
+    elif "timeout" in error_str or "connection" in error_str or "network" in error_str:
+        console.print("  • Check your internet connection")
+        console.print("  • Firewall may be blocking the connection")
+        console.print("  • Check Anthropic status: https://status.anthropic.com")
+
+    # Quota/billing errors
+    elif "quota" in error_str or "billing" in error_str or "payment" in error_str:
+        console.print("  • Your account may have exceeded its quota")
+        console.print("  • Check billing: https://console.anthropic.com/settings/billing")
+        console.print("  • Add payment method if needed")
+
+    # Generic fallback
+    else:
+        console.print("  • Test connection: hifzdefend ai test")
+        console.print("  • Check API status: https://status.anthropic.com")
+        console.print("  • View docs: docs/TROUBLESHOOTING.md")
+
+    console.print("\n[cyan]Still need help?[/cyan] See docs/TROUBLESHOOTING.md")
 
 
 @click.group()
@@ -79,8 +176,13 @@ def scan(path: str, save_report: bool):
                     "[bold red]ERROR:[/bold red] Cannot connect to ClamAV daemon"
                 )
                 console.print(
-                    f"Ensure clamd is running on {config.clamav.host}:{config.clamav.port}"
+                    f"Expected at: {config.clamav.host}:{config.clamav.port}"
                 )
+                console.print("\n[yellow]ClamAV is required for file scanning[/yellow]")
+                console.print("  Download: https://www.clamav.net/downloads")
+                console.print("  Or use AI features instead (no ClamAV needed):")
+                console.print("    hifzdefend analyze-script <file.ps1>")
+                console.print("\n[cyan]Need help?[/cyan] See docs/TROUBLESHOOTING.md")
                 return
 
             # Perform scan with progress
@@ -106,7 +208,7 @@ def scan(path: str, save_report: bool):
             console.print(f"Duration: {report.duration:.2f} seconds")
 
             if report.has_threats:
-                console.print(f"\n[bold red]⚠ Threats found: {report.threats_count}[/bold red]")
+                console.print(f"\n[bold red][WARNING] Threats found: {report.threats_count}[/bold red]")
 
                 # Display threats table
                 table = Table(title="Detected Threats")
@@ -123,7 +225,7 @@ def scan(path: str, save_report: bool):
 
                 console.print(table)
             else:
-                console.print("\n[bold green]✓ No threats detected[/bold green]")
+                console.print("\n[bold green][OK] No threats detected[/bold green]")
 
             # Save report if requested
             if save_report or report.has_threats:
@@ -154,21 +256,26 @@ def status():
         # Check ClamAV connection
         with ScanEngine(config) as engine:
             if engine.check_connection():
-                console.print("[bold green]✓[/bold green] ClamAV daemon: Running")
+                console.print("[bold green][OK][/bold green] ClamAV daemon: Running")
 
                 # Get version
                 version = engine.get_version()
                 if version:
                     console.print(f"[bold]Version:[/bold] {version}")
             else:
-                console.print("[bold red]✗[/bold red] ClamAV daemon: Not running")
+                console.print("[bold red][FAIL][/bold red] ClamAV daemon: Not running")
                 console.print(
                     f"  Expected at: {config.clamav.host}:{config.clamav.port}"
                 )
-                console.print("\n[yellow]Troubleshooting:[/yellow]")
-                console.print("  1. Ensure clamd.exe is running")
-                console.print("  2. Check configuration in clamd.conf")
-                console.print("  3. Verify TCPSocket is enabled on port 3310")
+                console.print("\n[yellow]Note:[/yellow] ClamAV is OPTIONAL for AI features")
+                console.print("  AI script analysis works WITHOUT ClamAV")
+                console.print("  ClamAV is only needed for traditional antivirus scanning")
+                console.print("\n[yellow]If you want to use ClamAV:[/yellow]")
+                console.print("  1. Download from: https://www.clamav.net/downloads")
+                console.print("  2. Ensure clamd.exe is running")
+                console.print("  3. Check configuration in clamd.conf")
+                console.print("  4. Verify TCPSocket is enabled on port 3310")
+                console.print("\n[cyan]Need help?[/cyan] See docs/TROUBLESHOOTING.md")
 
         # Display configuration
         console.print("\n[bold]Configuration:[/bold]")
@@ -202,17 +309,21 @@ def update():
         )
 
         if result.returncode == 0:
-            console.print("[bold green]✓[/bold green] Virus definitions updated successfully")
+            console.print("[bold green][OK][/bold green] Virus definitions updated successfully")
             if result.stdout:
                 console.print(result.stdout)
         else:
-            console.print("[bold red]✗[/bold red] Update failed")
+            console.print("[bold red][FAIL][/bold red] Update failed")
             if result.stderr:
                 console.print(result.stderr)
 
     except FileNotFoundError:
         console.print("[bold red]ERROR:[/bold red] freshclam not found")
-        console.print("Ensure ClamAV is properly installed")
+        console.print("\n[yellow]ClamAV is not installed or not in PATH[/yellow]")
+        console.print("  Download ClamAV: https://www.clamav.net/downloads")
+        console.print("  Or add ClamAV bin directory to PATH")
+        console.print("\n[yellow]Note:[/yellow] ClamAV is optional for AI features")
+        console.print("  Use AI commands without ClamAV: hifzdefend ai --help")
     except subprocess.TimeoutExpired:
         console.print("[bold red]ERROR:[/bold red] Update timed out")
     except Exception as e:
@@ -234,7 +345,7 @@ def quarantine(file_path: str, threat_name: str):
         with ScanEngine(config) as engine:
             entry = engine.quarantine_file(file_path, threat_name)
 
-            console.print("[bold green]✓[/bold green] File quarantined successfully")
+            console.print("[bold green][OK][/bold green] File quarantined successfully")
             console.print(f"Quarantine ID: {entry.quarantine_id}")
             console.print(f"Hash: {entry.file_hash}")
 
@@ -336,7 +447,7 @@ def start():
 
             progress.update(task, completed=True)
 
-        console.print("[bold green]✓[/bold green] All monitors started")
+        console.print("[bold green][OK][/bold green] All monitors started")
 
         # Display status
         status_data = manager.get_status()
@@ -387,7 +498,7 @@ def stop():
 
             progress.update(task, completed=True)
 
-        console.print("[bold green]✓[/bold green] All monitors stopped")
+        console.print("[bold green][OK][/bold green] All monitors stopped")
 
     except HifzDefendError as e:
         console.print(f"[bold red]ERROR:[/bold red] {e}")
@@ -625,7 +736,7 @@ def add(rule_file: str):
 
         shutil.copy2(rule_path, dest_path)
 
-        console.print(f"[bold green]✓[/bold green] Rule added: {dest_path.name}")
+        console.print(f"[bold green][OK][/bold green] Rule added: {dest_path.name}")
         console.print("\n[yellow]Note:[/yellow] Restart monitors for changes to take effect")
 
     except HifzDefendError as e:
@@ -654,7 +765,7 @@ def remove(rule_name: str):
 
         rule_path.unlink()
 
-        console.print(f"[bold green]✓[/bold green] Rule removed: {rule_name}")
+        console.print(f"[bold green][OK][/bold green] Rule removed: {rule_name}")
         console.print("\n[yellow]Note:[/yellow] Restart monitors for changes to take effect")
 
     except HifzDefendError as e:
@@ -817,8 +928,7 @@ def query(question: str, interactive: bool):
       hifzdefend query --interactive
     """
     if not AI_AVAILABLE:
-        console.print("[bold red]ERROR:[/bold red] AI features not available")
-        console.print("Install AI dependencies: pip install anthropic chromadb sentence-transformers")
+        print_ai_not_available_error()
         return
 
     try:
@@ -826,8 +936,11 @@ def query(question: str, interactive: bool):
 
         # Check if AI is enabled
         if not config.ai.enabled or not config.ai.natural_language.enabled:
-            console.print("[bold red]ERROR:[/bold red] Natural language queries are disabled")
-            console.print("Enable in config: [ai.natural_language] enabled = true")
+            console.print("[bold red]ERROR:[/bold red] Natural language queries are disabled in configuration")
+            console.print("\n[yellow]To enable queries:[/yellow]")
+            console.print("  Edit config file and set:")
+            console.print("  [ai.natural_language] enabled = true")
+            console.print("\n[cyan]Config location:[/cyan] %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
             return
 
         # Check Claude API key
@@ -898,7 +1011,7 @@ def query(question: str, interactive: bool):
     except HifzDefendError as e:
         console.print(f"[bold red]ERROR:[/bold red] {e}")
     except Exception as e:
-        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        print_api_error_with_hints(e, "Natural language query failed")
         logging.exception("Query command failed")
 
 
@@ -916,8 +1029,7 @@ def analyze_script(script_path: str, type: str, save: bool):
       hifzdefend analyze-script script.py --save
     """
     if not AI_AVAILABLE:
-        console.print("[bold red]ERROR:[/bold red] AI features not available")
-        console.print("Install AI dependencies: pip install anthropic chromadb sentence-transformers")
+        print_ai_not_available_error()
         return
 
     try:
@@ -925,20 +1037,33 @@ def analyze_script(script_path: str, type: str, save: bool):
 
         # Check if AI is enabled
         if not config.ai.enabled or not config.ai.claude.enabled:
-            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled")
-            console.print("Enable in config: [ai.claude] enabled = true")
+            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled in configuration")
+            console.print("\n[yellow]To enable AI features:[/yellow]")
+            console.print("  1. Edit your config file:")
+            console.print("     %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
+            console.print("  2. Or edit: config/hifzdefend.defaults.toml")
+            console.print("  3. Set: [ai.claude] enabled = true")
+            console.print("\n[cyan]Need help?[/cyan] See docs/AI_USAGE.md")
             return
 
         if not config.ai.claude.script_analysis:
-            console.print("[bold red]ERROR:[/bold red] Script analysis is disabled")
-            console.print("Enable in config: [ai.claude] script_analysis = true")
+            console.print("[bold red]ERROR:[/bold red] Script analysis is disabled in configuration")
+            console.print("\n[yellow]To enable script analysis:[/yellow]")
+            console.print("  Edit config file and set:")
+            console.print("  [ai.claude] script_analysis = true")
+            console.print("\n[cyan]Config location:[/cyan] %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
             return
 
         # Check API key
         api_key = config.ai.claude.get_api_key()
         if not api_key:
-            console.print("[bold red]ERROR:[/bold red] Claude API key not set")
-            console.print("Set environment variable: CLAUDE_API_KEY=sk-ant-api03-...")
+            print_api_key_not_set_error()
+            return
+
+        # Validate API key format
+        is_valid, error_msg = validate_api_key(api_key)
+        if not is_valid:
+            print_api_key_invalid_error(error_msg)
             return
 
         console.print(f"\n[bold cyan]Claude Script Analyzer[/bold cyan]")
@@ -1032,7 +1157,7 @@ def analyze_script(script_path: str, type: str, save: bool):
     except HifzDefendError as e:
         console.print(f"[bold red]ERROR:[/bold red] {e}")
     except Exception as e:
-        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        print_api_error_with_hints(e, "Script analysis failed")
         logging.exception("Analyze-script command failed")
 
 
@@ -1047,8 +1172,7 @@ def explain(threat_id: str):
       hifzdefend explain "Trojan.Win32.Generic"
     """
     if not AI_AVAILABLE:
-        console.print("[bold red]ERROR:[/bold red] AI features not available")
-        console.print("Install AI dependencies: pip install anthropic chromadb sentence-transformers")
+        print_ai_not_available_error()
         return
 
     try:
@@ -1056,20 +1180,33 @@ def explain(threat_id: str):
 
         # Check if AI is enabled
         if not config.ai.enabled or not config.ai.claude.enabled:
-            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled")
-            console.print("Enable in config: [ai.claude] enabled = true")
+            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled in configuration")
+            console.print("\n[yellow]To enable AI features:[/yellow]")
+            console.print("  1. Edit your config file:")
+            console.print("     %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
+            console.print("  2. Or edit: config/hifzdefend.defaults.toml")
+            console.print("  3. Set: [ai.claude] enabled = true")
+            console.print("\n[cyan]Need help?[/cyan] See docs/AI_USAGE.md")
             return
 
         if not config.ai.claude.plain_language_explanations:
-            console.print("[bold red]ERROR:[/bold red] Plain language explanations are disabled")
-            console.print("Enable in config: [ai.claude] plain_language_explanations = true")
+            console.print("[bold red]ERROR:[/bold red] Plain language explanations are disabled in configuration")
+            console.print("\n[yellow]To enable explanations:[/yellow]")
+            console.print("  Edit config file and set:")
+            console.print("  [ai.claude] plain_language_explanations = true")
+            console.print("\n[cyan]Config location:[/cyan] %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
             return
 
         # Check API key
         api_key = config.ai.claude.get_api_key()
         if not api_key:
-            console.print("[bold red]ERROR:[/bold red] Claude API key not set")
-            console.print("Set environment variable: CLAUDE_API_KEY=sk-ant-api03-...")
+            print_api_key_not_set_error()
+            return
+
+        # Validate API key format
+        is_valid, error_msg = validate_api_key(api_key)
+        if not is_valid:
+            print_api_key_invalid_error(error_msg)
             return
 
         console.print(f"\n[bold cyan]Threat Explanation[/bold cyan]")
@@ -1120,8 +1257,465 @@ def explain(threat_id: str):
     except HifzDefendError as e:
         console.print(f"[bold red]ERROR:[/bold red] {e}")
     except Exception as e:
-        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        print_api_error_with_hints(e, "Threat explanation failed")
         logging.exception("Explain command failed")
+
+
+@cli.group()
+def ai():
+    """Manage AI features and costs."""
+    pass
+
+
+@ai.command()
+def stats():
+    """Display AI usage statistics."""
+    if not AI_AVAILABLE:
+        print_ai_not_available_error()
+        return
+
+    try:
+        config = get_config()
+
+        # Check if AI is enabled
+        if not config.ai.enabled or not config.ai.claude.enabled:
+            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled in configuration")
+            console.print("\n[yellow]To enable AI features:[/yellow]")
+            console.print("  1. Edit your config file:")
+            console.print("     %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
+            console.print("  2. Or edit: config/hifzdefend.defaults.toml")
+            console.print("  3. Set: [ai.claude] enabled = true")
+            console.print("\n[cyan]Need help?[/cyan] See docs/AI_USAGE.md")
+            return
+
+        # Check API key
+        api_key = config.ai.claude.get_api_key()
+        if not api_key:
+            print_api_key_not_set_error()
+            return
+
+        # Validate API key format
+        is_valid, error_msg = validate_api_key(api_key)
+        if not is_valid:
+            print_api_key_invalid_error(error_msg)
+            return
+
+        console.print("\n[bold cyan]AI Usage Statistics[/bold cyan]\n")
+
+        # Initialize Claude analyzer
+        claude = ClaudeAnalyzer(
+            api_key=api_key,
+            model=config.ai.claude.model,
+            max_tokens=config.ai.claude.max_tokens,
+            temperature=config.ai.claude.temperature,
+            timeout=config.ai.claude.timeout,
+            cache_enabled=config.ai.claude.cache_responses,
+            cache_dir=config.ai.claude.cache_path_expanded,
+            cache_ttl=config.ai.claude.cache_ttl,
+            max_requests_per_hour=config.ai.claude.max_requests_per_hour,
+            log_costs=config.ai.claude.log_api_costs,
+            fallback_on_error=config.ai.claude.fallback_on_error,
+            retry_attempts=config.ai.claude.retry_attempts,
+            retry_delay=config.ai.claude.retry_delay,
+        )
+
+        # Get cost stats
+        stats = claude.get_cost_stats()
+
+        # Display statistics
+        console.print("[bold]API Usage:[/bold]")
+        console.print(f"  Model: {config.ai.claude.model}")
+        console.print(f"  Total requests: {stats.get('total_requests', 0)}")
+        console.print(f"  Successful requests: {stats.get('successful_requests', 0)}")
+        console.print(f"  Failed requests: {stats.get('failed_requests', 0)}")
+        console.print(f"  Cached responses: {stats.get('cached_responses', 0)}")
+
+        console.print("\n[bold]Token Usage:[/bold]")
+        console.print(f"  Input tokens: {stats.get('input_tokens', 0):,}")
+        console.print(f"  Output tokens: {stats.get('output_tokens', 0):,}")
+        console.print(f"  Total tokens: {stats.get('input_tokens', 0) + stats.get('output_tokens', 0):,}")
+
+        console.print("\n[bold]Cost Information:[/bold]")
+        console.print(f"  Input cost: ${stats.get('input_cost_usd', 0):.4f}")
+        console.print(f"  Output cost: ${stats.get('output_cost_usd', 0):.4f}")
+        console.print(f"  Total cost: ${stats.get('total_cost_usd', 0):.4f}")
+
+        console.print("\n[bold]Rate Limiting:[/bold]")
+        console.print(f"  Max requests/hour: {config.ai.claude.max_requests_per_hour}")
+        console.print(f"  Requests this hour: {stats.get('requests_this_hour', 0)}")
+        remaining = max(0, config.ai.claude.max_requests_per_hour - stats.get('requests_this_hour', 0))
+        console.print(f"  Remaining this hour: {remaining}")
+
+        console.print("\n[bold]Cache Status:[/bold]")
+        console.print(f"  Caching enabled: {'Yes' if config.ai.claude.cache_responses else 'No'}")
+        console.print(f"  Cache TTL: {config.ai.claude.cache_ttl / 3600:.1f} hours")
+        console.print(f"  Cache directory: {config.ai.claude.cache_path_expanded}")
+
+        # Check cache size
+        cache_dir = Path(config.ai.claude.cache_path_expanded)
+        if cache_dir.exists():
+            cache_files = list(cache_dir.glob("*"))
+            total_size = sum(f.stat().st_size for f in cache_files if f.is_file())
+            console.print(f"  Cached entries: {len(cache_files)}")
+            console.print(f"  Cache size: {total_size / 1024 / 1024:.2f} MB")
+
+        # Cost projection
+        if stats.get('total_requests', 0) > 0:
+            avg_cost_per_request = stats.get('total_cost_usd', 0) / stats.get('total_requests', 0)
+            console.print("\n[bold]Projections:[/bold]")
+            console.print(f"  Average cost/request: ${avg_cost_per_request:.4f}")
+            console.print(f"  Est. cost for 100 requests: ${avg_cost_per_request * 100:.2f}")
+            console.print(f"  Est. monthly cost (1000 req): ${avg_cost_per_request * 1000:.2f}")
+
+    except HifzDefendError as e:
+        console.print(f"[bold red]ERROR:[/bold red] {e}")
+    except Exception as e:
+        print_api_error_with_hints(e, "Failed to retrieve AI statistics")
+        logging.exception("AI stats command failed")
+
+
+@ai.command()
+def cost():
+    """Display detailed cost breakdown."""
+    if not AI_AVAILABLE:
+        print_ai_not_available_error()
+        return
+
+    try:
+        config = get_config()
+
+        # Check if AI is enabled
+        if not config.ai.enabled or not config.ai.claude.enabled:
+            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled")
+            return
+
+        # Check API key
+        api_key = config.ai.claude.get_api_key()
+        if not api_key:
+            console.print("[bold red]ERROR:[/bold red] Claude API key not set")
+            return
+
+        console.print("\n[bold cyan]AI Cost Breakdown[/bold cyan]\n")
+
+        # Initialize Claude analyzer
+        claude = ClaudeAnalyzer(
+            api_key=api_key,
+            model=config.ai.claude.model,
+            max_tokens=config.ai.claude.max_tokens,
+            temperature=config.ai.claude.temperature,
+            timeout=config.ai.claude.timeout,
+            cache_enabled=config.ai.claude.cache_responses,
+            cache_dir=config.ai.claude.cache_path_expanded,
+            cache_ttl=config.ai.claude.cache_ttl,
+            max_requests_per_hour=config.ai.claude.max_requests_per_hour,
+            log_costs=config.ai.claude.log_api_costs,
+            fallback_on_error=config.ai.claude.fallback_on_error,
+            retry_attempts=config.ai.claude.retry_attempts,
+            retry_delay=config.ai.claude.retry_delay,
+        )
+
+        # Get cost stats
+        stats = claude.get_cost_stats()
+
+        # Create cost table
+        table = Table(title="Cost Analysis")
+        table.add_column("Metric", style="cyan")
+        table.add_column("Value", style="yellow", justify="right")
+        table.add_column("Cost (USD)", style="green", justify="right")
+
+        # Model pricing (approximate - update based on actual pricing)
+        if "sonnet" in config.ai.claude.model.lower():
+            input_price_per_mtok = 3.00
+            output_price_per_mtok = 15.00
+        elif "opus" in config.ai.claude.model.lower():
+            input_price_per_mtok = 15.00
+            output_price_per_mtok = 75.00
+        elif "haiku" in config.ai.claude.model.lower():
+            input_price_per_mtok = 0.25
+            output_price_per_mtok = 1.25
+        else:
+            input_price_per_mtok = 3.00
+            output_price_per_mtok = 15.00
+
+        # Add rows
+        input_tokens = stats.get('input_tokens', 0)
+        output_tokens = stats.get('output_tokens', 0)
+        input_cost = (input_tokens / 1_000_000) * input_price_per_mtok
+        output_cost = (output_tokens / 1_000_000) * output_price_per_mtok
+        total_cost = input_cost + output_cost
+
+        table.add_row(
+            "Input Tokens",
+            f"{input_tokens:,}",
+            f"${input_cost:.4f}"
+        )
+        table.add_row(
+            "Output Tokens",
+            f"{output_tokens:,}",
+            f"${output_cost:.4f}"
+        )
+        table.add_row(
+            "[bold]Total[/bold]",
+            f"[bold]{input_tokens + output_tokens:,}[/bold]",
+            f"[bold]${total_cost:.4f}[/bold]"
+        )
+
+        console.print(table)
+
+        # Pricing info
+        console.print(f"\n[bold]Pricing (per 1M tokens):[/bold]")
+        console.print(f"  Model: {config.ai.claude.model}")
+        console.print(f"  Input: ${input_price_per_mtok:.2f}")
+        console.print(f"  Output: ${output_price_per_mtok:.2f}")
+
+        # Usage breakdown
+        console.print(f"\n[bold]Request Breakdown:[/bold]")
+        console.print(f"  Total requests: {stats.get('total_requests', 0)}")
+        console.print(f"  Successful: {stats.get('successful_requests', 0)}")
+        console.print(f"  Failed: {stats.get('failed_requests', 0)}")
+        console.print(f"  From cache: {stats.get('cached_responses', 0)}")
+
+        # Cost savings from cache
+        cached = stats.get('cached_responses', 0)
+        if cached > 0 and stats.get('total_requests', 0) > 0:
+            avg_cost = total_cost / max(1, stats.get('successful_requests', 0) - cached)
+            estimated_savings = avg_cost * cached
+            console.print(f"\n[bold green]Cache Savings:[/bold green]")
+            console.print(f"  Estimated savings: ${estimated_savings:.4f}")
+            console.print(f"  Cached responses: {cached}")
+
+        # Budget recommendations
+        console.print(f"\n[bold]Budget Recommendations:[/bold]")
+        if total_cost < 1.00:
+            console.print("  [green]Low usage - well within budget[/green]")
+        elif total_cost < 5.00:
+            console.print("  [yellow]Moderate usage - monitor costs[/yellow]")
+        else:
+            console.print("  [red]High usage - consider optimization[/red]")
+
+        # Optimization tips
+        if stats.get('cached_responses', 0) == 0 and stats.get('total_requests', 0) > 5:
+            console.print("\n[yellow]Tip:[/yellow] Enable caching to reduce costs")
+        if "opus" in config.ai.claude.model.lower() and stats.get('total_requests', 0) > 20:
+            console.print("\n[yellow]Tip:[/yellow] Consider using Claude Sonnet or Haiku for lower costs")
+
+        # View detailed costs
+        console.print("\n[dim]For real-time costs, visit: https://console.anthropic.com/settings/costs[/dim]")
+
+    except HifzDefendError as e:
+        console.print(f"[bold red]ERROR:[/bold red] {e}")
+    except Exception as e:
+        print_api_error_with_hints(e, "Failed to retrieve cost information")
+        logging.exception("AI cost command failed")
+
+
+@ai.command("reset-cache")
+def reset_cache():
+    """Clear the AI response cache."""
+    if not AI_AVAILABLE:
+        console.print("[bold red]ERROR:[/bold red] AI features not available")
+        return
+
+    try:
+        config = get_config()
+
+        console.print("\n[bold cyan]Clear AI Cache[/bold cyan]\n")
+
+        cache_dir = Path(config.ai.claude.cache_path_expanded)
+
+        if not cache_dir.exists():
+            console.print("[yellow]No cache directory found[/yellow]")
+            return
+
+        # Count cache files
+        cache_files = list(cache_dir.glob("*"))
+        total_size = sum(f.stat().st_size for f in cache_files if f.is_file())
+
+        console.print(f"Cache directory: {cache_dir}")
+        console.print(f"Cached entries: {len(cache_files)}")
+        console.print(f"Cache size: {total_size / 1024 / 1024:.2f} MB\n")
+
+        # Confirm deletion
+        response = click.confirm("Are you sure you want to clear the cache?", default=False)
+
+        if not response:
+            console.print("[yellow]Cache clearing cancelled[/yellow]")
+            return
+
+        # Delete cache files
+        deleted = 0
+        for cache_file in cache_files:
+            try:
+                if cache_file.is_file():
+                    cache_file.unlink()
+                    deleted += 1
+            except Exception as e:
+                console.print(f"[yellow]Warning:[/yellow] Could not delete {cache_file.name}: {e}")
+
+        console.print(f"\n[bold green][OK][/bold green] Cleared {deleted} cache entries")
+        console.print("[dim]Note: Cost statistics are stored separately and not affected[/dim]")
+
+        # Check vector DB cache
+        if CHROMADB_AVAILABLE:
+            vector_db_path = Path(config.ai.natural_language.vector_db_path_expanded)
+            if vector_db_path.exists():
+                console.print(f"\n[yellow]Note:[/yellow] Vector database not cleared: {vector_db_path}")
+                console.print("To clear vector DB, delete the directory manually:")
+                console.print(f"  Remove-Item -Recurse '{vector_db_path}'")
+
+    except HifzDefendError as e:
+        console.print(f"[bold red]ERROR:[/bold red] {e}")
+    except Exception as e:
+        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        logging.exception("Reset cache command failed")
+
+
+@ai.command()
+def test():
+    """Test Claude API connection."""
+    if not AI_AVAILABLE:
+        print_ai_not_available_error()
+        return
+
+    try:
+        config = get_config()
+
+        console.print("\n[bold cyan]Testing Claude API Connection[/bold cyan]\n")
+
+        # Check if AI is enabled
+        if not config.ai.enabled or not config.ai.claude.enabled:
+            console.print("[bold red]ERROR:[/bold red] Claude AI is disabled in configuration")
+            console.print("\n[yellow]To enable AI features:[/yellow]")
+            console.print("  1. Edit your config file:")
+            console.print("     %LOCALAPPDATA%\\HifzDefend\\hifzdefend.toml")
+            console.print("  2. Or edit: config/hifzdefend.defaults.toml")
+            console.print("  3. Set: [ai.claude] enabled = true")
+            console.print("\n[cyan]Need help?[/cyan] See docs/AI_USAGE.md")
+            return
+
+        # Check API key
+        api_key = config.ai.claude.get_api_key()
+        if not api_key:
+            console.print("[bold red]ERROR:[/bold red] Claude API key not set")
+            console.print("\nTo set your API key:")
+            console.print("  1. Get key from: https://console.anthropic.com/settings/keys")
+            console.print("  2. Set environment variable:")
+            console.print("     $env:CLAUDE_API_KEY = 'sk-ant-api03-...'")
+            console.print("  3. Or add to .env file")
+            return
+
+        console.print("[bold]Configuration:[/bold]")
+        console.print(f"  API key: {api_key[:12]}...{api_key[-4:]}")
+        console.print(f"  Model: {config.ai.claude.model}")
+        console.print(f"  Max tokens: {config.ai.claude.max_tokens}")
+        console.print(f"  Timeout: {config.ai.claude.timeout}s")
+        console.print(f"  Caching: {'Enabled' if config.ai.claude.cache_responses else 'Disabled'}")
+
+        # Test connection
+        console.print("\n[bold]Testing connection...[/bold]")
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Sending test request to Claude...", total=None)
+
+            # Initialize Claude analyzer
+            claude = ClaudeAnalyzer(
+                api_key=api_key,
+                model=config.ai.claude.model,
+                max_tokens=config.ai.claude.max_tokens,
+                temperature=config.ai.claude.temperature,
+                timeout=config.ai.claude.timeout,
+                cache_enabled=False,  # Don't cache test requests
+                cache_dir=config.ai.claude.cache_path_expanded,
+                cache_ttl=config.ai.claude.cache_ttl,
+                max_requests_per_hour=config.ai.claude.max_requests_per_hour,
+                log_costs=config.ai.claude.log_api_costs,
+                fallback_on_error=config.ai.claude.fallback_on_error,
+                retry_attempts=config.ai.claude.retry_attempts,
+                retry_delay=config.ai.claude.retry_delay,
+            )
+
+            # Send test request
+            test_prompt = "Reply with 'OK' if you receive this message."
+            try:
+                response = claude.client.messages.create(
+                    model=claude.model,
+                    max_tokens=50,
+                    temperature=0,
+                    messages=[{"role": "user", "content": test_prompt}]
+                )
+
+                progress.update(task, completed=True)
+
+                console.print("\n[bold green][OK][/bold green] Connection successful!")
+                console.print(f"\n[bold]Response:[/bold]")
+                console.print(f"  {response.content[0].text}")
+
+                console.print(f"\n[bold]Usage:[/bold]")
+                console.print(f"  Input tokens: {response.usage.input_tokens}")
+                console.print(f"  Output tokens: {response.usage.output_tokens}")
+
+                # Calculate cost
+                if "sonnet" in config.ai.claude.model.lower():
+                    input_price_per_mtok = 3.00
+                    output_price_per_mtok = 15.00
+                elif "opus" in config.ai.claude.model.lower():
+                    input_price_per_mtok = 15.00
+                    output_price_per_mtok = 75.00
+                elif "haiku" in config.ai.claude.model.lower():
+                    input_price_per_mtok = 0.25
+                    output_price_per_mtok = 1.25
+                else:
+                    input_price_per_mtok = 3.00
+                    output_price_per_mtok = 15.00
+
+                test_cost = (
+                    (response.usage.input_tokens / 1_000_000) * input_price_per_mtok +
+                    (response.usage.output_tokens / 1_000_000) * output_price_per_mtok
+                )
+                console.print(f"  Test cost: ${test_cost:.6f}")
+
+                console.print("\n[bold green]All systems operational![/bold green]")
+                console.print("\nYou can now use:")
+                console.print("  • hifzdefend analyze-script <file>")
+                console.print("  • hifzdefend query \"<question>\"")
+                console.print("  • hifzdefend explain \"<threat>\"")
+
+            except Exception as e:
+                progress.update(task, completed=True)
+                console.print(f"\n[bold red][FAIL][/bold red] Connection failed")
+                console.print(f"\n[bold]Error:[/bold] {str(e)}")
+
+                # Provide troubleshooting hints
+                if "authentication" in str(e).lower() or "api key" in str(e).lower():
+                    console.print("\n[yellow]Troubleshooting:[/yellow]")
+                    console.print("  • Check your API key is correct")
+                    console.print("  • Verify key is active at: https://console.anthropic.com/settings/keys")
+                    console.print("  • Try generating a new API key")
+                elif "rate limit" in str(e).lower():
+                    console.print("\n[yellow]Troubleshooting:[/yellow]")
+                    console.print("  • You've hit the rate limit")
+                    console.print("  • Wait a few minutes and try again")
+                    console.print("  • Check usage at: https://console.anthropic.com/")
+                elif "timeout" in str(e).lower():
+                    console.print("\n[yellow]Troubleshooting:[/yellow]")
+                    console.print("  • Check your internet connection")
+                    console.print("  • Increase timeout in config")
+                    console.print("  • Try again in a moment")
+                else:
+                    console.print("\n[yellow]Troubleshooting:[/yellow]")
+                    console.print("  • Check internet connection")
+                    console.print("  • Verify firewall settings")
+                    console.print("  • See docs/TROUBLESHOOTING.md")
+
+    except HifzDefendError as e:
+        console.print(f"[bold red]ERROR:[/bold red] {e}")
+    except Exception as e:
+        print_api_error_with_hints(e, "API connection test failed")
+        logging.exception("AI test command failed")
 
 
 if __name__ == "__main__":

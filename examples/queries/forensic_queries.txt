@@ -1,0 +1,293 @@
+# ============================================================================
+# HifzDefend - Forensic & Incident Response Queries
+# ============================================================================
+# Specialized queries for incident investigation and forensic analysis.
+#
+# Usage: hifzdefend query "<question>"
+# ============================================================================
+
+# ==========================
+# Incident Timeline
+# ==========================
+
+create a timeline of all security events from the last 24 hours
+show me the sequence of events leading to malware detection
+reconstruct the attack timeline starting from initial access
+show me all events between 3:00 AM and 3:30 AM today
+trace the progression of the ransomware attack
+
+# ==========================
+# Initial Access Investigation
+# ==========================
+
+what was the entry point for the detected malware?
+show me all file downloads in the hour before detection
+identify suspicious email attachments processed today
+what removable media was accessed before the incident?
+show me all browser downloads from untrusted sites
+
+# ==========================
+# Lateral Movement Analysis
+# ==========================
+
+trace network connections from the infected system
+show me all systems that communicated with the compromised host
+identify process injection attempts
+what credentials were accessed or stolen?
+show me RDP or SSH connections to other systems
+
+# ==========================
+# Persistence Mechanisms
+# ==========================
+
+what registry keys were modified for persistence?
+show me all scheduled tasks created in the last week
+identify new services installed on the system
+what files were added to startup folders?
+show me WMI event subscriptions created recently
+
+# ==========================
+# Data Access & Exfiltration
+# ==========================
+
+what sensitive files were accessed by suspicious processes?
+show me large outbound data transfers
+identify files that were copied to external locations
+what documents were opened before network transmission?
+trace data flow from sensitive directories to network
+
+# ==========================
+# Command & Control
+# ==========================
+
+identify all external IPs contacted by suspicious processes
+show me DNS queries to newly registered domains
+what connections used non-standard ports?
+identify beaconing behavior in network traffic
+show me encrypted connections to suspicious destinations
+
+# ==========================
+# Malware Analysis
+# ==========================
+
+what payloads were dropped by the initial infection?
+show me all files created by the malicious process
+identify scripts that were decoded and executed
+what DLLs were loaded by the suspicious process?
+trace parent-child process relationships
+
+# ==========================
+# Evidence Collection
+# ==========================
+
+list all files modified in the last hour before detection
+show me registry changes that occurred during the incident
+identify log entries related to the security event
+what files should be preserved for forensic analysis?
+generate a list of IOCs for this incident
+
+# ==========================
+# User Activity Correlation
+# ==========================
+
+what user was logged in when the threat was detected?
+show me all user actions in the hour before infection
+identify user accounts that exhibited unusual behavior
+what applications were running under the affected user?
+trace user activity across multiple systems
+
+# ==========================
+# Network Forensics
+# ==========================
+
+show me all network connections from the affected system
+identify suspicious DNS lookups
+what domains resolved to known malicious IPs?
+show me packet captures around the time of detection
+identify network traffic to TOR exit nodes
+
+# ==========================
+# File System Forensics
+# ==========================
+
+what files were deleted during the incident?
+show me files with recent timestamp modifications
+identify files with suspicious extensions
+what encrypted files were created?
+show me alternate data streams added to files
+
+# ==========================
+# Process Forensics
+# ==========================
+
+what processes were spawned by the malicious executable?
+show me processes with unusual command-line arguments
+identify processes that ran with elevated privileges
+what injection techniques were used?
+trace process hollowing or doppelganging attempts
+
+# ==========================
+# Memory Forensics (Hypothetical)
+# ==========================
+
+what processes have suspicious memory patterns?
+identify processes with injected code
+show me processes hiding from task manager
+what credentials are in memory?
+identify rootkit-like behavior in running processes
+
+# ==========================
+# Log Analysis
+# ==========================
+
+show me failed login attempts before successful compromise
+identify suspicious PowerShell logging events
+what security event IDs were triggered?
+show me gaps in security logs (potential tampering)
+correlate application logs with security events
+
+# ==========================
+# Threat Attribution
+# ==========================
+
+what TTPs (Tactics, Techniques, Procedures) were used?
+identify the malware family based on behavior
+does this match any known APT campaigns?
+show me similar historical incidents
+what's the likely threat actor profile?
+
+# ==========================
+# Scope Assessment
+# ==========================
+
+how many systems were affected by this threat?
+what's the blast radius of the compromise?
+identify all accounts that may be compromised
+what data may have been exfiltrated?
+assess the extent of the security breach
+
+# ==========================
+# Containment Verification
+# ==========================
+
+confirm all malicious processes have been terminated
+verify no persistence mechanisms remain
+check that all infected files are quarantined
+validate network connections have been blocked
+ensure no backdoors remain active
+
+# ==========================
+# Recovery Investigation
+# ==========================
+
+what files need to be restored from backup?
+identify systems requiring reimaging
+what security controls need to be reinforced?
+verify all IOCs have been blocked
+confirm threat has been fully eradicated
+
+# ==========================
+# Root Cause Analysis
+# ==========================
+
+what vulnerability was exploited?
+identify the security gap that enabled the attack
+what controls failed to prevent this incident?
+show me missed detection opportunities
+analyze why the threat wasn't caught earlier
+
+# ==========================
+# Lessons Learned
+# ==========================
+
+what additional detections would have prevented this?
+identify gaps in current security posture
+what monitoring should be added?
+analyze the effectiveness of incident response
+generate recommendations for future prevention
+
+# ==========================
+# FORENSIC WORKFLOW EXAMPLE
+# ==========================
+
+# Phase 1: Initial Assessment
+# "what threats were detected in the last hour?"
+# "show me the affected systems"
+# "assess the severity of the incident"
+
+# Phase 2: Containment
+# "identify all network connections from infected system"
+# "show me persistence mechanisms to remove"
+# "verify threat has been isolated"
+
+# Phase 3: Investigation
+# "reconstruct the attack timeline"
+# "identify the initial access vector"
+# "trace lateral movement"
+# "analyze data exfiltration attempts"
+
+# Phase 4: Eradication
+# "confirm all malicious processes terminated"
+# "verify no backdoors remain"
+# "ensure all persistence removed"
+
+# Phase 5: Recovery
+# "identify files to restore"
+# "validate system integrity"
+# "confirm threat eradicated"
+
+# Phase 6: Lessons Learned
+# "analyze root cause"
+# "identify detection gaps"
+# "generate prevention recommendations"
+
+# ==========================
+# INCIDENT REPORTING
+# ==========================
+
+# Executive Summary
+# "generate an executive summary of today's security incident"
+
+# Technical Details
+# "create a detailed technical analysis of the malware"
+
+# IOC List
+# "generate a list of all indicators of compromise"
+
+# Remediation Steps
+# "document all actions taken to contain and eradicate the threat"
+
+# Recommendations
+# "provide security improvement recommendations based on this incident"
+
+# ==========================
+# NOTES
+# ==========================
+
+# Forensic queries are typically:
+# - More complex and time-consuming
+# - Require detailed context and historical data
+# - May cost $0.01-0.03 per query
+# - Should be cached for repeated analysis
+# - May require multiple follow-up queries
+
+# Best practices:
+# 1. Start broad, then narrow down
+# 2. Build a timeline chronologically
+# 3. Correlate multiple data sources
+# 4. Document findings as you go
+# 5. Generate IOCs for sharing
+# 6. Create incident reports
+# 7. Archive analysis results
+
+# ==========================
+# LEGAL CONSIDERATIONS
+# ==========================
+
+# When conducting forensic analysis:
+# - Maintain chain of custody for evidence
+# - Document all queries and findings
+# - Preserve original data
+# - Follow incident response procedures
+# - Consider regulatory requirements
+# - Consult legal team when necessary

@@ -1,0 +1,212 @@
+# ============================================================================
+# HifzDefend - Basic Natural Language Queries
+# ============================================================================
+# These are simple, beginner-friendly queries to get started with HifzDefend's
+# natural language interface.
+#
+# Usage: hifzdefend query "<question>"
+# Example: hifzdefend query "what is hifzdefend?"
+# ============================================================================
+
+# ==========================
+# Getting Started
+# ==========================
+
+what is hifzdefend?
+how does hifzdefend work?
+what can hifzdefend do?
+what features does hifzdefend have?
+
+# ==========================
+# Basic Status Queries
+# ==========================
+
+what threats were detected today?
+are there any active threats?
+show me recent security alerts
+what's happening with my system?
+is everything secure?
+
+# ==========================
+# Threat Detection
+# ==========================
+
+show me all PowerShell alerts
+what suspicious scripts were found?
+did you detect any malware today?
+are there any ransomware threats?
+show me cryptominer detections
+
+# ==========================
+# File Operations
+# ==========================
+
+did any files get quarantined?
+what files were scanned today?
+show me quarantined files
+which files are suspicious?
+what downloads were analyzed?
+
+# ==========================
+# Network Activity
+# ==========================
+
+what domains were blocked?
+show me network connections
+were there any C2 communications?
+did you detect data exfiltration?
+what suspicious IPs were found?
+
+# ==========================
+# System Information
+# ==========================
+
+what processes are running?
+show me high CPU processes
+are there any unauthorized changes?
+what services were modified?
+show me registry modifications
+
+# ==========================
+# Time-Based Queries
+# ==========================
+
+what happened today?
+show me alerts from yesterday
+what threats were found this week?
+summarize this month's security events
+what changed in the last hour?
+
+# ==========================
+# Specific Threat Types
+# ==========================
+
+show me trojan detections
+did you find any spyware?
+are there keylogger threats?
+show me botnet activity
+did you detect phishing?
+
+# ==========================
+# File Type Queries
+# ==========================
+
+what .exe files were analyzed?
+show me PowerShell script scans
+were any .bat files suspicious?
+what Python scripts were found?
+show me executable analysis results
+
+# ==========================
+# Severity Queries
+# ==========================
+
+what are the most critical threats?
+show me high priority alerts
+are there any low-risk detections?
+what requires immediate attention?
+summarize threats by severity
+
+# ==========================
+# Action Queries
+# ==========================
+
+what actions were taken?
+show me quarantine operations
+what files were blocked?
+did you terminate any processes?
+what was automatically remediated?
+
+# ==========================
+# Configuration Queries
+# ==========================
+
+is AI enabled?
+what's my current configuration?
+show me monitoring settings
+is real-time protection active?
+what directories are being watched?
+
+# ==========================
+# Cost/Usage Queries
+# ==========================
+
+how much did AI analysis cost today?
+how many API requests were made?
+what's my AI usage this month?
+show me caching statistics
+how much money did caching save?
+
+# ==========================
+# Comparison Queries
+# ==========================
+
+compare today's threats to yesterday
+show me threat trends this week
+are threats increasing or decreasing?
+what's different from last month?
+how does today compare to average?
+
+# ==========================
+# Help Queries
+# ==========================
+
+how do I use natural language queries?
+what questions can I ask?
+show me example queries
+what types of analysis do you support?
+how accurate is threat detection?
+
+# ==========================
+# USAGE TIPS
+# ==========================
+
+# 1. Be specific: "show me PowerShell alerts today" is better than "show alerts"
+# 2. Use time qualifiers: "today", "yesterday", "this week", "last hour"
+# 3. Specify threat types: "ransomware", "trojan", "cryptominer", etc.
+# 4. Ask follow-up questions based on answers you receive
+# 5. Combine concepts: "show me high-priority PowerShell threats from today"
+
+# ==========================
+# NOTES
+# ==========================
+
+# - Queries require ChromaDB to be installed
+# - First query may take 5-10 seconds (database initialization)
+# - Subsequent queries are faster
+# - Queries are cached for 24 hours by default
+# - Cost per query: approximately $0.001-0.005
+
+# ==========================
+# EXAMPLES OF GOOD QUERIES
+# ==========================
+
+# ✓ "what PowerShell scripts were flagged as malicious today?"
+# ✓ "show me all high-severity threats from the last 24 hours"
+# ✓ "did you detect any ransomware this week?"
+# ✓ "what domains were blocked in the last hour?"
+# ✓ "summarize today's security events by threat type"
+
+# ==========================
+# EXAMPLES OF BAD QUERIES
+# ==========================
+
+# ✗ "stuff" (too vague)
+# ✗ "yes" (not a question)
+# ✗ "..." (no content)
+# ✗ "how are you?" (social, not security-related)
+# ✗ "make me a sandwich" (not security-related)
+
+# ==========================
+# TRY THESE FIRST
+# ==========================
+
+# Start with these queries to get comfortable:
+
+# 1. what is hifzdefend?
+# 2. what threats were detected today?
+# 3. show me all PowerShell alerts
+# 4. what files were quarantined?
+# 5. summarize today's security events
+
+# Then move on to more specific queries based on what you find!

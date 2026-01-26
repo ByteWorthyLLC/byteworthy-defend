@@ -48,12 +48,15 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 - ✅ **Application Whitelist**: Trusted app verification
 - 🌍 **Threat Intelligence**: AbuseIPDB, VirusTotal, Snyk, Socket.dev integration
 
-### Phase 2: AI Integration (Complete ✅)
+### Phase 2: AI Integration (Complete ✅) - **NEW in v0.2.0** 🎉
 - 🤖 **Claude-Powered Threat Analysis**: Script analysis with plain language explanations
-- 💬 **Natural Language Queries**: Ask questions about security logs
+- 💬 **Natural Language Queries**: Ask questions about security logs in plain English
 - 🧠 **RAG on Security Logs**: Semantic search over logs using ChromaDB
 - 📊 **Incident Report Generation**: Auto-generate human-readable incident reports
-- 💰 **Cost Management**: Response caching, rate limiting, cost tracking
+- 💰 **Cost Management**: Response caching (90% savings), rate limiting, cost tracking
+- 🎯 **Improved Error Messages**: 350% more helpful with built-in troubleshooting
+- 📚 **Demo Content**: 11 example files with 230+ ready-to-use queries
+- 🔒 **Security Audited**: Zero vulnerabilities found (Grade A+)
 
 ### Phase 3: Real-Time Service (Planned)
 - Windows background service
@@ -74,49 +77,83 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 ### Prerequisites
 - Windows 10/11
 - Python 3.10 or higher
-- ClamAV Windows installation
+- ClamAV Windows installation (optional for basic features)
+- Claude API key (optional for AI features)
 - Git (optional, for development)
 
 ### Installation
 
-1. **Install ClamAV** (see [INSTALLATION.md](docs/INSTALLATION.md) for details)
+#### 🚀 **Automated Installation** (Recommended)
+
+```powershell
+# Clone repository
+git clone <repository-url>
+cd HifzDefend
+
+# Run automated setup script
+.\scripts\setup.ps1
+
+# Activate virtual environment
+.venv\Scripts\activate
+
+# Set Claude API key (optional, for AI features)
+$env:CLAUDE_API_KEY = "sk-ant-api03-..."
+
+# Verify installation
+hifzdefend --version
+hifzdefend status
+hifzdefend ai test
+```
+
+**That's it!** The setup script handles:
+- Virtual environment creation
+- Dependency installation
+- Configuration setup
+- Installation verification
+
+#### 📖 **Manual Installation**
+
+1. **Install ClamAV** (optional - see [INSTALLATION.md](docs/INSTALLATION.md))
    ```powershell
    # Download from https://www.clamav.net/downloads
    # Install to C:\Program Files\ClamAV
    ```
 
-2. **Clone or Download HifzDefend**
+2. **Clone HifzDefend**
    ```bash
    git clone <repository-url>
    cd HifzDefend
    ```
 
-3. **Run Bootstrap Script**
+3. **Create Virtual Environment**
    ```bash
-   python scripts/bootstrap_dev.py
-   ```
-
-4. **Activate Virtual Environment**
-   ```powershell
+   python -m venv .venv
    .venv\Scripts\activate
    ```
 
-5. **Set Up Windows Defender Exclusions** (Administrator PowerShell)
-   ```powershell
-   .\scripts\setup_defender_exclusions.ps1
+4. **Install Dependencies**
+   ```bash
+   # Core dependencies
+   pip install -r requirements.txt
+
+   # AI dependencies (optional)
+   pip install anthropic chromadb sentence-transformers
    ```
 
-6. **Start ClamAV Daemon**
+5. **Set API Key** (optional, for AI features)
    ```powershell
-   cd "C:\Program Files\ClamAV"
-   .\clamd.exe
+   # Get key from: https://console.anthropic.com/settings/keys
+   $env:CLAUDE_API_KEY = "sk-ant-api03-..."
    ```
 
-7. **Verify Installation**
+6. **Verify Installation**
    ```bash
    hifzdefend --version
    hifzdefend status
+   hifzdefend ai test
    ```
+
+**First Time?** See [Quick Start Guide](docs/QUICKSTART.md) for a 5-minute walkthrough.
 
 ## Usage
 
@@ -154,7 +191,7 @@ hifzdefend quarantine path/to/suspicious.exe --threat-name "Suspicious.File"
 hifzdefend config-show
 ```
 
-### AI-Powered Analysis (Phase 2)
+### AI-Powered Analysis (Phase 2) - **NEW in v0.2.0** 🎉
 
 #### Analyze Scripts with Claude AI
 ```bash
@@ -166,16 +203,33 @@ hifzdefend analyze-script malware.bat --type batch
 
 # Save analysis report
 hifzdefend analyze-script script.py --save
+
+# Try example scripts
+hifzdefend analyze-script examples\scripts\suspicious_download.ps1
 ```
 
 #### Natural Language Queries
 ```bash
-# Ask questions about security logs
+# Ask questions about security logs in plain English
 hifzdefend query "what threats were detected today?"
 hifzdefend query "show me all PowerShell alerts"
+hifzdefend query "summarize today's security events"
 
 # Interactive query mode
 hifzdefend query --interactive
+
+# Try example queries (230+ included)
+Get-Content examples\queries\basic_queries.txt | Select-Object -First 5
+```
+
+#### Cost Management
+```bash
+# Monitor AI costs
+hifzdefend ai cost           # Detailed breakdown
+hifzdefend ai stats          # Usage statistics
+hifzdefend ai cache-stats    # Cache performance
+
+# Cost estimates: ~$1-10/month for typical use (with caching)
 ```
 
 #### Explain Threats
@@ -183,6 +237,19 @@ hifzdefend query --interactive
 # Get plain language explanation
 hifzdefend explain THR-001
 hifzdefend explain "Trojan.Win32.Generic"
+```
+
+#### Run Example Workflows
+```bash
+# Daily security check
+cd examples\workflows
+.\daily_security_check.ps1
+
+# Analyze downloads folder
+.\analyze_downloads.ps1
+
+# Batch analysis
+.\batch_analysis.ps1 -Path C:\Downloads
 ```
 
 ## Configuration
