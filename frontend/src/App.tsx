@@ -10,6 +10,8 @@ import { Logs } from './pages/Logs'
 import { Settings } from './pages/Settings'
 import License from './pages/License'
 import Purchase from './pages/Purchase'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +28,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="monitors" element={<Monitors />} />

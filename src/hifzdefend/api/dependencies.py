@@ -13,11 +13,15 @@ import secrets
 
 from ..service.engine import HifzDefendEngine
 from ..licensing.manager import LicenseManager
+from ..auth.manager import AuthManager
 
 logger = logging.getLogger(__name__)
 
 # Global license manager instance
 _license_manager: Optional[LicenseManager] = None
+
+# Global auth manager instance
+_auth_manager: Optional[AuthManager] = None
 
 
 def get_license_manager() -> LicenseManager:
@@ -30,6 +34,18 @@ def get_license_manager() -> LicenseManager:
     if _license_manager is None:
         _license_manager = LicenseManager()
     return _license_manager
+
+
+def get_auth_manager() -> AuthManager:
+    """Get the global auth manager instance.
+
+    Returns:
+        Auth manager
+    """
+    global _auth_manager
+    if _auth_manager is None:
+        _auth_manager = AuthManager()
+    return _auth_manager
 
 # Security scheme for authentication
 security = HTTPBearer(auto_error=False)
