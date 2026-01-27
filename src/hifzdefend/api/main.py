@@ -15,7 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from ..service.engine import HifzDefendEngine
-from .routers import dashboard, scanning, monitoring, quarantine, config as config_router, licensing, payments, auth, updates
+from ..database import init_db
+from .routers import dashboard, scanning, monitoring, quarantine, config as config_router, licensing, payments, auth, updates, tickets, admin
 from .websocket import router as websocket_router
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     Handles startup and shutdown of the HifzDefend engine.
     """
     logger.info("Starting HifzDefend API server")
+
+    # Initialize database
+    logger.info("Initializing database...")
+    init_db()
+    logger.info("Database initialized")
 
     # Engine is created but not started (Windows service will start it)
     # The API just provides access to the engine
@@ -118,6 +124,16 @@ def create_app(engine: HifzDefendEngine) -> FastAPI:
         updates.router,
         prefix="/api/v1",
         tags=["updates"],
+    )
+    app.include_router(
+        tickets.router,
+        prefix="/api/v1",
+        tags=["tickets"],
+    )
+    app.include_router(
+        admin.router,
+        prefix="/api/v1",
+        tags=["admin"],
     )
     app.include_router(
         websocket_router,
