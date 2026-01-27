@@ -12,6 +12,7 @@ import License from './pages/License'
 import Purchase from './pages/Purchase'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import About from './pages/About'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +41,7 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="license" element={<License />} />
             <Route path="purchase" element={<Purchase />} />
+            <Route path="about" element={<About />} />
           </Route>
         </Routes>
       </Router>
