@@ -60,6 +60,8 @@ dependencies = [
     "anthropic>=0.40.0",            # Claude API client
     "chromadb>=0.4.0",              # Vector database for RAG
     "sentence-transformers>=2.2.0", # Text embeddings
+    # Phase 3: Commercial features
+    "stripe>=7.0.0",                # Payment processing
 ]
 
 [project.optional-dependencies]

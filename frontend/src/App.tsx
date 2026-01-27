@@ -9,6 +9,7 @@ import { AIAssistant } from './pages/AIAssistant'
 import { Logs } from './pages/Logs'
 import { Settings } from './pages/Settings'
 import License from './pages/License'
+import Purchase from './pages/Purchase'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +35,7 @@ function App() {
             <Route path="logs" element={<Logs />} />
             <Route path="settings" element={<Settings />} />
             <Route path="license" element={<License />} />
+            <Route path="purchase" element={<Purchase />} />
           </Route>
         </Routes>
       </Router>
