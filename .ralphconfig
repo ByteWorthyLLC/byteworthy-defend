@@ -1,0 +1,7 @@
+{
+  "ralphDirectory": ".",
+  "maxIterations": 5,
+  "stopOnFailure": false,
+  "typecheckCommand": "mypy src/",
+  "testCommand": "pytest"
+}

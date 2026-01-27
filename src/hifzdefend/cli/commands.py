@@ -279,5 +279,34 @@ def config_show():
         console.print(f"[bold red]Unexpected error:[/bold red] {e}")
 
 
+@cli.command()
+@click.option("--host", default="0.0.0.0", help="Host to bind to")
+@click.option("--port", default=8000, help="Port to listen on")
+@click.option("--reload", is_flag=True, help="Enable auto-reload for development")
+def web(host: str, port: int, reload: bool):
+    """Start HifzDefend web application."""
+    import webbrowser
+    import uvicorn
+    from threading import Timer
+
+    console.print("\n[bold cyan]HifzDefend Web Application[/bold cyan]\n")
+    console.print(f"Starting web server on http://{host}:{port}")
+    console.print("Press Ctrl+C to stop\n")
+
+    # Open browser after 1 second
+    def open_browser():
+        webbrowser.open(f"http://localhost:{port}")
+
+    Timer(1.0, open_browser).start()
+
+    # Start server
+    uvicorn.run(
+        "hifzdefend.api.main:app",
+        host=host,
+        port=port,
+        reload=reload
+    )
+
+
 if __name__ == "__main__":
     cli()

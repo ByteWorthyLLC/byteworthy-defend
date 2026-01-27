@@ -1,0 +1,331 @@
+{
+  "project": "HifzDefend Web Application",
+  "branchName": "feature/web-app",
+  "description": "Phase 2: Convert HifzDefend CLI antivirus to a modern web application with FastAPI backend, React TypeScript frontend, real-time monitoring, and management UI",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "FastAPI Backend Setup",
+      "description": "As a developer, I want a FastAPI backend with proper project structure so that I can serve REST API endpoints for the web frontend",
+      "acceptanceCriteria": [
+        "FastAPI project structure at src/hifzdefend/api/",
+        "Main FastAPI app at src/hifzdefend/api/main.py",
+        "CORS middleware configured for local development",
+        "Health check endpoint at /api/health",
+        "API documentation at /api/docs (Swagger)",
+        "Pydantic models for request/response at src/hifzdefend/api/models.py",
+        "API router structure at src/hifzdefend/api/routers/",
+        "Environment configuration using pydantic-settings",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 1,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Scan Management API Endpoints",
+      "description": "As a web user, I want API endpoints to trigger and monitor scans so that I can scan files and directories from the web interface",
+      "acceptanceCriteria": [
+        "POST /api/scans - Start new scan (file or directory path)",
+        "GET /api/scans - List all scans with pagination",
+        "GET /api/scans/{scan_id} - Get scan details and results",
+        "DELETE /api/scans/{scan_id} - Cancel running scan",
+        "Scan job queue using background tasks",
+        "Scan status: pending, running, completed, failed, cancelled",
+        "Response includes: scan_id, status, path, threats_found, start_time, end_time",
+        "Integration with existing scanner.py",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 2,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Dashboard Statistics API",
+      "description": "As a web user, I want API endpoints for dashboard statistics so that I can view system health and scan history",
+      "acceptanceCriteria": [
+        "GET /api/stats/overview - Total scans, threats found, quarantined items",
+        "GET /api/stats/recent-scans - Last 10 scans with results",
+        "GET /api/stats/threats-timeline - Threats detected over time (7 days)",
+        "GET /api/stats/system-status - ClamAV status, definitions version, last update",
+        "Response caching with 30-second TTL",
+        "Database or file-based storage for scan history",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 3,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Quarantine Management API",
+      "description": "As a web user, I want API endpoints to manage quarantined files so that I can view, restore, or delete quarantined threats",
+      "acceptanceCriteria": [
+        "GET /api/quarantine - List all quarantined files with pagination",
+        "GET /api/quarantine/{file_id} - Get quarantine file details",
+        "POST /api/quarantine/{file_id}/restore - Restore file to original location",
+        "DELETE /api/quarantine/{file_id} - Permanently delete quarantined file",
+        "Response includes: file_id, original_path, quarantine_path, threat_name, quarantine_date, file_size",
+        "Integration with existing quarantine system",
+        "Secure file operations (no path traversal)",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 4,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Configuration Management API",
+      "description": "As a web user, I want API endpoints to view and update configuration so that I can manage HifzDefend settings from the web interface",
+      "acceptanceCriteria": [
+        "GET /api/config - Get current configuration (sanitized, no secrets)",
+        "PUT /api/config - Update configuration settings",
+        "POST /api/config/validate - Validate configuration without saving",
+        "GET /api/config/defaults - Get default configuration values",
+        "Configuration validation using existing Pydantic models",
+        "Only allow updating safe settings (no ClamAV host/port from web)",
+        "Audit log for configuration changes",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 5,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "WebSocket Real-Time Updates",
+      "description": "As a web user, I want real-time updates via WebSocket so that I can see scan progress and system events live",
+      "acceptanceCriteria": [
+        "WebSocket endpoint at /api/ws",
+        "Broadcast scan progress updates (files scanned, current file, percentage)",
+        "Broadcast threat detection events",
+        "Broadcast system status changes",
+        "Client connection management",
+        "Graceful disconnection handling",
+        "Message format: JSON with event type and payload",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 6,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "React Frontend Setup with TypeScript",
+      "description": "As a developer, I want a React TypeScript frontend with proper tooling so that I can build a modern web UI",
+      "acceptanceCriteria": [
+        "Create frontend/ directory in project root",
+        "Initialize Vite + React + TypeScript project",
+        "Install dependencies: axios, react-router-dom, recharts, shadcn/ui",
+        "Configure TypeScript with strict mode",
+        "Setup Tailwind CSS for styling",
+        "API client service at frontend/src/services/api.ts",
+        "Environment configuration for API base URL",
+        "Development server runs on port 5173",
+        "Build command generates static files to frontend/dist/",
+        "Typecheck passes (npm run typecheck)"
+      ],
+      "priority": 7,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Dashboard Page with Statistics",
+      "description": "As a web user, I want a dashboard showing system overview so that I can monitor HifzDefend at a glance",
+      "acceptanceCriteria": [
+        "Dashboard route at / (home page)",
+        "Display overview statistics cards: Total Scans, Threats Found, Files Quarantined, System Status",
+        "Recent scans list with status badges",
+        "Threats timeline chart (last 7 days) using recharts",
+        "ClamAV status indicator (online/offline)",
+        "Last virus definitions update timestamp",
+        "Responsive design (mobile-friendly)",
+        "Auto-refresh statistics every 30 seconds",
+        "Loading states and error handling",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Scan Management Page",
+      "description": "As a web user, I want a page to start and monitor scans so that I can scan files and directories via the web UI",
+      "acceptanceCriteria": [
+        "Scan page route at /scans",
+        "Form to start new scan: path input, scan button",
+        "Scans list table with columns: ID, Path, Status, Threats, Start Time, Duration, Actions",
+        "Status badges with colors: pending (gray), running (blue), completed (green), failed (red)",
+        "Real-time scan progress updates via WebSocket",
+        "Cancel button for running scans",
+        "View details button to see scan results",
+        "File path validation (no empty paths)",
+        "Loading states and error handling",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Quarantine Management Page",
+      "description": "As a web user, I want a page to manage quarantined files so that I can restore or delete threats from the web UI",
+      "acceptanceCriteria": [
+        "Quarantine page route at /quarantine",
+        "Quarantine files table with columns: File Name, Original Path, Threat Name, Date, Size, Actions",
+        "Restore button with confirmation dialog",
+        "Delete button with confirmation dialog",
+        "Empty state message when no quarantined files",
+        "Pagination for large lists (10 items per page)",
+        "Search/filter by filename or threat name",
+        "Loading states and error handling",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Settings Page",
+      "description": "As a web user, I want a settings page to configure HifzDefend so that I can customize behavior from the web UI",
+      "acceptanceCriteria": [
+        "Settings page route at /settings",
+        "Form sections: Scanning Settings, Quarantine Settings",
+        "Toggle switches for: Auto-quarantine, Scan archives",
+        "Input fields for: Max file size, Excluded paths (textarea)",
+        "Save button with validation",
+        "Reset to defaults button",
+        "Show current values on page load",
+        "Success/error notifications",
+        "Form validation with error messages",
+        "Loading states and error handling",
+        "Typecheck passes"
+      ],
+      "priority": 11,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Navigation and Layout",
+      "description": "As a web user, I want consistent navigation and layout so that I can easily navigate the web application",
+      "acceptanceCriteria": [
+        "Main layout component with sidebar navigation",
+        "Navigation items: Dashboard, Scans, Quarantine, Settings",
+        "Active route highlighting",
+        "HifzDefend logo and branding",
+        "Responsive mobile menu (hamburger icon)",
+        "Footer with version number and copyright",
+        "Consistent spacing and typography",
+        "Dark mode toggle (optional)",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Backend-Frontend Integration",
+      "description": "As a developer, I want FastAPI to serve the React frontend so that the application runs as a single deployable unit",
+      "acceptanceCriteria": [
+        "FastAPI serves static files from frontend/dist/ at root path",
+        "API routes at /api/* prefix",
+        "WebSocket at /api/ws",
+        "Frontend build integrated into backend startup",
+        "Single command to run full stack: python -m hifzdefend web",
+        "New CLI command: hifzdefend web --host 0.0.0.0 --port 8000",
+        "Browser automatically opens to http://localhost:8000",
+        "README updated with web app usage instructions",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 13,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Error Handling and Validation",
+      "description": "As a developer, I want comprehensive error handling so that the web app provides clear feedback to users",
+      "acceptanceCriteria": [
+        "FastAPI exception handlers for common errors (404, 500, validation)",
+        "Consistent error response format: {error: string, detail?: string, code: string}",
+        "Frontend error boundary component",
+        "Toast notifications for user actions (success/error)",
+        "Form validation with inline error messages",
+        "API error handling in frontend with user-friendly messages",
+        "Loading spinners during async operations",
+        "Network error detection and retry suggestions",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 14,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Documentation and Deployment",
+      "description": "As a user, I want clear documentation for running the web app so that I can easily deploy and use HifzDefend",
+      "acceptanceCriteria": [
+        "Update README.md with web app section",
+        "New doc: docs/WEB_APP.md with architecture and API reference",
+        "Installation instructions for web app dependencies",
+        "Development setup: running backend and frontend separately",
+        "Production deployment: building and running as single app",
+        "Environment variables documentation",
+        "API endpoint reference",
+        "Screenshots of web interface",
+        "Troubleshooting section",
+        "Update CHANGELOG.md with v0.2.0 features"
+      ],
+      "priority": 15,
+      "max_iterations": 5,
+      "passes": false,
+      "status": "todo",
+      "notes": ""
+    }
+  ]
+}

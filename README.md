@@ -12,7 +12,7 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 
 ## Features
 
-### Phase 1: MVP (Current)
+### Phase 1: MVP ✅
 - **CLI Scanner**: Scan files and directories for malware
 - **ClamAV Integration**: Enterprise-grade virus detection engine
 - **Quarantine Management**: Automatic quarantine of detected threats
@@ -21,19 +21,21 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
 - **Rich Terminal Output**: Beautiful progress bars and tables
 - **EICAR Test Support**: Safe malware testing with encrypted samples
 
-### Phase 2: Real-Time Monitoring (Planned)
+### Phase 2: Web Application ✅ (v0.2.0)
+- **FastAPI Backend**: REST API with async support
+- **React TypeScript Frontend**: Modern, responsive web UI
+- **Real-time Dashboard**: Live statistics and threat timeline
+- **Scan Management**: Start and monitor scans from web browser
+- **Quarantine UI**: Manage quarantined files with restore/delete
+- **Settings Panel**: Configure scanning and quarantine options
+- **WebSocket Support**: Real-time updates (infrastructure ready)
+
+### Phase 3: Real-Time Monitoring (Planned)
 - File system monitoring with watchdog
 - Auto-scan on file creation/modification
 - Desktop notifications
 - Scheduled scans
 - Automatic virus definition updates
-
-### Phase 3: Web Dashboard (Planned)
-- REST API backend
-- Real-time scan statistics
-- Historical threat reports
-- Configuration management UI
-- Quarantine management interface
 
 ## Quick Start
 
@@ -85,6 +87,33 @@ HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featur
    ```
 
 ## Usage
+
+### Web Application (NEW in v0.2.0)
+
+Start the web application with a single command:
+
+```bash
+hifzdefend web
+```
+
+This will:
+- Start the FastAPI backend server
+- Serve the React frontend
+- Automatically open your browser to http://localhost:8000
+
+**Web Features:**
+- **Dashboard**: Real-time statistics and threat timeline
+- **Scan Management**: Start scans and monitor progress
+- **Quarantine**: Manage quarantined files
+- **Settings**: Configure scanning and quarantine options
+
+**Options:**
+```bash
+hifzdefend web --host 0.0.0.0 --port 8000  # Custom host/port
+hifzdefend web --reload                    # Enable auto-reload for development
+```
+
+### CLI Commands
 
 ### Scan a File
 ```bash
