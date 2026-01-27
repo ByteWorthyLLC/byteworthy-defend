@@ -15,6 +15,7 @@ from rich.table import Table
 from ..config.loader import get_config
 from ..config.validator import validate_config
 from ..core.engine import ScanEngine
+from ..service.engine import HifzDefendEngine  # New service layer
 from ..monitoring.manager import MonitorManager
 from ..reporting.formatter import save_report as save_scan_report
 from ..reporting.logger import setup_logger
@@ -43,6 +44,22 @@ except (ImportError, Exception):
 
 
 console = Console(force_terminal=True, legacy_windows=False)
+
+
+# Global engine instance (singleton pattern for CLI session)
+_engine_instance: Optional[HifzDefendEngine] = None
+
+
+def get_engine() -> HifzDefendEngine:
+    """
+    Get or create the HifzDefend engine instance.
+
+    This provides a singleton engine for the CLI session.
+    """
+    global _engine_instance
+    if _engine_instance is None:
+        _engine_instance = HifzDefendEngine()
+    return _engine_instance
 
 
 # Helper functions for consistent error messaging
@@ -324,34 +341,43 @@ def scan(path: str, save_report: bool):
 def status():
     """Display system status and ClamAV information."""
     try:
-        # Load configuration
-        config = get_config()
+        # Get engine instance
+        engine = get_engine()
+        config = engine.config
 
         console.print("\n[bold cyan]HifzDefend Status[/bold cyan]\n")
 
-        # Check ClamAV connection
-        with ScanEngine(config) as engine:
-            if engine.check_connection():
-                console.print("[bold green][OK][/bold green] ClamAV daemon: Running")
+        # Check ClamAV connection using engine
+        clamav_status = engine.check_clamav_connection()
 
-                # Get version
-                version = engine.get_version()
-                if version:
-                    console.print(f"[bold]Version:[/bold] {version}")
-            else:
-                console.print("[bold red][FAIL][/bold red] ClamAV daemon: Not running")
-                console.print(
-                    f"  Expected at: {config.clamav.host}:{config.clamav.port}"
-                )
-                console.print("\n[yellow]Note:[/yellow] ClamAV is OPTIONAL for AI features")
-                console.print("  AI script analysis works WITHOUT ClamAV")
-                console.print("  ClamAV is only needed for traditional antivirus scanning")
-                console.print("\n[yellow]If you want to use ClamAV:[/yellow]")
-                console.print("  1. Download from: https://www.clamav.net/downloads")
-                console.print("  2. Ensure clamd.exe is running")
-                console.print("  3. Check configuration in clamd.conf")
-                console.print("  4. Verify TCPSocket is enabled on port 3310")
-                console.print("\n[cyan]Need help?[/cyan] See docs/TROUBLESHOOTING.md")
+        if clamav_status["connected"]:
+            console.print("[bold green][OK][/bold green] ClamAV daemon: Running")
+            if clamav_status.get("version"):
+                console.print(f"[bold]Version:[/bold] {clamav_status['version']}")
+        else:
+            console.print("[bold red][FAIL][/bold red] ClamAV daemon: Not running")
+            console.print(
+                f"  Expected at: {clamav_status['host']}:{clamav_status['port']}"
+            )
+            if clamav_status.get("error"):
+                console.print(f"  Error: {clamav_status['error']}")
+
+            console.print("\n[yellow]Note:[/yellow] ClamAV is OPTIONAL for AI features")
+            console.print("  AI script analysis works WITHOUT ClamAV")
+            console.print("  ClamAV is only needed for traditional antivirus scanning")
+            console.print("\n[yellow]If you want to use ClamAV:[/yellow]")
+            console.print("  1. Download from: https://www.clamav.net/downloads")
+            console.print("  2. Ensure clamd.exe is running")
+            console.print("  3. Check configuration in clamd.conf")
+            console.print("  4. Verify TCPSocket is enabled on port 3310")
+            console.print("\n[cyan]Need help?[/cyan] See docs/TROUBLESHOOTING.md")
+
+        # Display service status
+        system_status = engine.get_system_status()
+        console.print("\n[bold]Service Status:[/bold]")
+        console.print(f"  Protection: {system_status['protection_status']}")
+        console.print(f"  Active monitors: {system_status['monitors']['active']}/{system_status['monitors']['total']}")
+        console.print(f"  Threats detected: {system_status['threats']['total']}")
 
         # Display configuration
         console.print("\n[bold]Configuration:[/bold]")
@@ -371,32 +397,36 @@ def status():
 @cli.command()
 def update():
     """Update virus definitions."""
-    import subprocess
-
     console.print("\n[bold cyan]Updating Virus Definitions[/bold cyan]\n")
 
     try:
-        # Try to run freshclam
-        result = subprocess.run(
-            ["freshclam"],
-            capture_output=True,
-            text=True,
-            timeout=300,
-        )
+        # Get engine instance
+        engine = get_engine()
 
-        if result.returncode == 0:
+        # Run update using engine
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Updating...", total=None)
+            result = engine.update_virus_definitions()
+            progress.update(task, completed=True)
+
+        if result["success"]:
             console.print("[bold green][OK][/bold green] Virus definitions updated successfully")
-            if result.stdout:
-                console.print(result.stdout)
+            if result.get("stdout"):
+                console.print(result["stdout"])
         else:
             console.print("[bold red][FAIL][/bold red] Update failed")
-            if result.stderr:
-                console.print(result.stderr)
+            if result.get("error"):
+                console.print(f"[red]{result['error']}[/red]")
+            elif result.get("stderr"):
+                console.print(result["stderr"])
 
-    except FileNotFoundError:
-        console.print("[bold red]ERROR:[/bold red] freshclam not found")
-        console.print("\n[yellow]ClamAV is not installed or not in PATH[/yellow]")
-        console.print("  Download ClamAV: https://www.clamav.net/downloads")
+            if "not found" in result.get("error", "").lower():
+                console.print("\n[yellow]ClamAV is not installed or not in PATH[/yellow]")
+                console.print("  Download ClamAV: https://www.clamav.net/downloads")
         console.print("  Or add ClamAV bin directory to PATH")
         console.print("\n[yellow]Note:[/yellow] ClamAV is optional for AI features")
         console.print("  Use AI commands without ClamAV: hifzdefend ai --help")
@@ -1036,7 +1066,9 @@ def query(question: str, interactive: bool):
         return
 
     try:
-        config = get_config()
+        # Get engine instance
+        engine = get_engine()
+        config = engine.config
 
         # Check if AI is enabled
         if not config.ai.enabled or not config.ai.natural_language.enabled:
@@ -1057,62 +1089,69 @@ def query(question: str, interactive: bool):
 
         console.print("\n[bold cyan]HifzDefend Natural Language Query[/bold cyan]\n")
 
-        # Initialize Claude analyzer
-        claude = ClaudeAnalyzer(
-            api_key=api_key,
-            model=config.ai.claude.model,
-            max_tokens=config.ai.claude.max_tokens,
-            temperature=config.ai.claude.temperature,
-            timeout=config.ai.claude.timeout,
-            cache_enabled=config.ai.claude.cache_responses,
-            cache_dir=config.ai.claude.cache_path_expanded,
-            cache_ttl=config.ai.claude.cache_ttl,
-            max_requests_per_hour=config.ai.claude.max_requests_per_hour,
-            log_costs=config.ai.claude.log_api_costs,
-            fallback_on_error=config.ai.claude.fallback_on_error,
-            retry_attempts=config.ai.claude.retry_attempts,
-            retry_delay=config.ai.claude.retry_delay,
-        )
-
-        # Initialize NL interface
-        nl_interface = NaturalLanguageInterface(
-            vector_db_path=config.ai.natural_language.vector_db_path_expanded,
-            claude_analyzer=claude,
-            embedding_model=config.ai.natural_language.embedding_model,
-            collection_name=config.ai.natural_language.chromadb.collection_name,
-            max_context_results=config.ai.natural_language.max_context_results,
-        )
-
         if interactive:
-            # Start interactive mode
+            # Interactive mode requires direct NL interface access (not refactored yet)
+            from ..ai.claude_analyzer import ClaudeAnalyzer
+            from ..ai.nl_interface import NaturalLanguageInterface
+
+            claude = ClaudeAnalyzer(
+                api_key=api_key,
+                model=config.ai.claude.model,
+                max_tokens=config.ai.claude.max_tokens,
+                temperature=config.ai.claude.temperature,
+                timeout=config.ai.claude.timeout,
+                cache_enabled=config.ai.claude.cache_responses,
+                cache_dir=config.ai.claude.cache_path_expanded,
+                cache_ttl=config.ai.claude.cache_ttl,
+                max_requests_per_hour=config.ai.claude.max_requests_per_hour,
+                log_costs=config.ai.claude.log_api_costs,
+                fallback_on_error=config.ai.claude.fallback_on_error,
+                retry_attempts=config.ai.claude.retry_attempts,
+                retry_delay=config.ai.claude.retry_delay,
+            )
+
+            nl_interface = NaturalLanguageInterface(
+                vector_db_path=config.ai.natural_language.vector_db_path_expanded,
+                claude_analyzer=claude,
+                embedding_model=config.ai.natural_language.embedding_model,
+                collection_name=config.ai.natural_language.chromadb.collection_name,
+                max_context_results=config.ai.natural_language.max_context_results,
+            )
             nl_interface.interactive_query()
         else:
-            # Single query
+            # Single query using engine
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
                 console=console,
             ) as progress:
                 task = progress.add_task("[cyan]Searching logs...", total=None)
-                result = nl_interface.query(question)
+                query_result = engine.query_with_ai(question)
                 progress.update(task, completed=True)
+
+            # Check for errors
+            if not query_result["success"]:
+                console.print(f"[bold red]ERROR:[/bold red] {query_result.get('error', 'Unknown error')}")
+                return
 
             # Display result
             console.print(f"\n[bold]Q:[/bold] {question}")
-            console.print(f"\n[bold green]A:[/bold green] {result['answer']}\n")
+            console.print(f"\n[bold green]A:[/bold green] {query_result['answer']}\n")
 
-            if result['num_results'] > 0:
-                console.print(f"[dim]Found {result['num_results']} relevant log entries[/dim]")
+            if query_result['num_results'] > 0:
+                console.print(f"[dim]Found {query_result['num_results']} relevant log entries[/dim]")
 
                 # Show cost stats
-                if config.ai.claude.log_api_costs:
-                    stats = claude.get_cost_stats()
+                if config.ai.claude.log_api_costs and query_result.get("cost"):
+                    cost = query_result["cost"]
                     console.print(
-                        f"[dim]Cost: ${stats['total_cost_usd']:.4f} "
-                        f"({stats['input_tokens']} in, {stats['output_tokens']} out)[/dim]"
+                        f"[dim]Cost: ${cost['total_cost_usd']:.4f} "
+                        f"({cost['input_tokens']} in, {cost['output_tokens']} out)[/dim]"
                     )
 
     except HifzDefendError as e:
+        console.print(f"[bold red]ERROR:[/bold red] {e}")
+    except ValueError as e:
         console.print(f"[bold red]ERROR:[/bold red] {e}")
     except Exception as e:
         print_api_error_with_hints(e, "Natural language query failed")
@@ -1137,7 +1176,9 @@ def analyze_script(script_path: str, type: str, save: bool):
         return
 
     try:
-        config = get_config()
+        # Get engine instance
+        engine = get_engine()
+        config = engine.config
 
         # Check if AI is enabled
         if not config.ai.enabled or not config.ai.claude.enabled:
@@ -1173,32 +1214,23 @@ def analyze_script(script_path: str, type: str, save: bool):
         console.print(f"\n[bold cyan]Claude Script Analyzer[/bold cyan]")
         console.print(f"Analyzing: [yellow]{script_path}[/yellow]\n")
 
-        # Initialize Claude analyzer
-        claude = ClaudeAnalyzer(
-            api_key=api_key,
-            model=config.ai.claude.model,
-            max_tokens=config.ai.claude.max_tokens,
-            temperature=config.ai.claude.temperature,
-            timeout=config.ai.claude.timeout,
-            cache_enabled=config.ai.claude.cache_responses,
-            cache_dir=config.ai.claude.cache_path_expanded,
-            cache_ttl=config.ai.claude.cache_ttl,
-            max_requests_per_hour=config.ai.claude.max_requests_per_hour,
-            log_costs=config.ai.claude.log_api_costs,
-            fallback_on_error=config.ai.claude.fallback_on_error,
-            retry_attempts=config.ai.claude.retry_attempts,
-            retry_delay=config.ai.claude.retry_delay,
-        )
-
-        # Analyze script
+        # Analyze script using engine
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
             task = progress.add_task("[cyan]Analyzing script with Claude...", total=None)
-            result = claude.analyze_script(Path(script_path), script_type=type)
+            analysis_result = engine.analyze_script_with_ai(script_path, script_type=type)
             progress.update(task, completed=True)
+
+        # Check for errors
+        if not analysis_result["success"]:
+            console.print(f"[bold red]ERROR:[/bold red] {analysis_result.get('error', 'Unknown error')}")
+            return
+
+        # Extract analysis from result
+        result = analysis_result["analysis"]
 
         # Display results
         console.print("\n[bold]Analysis Results:[/bold]\n")
@@ -1240,11 +1272,11 @@ def analyze_script(script_path: str, type: str, save: bool):
                     console.print(f"  {key}: {value}")
 
         # Show cost stats
-        if config.ai.claude.log_api_costs:
-            stats = claude.get_cost_stats()
+        if config.ai.claude.log_api_costs and analysis_result.get("cost"):
+            cost = analysis_result["cost"]
             console.print(
-                f"\n[dim]API Cost: ${stats['total_cost_usd']:.4f} "
-                f"({stats['input_tokens']} in, {stats['output_tokens']} out)[/dim]"
+                f"\n[dim]API Cost: ${cost['total_cost_usd']:.4f} "
+                f"({cost['input_tokens']} in, {cost['output_tokens']} out)[/dim]"
             )
 
         # Save report if requested

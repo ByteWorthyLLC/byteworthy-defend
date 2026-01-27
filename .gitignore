@@ -98,3 +98,4 @@ dmypy.json
 # Environment variables
 .env
 .env.local
+nul
