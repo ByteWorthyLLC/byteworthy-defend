@@ -8,6 +8,7 @@ import {
   FileText,
   Settings,
   Activity,
+  Key,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from './ui/badge'
@@ -20,6 +21,7 @@ const navigation = [
   { name: 'Quarantine', href: '/quarantine', icon: Archive },
   { name: 'AI Assistant', href: '/ai', icon: Brain },
   { name: 'Logs', href: '/logs', icon: FileText },
+  { name: 'License', href: '/license', icon: Key },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 

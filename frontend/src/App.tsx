@@ -8,6 +8,7 @@ import { Quarantine } from './pages/Quarantine'
 import { AIAssistant } from './pages/AIAssistant'
 import { Logs } from './pages/Logs'
 import { Settings } from './pages/Settings'
+import License from './pages/License'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +33,7 @@ function App() {
             <Route path="ai" element={<AIAssistant />} />
             <Route path="logs" element={<Logs />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="license" element={<License />} />
           </Route>
         </Routes>
       </Router>

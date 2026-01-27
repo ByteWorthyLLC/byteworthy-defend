@@ -12,8 +12,24 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import secrets
 
 from ..service.engine import HifzDefendEngine
+from ..licensing.manager import LicenseManager
 
 logger = logging.getLogger(__name__)
+
+# Global license manager instance
+_license_manager: Optional[LicenseManager] = None
+
+
+def get_license_manager() -> LicenseManager:
+    """Get the global license manager instance.
+
+    Returns:
+        License manager
+    """
+    global _license_manager
+    if _license_manager is None:
+        _license_manager = LicenseManager()
+    return _license_manager
 
 # Security scheme for authentication
 security = HTTPBearer(auto_error=False)

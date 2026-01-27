@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from ..service.engine import HifzDefendEngine
-from .routers import dashboard, scanning, monitoring, quarantine, config as config_router
+from .routers import dashboard, scanning, monitoring, quarantine, config as config_router, licensing
 from .websocket import router as websocket_router
 
 logger = logging.getLogger(__name__)
@@ -98,6 +98,11 @@ def create_app(engine: HifzDefendEngine) -> FastAPI:
         config_router.router,
         prefix="/api/v1/config",
         tags=["configuration"],
+    )
+    app.include_router(
+        licensing.router,
+        prefix="/api/v1",
+        tags=["licensing"],
     )
     app.include_router(
         websocket_router,
