@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Linux host (production target)
-- Windows host (development validation gate only)
+- Windows host (production target)
 - Python 3.11+
 
 ## Install
@@ -22,9 +22,9 @@ pip install -e '.[dev]'
 bw-defend doctor --strict --json
 ```
 
-## Linux Parity via Docker (macOS/Windows Dev Hosts)
+## Linux Runtime Parity via Docker (Optional)
 
-Run the same Linux gate used by CI:
+Run the same Linux gate used by CI/release workflows:
 
 ```bash
 docker compose run --rm linux-gate
@@ -46,9 +46,20 @@ pwsh -File scripts/windows-gate.ps1
 
 ## First Scan
 
+Linux:
+
 ```bash
 mkdir -p /tmp/bw-defend-lab
 echo 'EICAR-STANDARD-ANTIVIRUS-TEST-FILE' > /tmp/bw-defend-lab/eicar.txt
 bw-defend scan /tmp/bw-defend-lab --json
+bw-defend quarantine list --json
+```
+
+Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force -Path \"$env:TEMP\\bw-defend-lab\" | Out-Null
+Set-Content -Path \"$env:TEMP\\bw-defend-lab\\eicar.txt\" -Value 'EICAR-STANDARD-ANTIVIRUS-TEST-FILE'
+bw-defend scan \"$env:TEMP\\bw-defend-lab\" --json
 bw-defend quarantine list --json
 ```

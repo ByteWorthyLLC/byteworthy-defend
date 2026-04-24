@@ -15,9 +15,9 @@
 - process kill approval enforcement
 - AI remediation gating (blocked vs approved)
 
-## End-to-End Linux Verification
+## End-to-End Cross-Platform Verification
 
-Before production release, run:
+Before production release on Linux, run:
 
 ```bash
 ./scripts/linux-gate.sh
@@ -29,7 +29,7 @@ For macOS/Windows developers who need Linux parity:
 docker compose run --rm linux-gate
 ```
 
-For native Windows CI-equivalent validation:
+Before production release on Windows, run:
 
 ```powershell
 pwsh -File scripts/windows-gate.ps1

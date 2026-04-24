@@ -15,7 +15,7 @@
 - [ ] `pytest`
 - [ ] `bw-defend doctor --json`
 - [ ] `bw-defend rules verify --json`
-- [ ] Linux smoke verification completed for changed command surfaces
+- [ ] Linux and Windows smoke verification completed for changed command surfaces
 
 ## Risk and Blast Radius
 

@@ -1,6 +1,6 @@
 # ByteWorthy Defend
 
-ByteWorthy Defend is an open-source Linux-first terminal antivirus by ByteWorthy LLC.
+ByteWorthy Defend is an open-source Windows and Linux terminal antivirus by ByteWorthy LLC.
 
 - Repository: https://github.com/ByteWorthyLLC/byteworthy-defend
 - Product site: https://byteworthyllc.github.io/byteworthy-defend/

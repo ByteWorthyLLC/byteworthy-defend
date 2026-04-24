@@ -14,7 +14,7 @@ Use this guide for all user-facing content in README, docs, and site pages.
 1. Use short paragraphs and explicit sections.
 2. Prefer checklists, commands, and tables over vague prose.
 3. Keep naming consistent: `ByteWorthy Defend` and `bw-defend`.
-4. Keep Linux-first scope explicit for production declarations.
+4. Keep Windows and Linux scope explicit for production declarations.
 
 ## Phrase Policy
 
@@ -34,7 +34,7 @@ Keep ByteWorthy references explicit and accurate:
 1. Sovra: open-source AI SaaS baseline
 2. Klienta: paid white-label baseline
 3. Clynova: paid healthcare baseline
-4. ByteWorthy Defend: open-source Linux endpoint defense CLI
+4. ByteWorthy Defend: open-source Windows and Linux endpoint defense CLI
 
 ## Offer Clarity Checklist
 

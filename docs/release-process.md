@@ -7,11 +7,16 @@
 
 ## Pre-Release Validation
 
+Linux:
+
 ```bash
-pytest
-bw-defend doctor --strict --json
-bw-defend rules verify --json
-./scripts/validate-docs.sh
+./scripts/linux-gate.sh
+```
+
+Windows:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
 ```
 
 ## Versioning

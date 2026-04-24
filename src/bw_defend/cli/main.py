@@ -19,7 +19,9 @@ from bw_defend.monitor.service import monitor_status, start_monitor, stop_monito
 from bw_defend.security import firewall, process_control
 from bw_defend.cli.output import emit
 
-app = typer.Typer(help="ByteWorthy Defend Linux-first terminal antivirus")
+SUPPORTED_PLATFORMS = {"linux", "windows"}
+
+app = typer.Typer(help="ByteWorthy Defend terminal antivirus for Windows and Linux")
 monitor_app = typer.Typer()
 quarantine_app = typer.Typer()
 firewall_app = typer.Typer()
@@ -234,6 +236,7 @@ def doctor(
     json_output: bool = typer.Option(False, "--json"),
     strict: bool = typer.Option(False, "--strict", help="Exit non-zero when any doctor check fails"),
 ) -> None:
+    runtime_platform = platform.system().lower()
     try:
         config = load_config()
         config_loaded = True
@@ -249,10 +252,11 @@ def doctor(
         "edition": config.edition if config else "unknown",
         "config": config_as_dict(config) if config else {},
         "checks": {
-            "linux_target": platform.system().lower() == "linux",
+            "supported_platform": runtime_platform in SUPPORTED_PLATFORMS,
             "config_loaded": config_loaded,
             "state_writable": writable,
         },
+        "platform": runtime_platform,
         "errors": {"config": config_error} if config_error else {},
     }
     emit(payload, json_output)

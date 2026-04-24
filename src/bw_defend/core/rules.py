@@ -15,6 +15,7 @@ DEFAULT_RULES = {
     "rules": [
         {"id": "MAL-EICAR-001", "pattern": "EICAR-STANDARD-ANTIVIRUS-TEST-FILE", "severity": "high"},
         {"id": "SUS-DANG-002", "pattern": "rm -rf /", "severity": "critical"},
+        {"id": "SUS-WIN-003", "pattern": "powershell -enc", "severity": "critical"},
     ],
 }
 VALID_SEVERITIES = {"low", "medium", "high", "critical"}

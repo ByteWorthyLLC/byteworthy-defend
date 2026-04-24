@@ -2,7 +2,7 @@
 
 ## Threat Model Focus
 
-- malicious artifacts on Linux hosts
+- malicious artifacts on Windows and Linux hosts
 - unsafe or over-broad remediation actions
 - integrity tampering of rule bundles
 - loss of forensic auditability

@@ -5,19 +5,20 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "byteworthy-defend"
 version = "0.1.0"
-description = "Linux-first terminal antivirus with core and AI editions."
+description = "Windows and Linux terminal antivirus with core and AI editions."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
   { name = "ByteWorthy LLC", email = "support@byteworthy.io" }
 ]
-keywords = ["antivirus", "security", "linux", "cli", "endpoint-security", "malware"]
+keywords = ["antivirus", "security", "linux", "windows", "cli", "endpoint-security", "malware"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",

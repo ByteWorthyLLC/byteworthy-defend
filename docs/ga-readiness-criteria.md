@@ -4,10 +4,10 @@ A release is production-ready only when all criteria are true.
 
 ## Mandatory Gates
 
-- [ ] CI workflow green on `main`
+- [ ] CI workflow green on `main` for Linux and Windows jobs
 - [ ] Security workflow green on `main`
 - [ ] Release-readiness workflow green on `main`
-- [ ] `pytest` passes on release commit
+- [ ] `pytest` passes on release commit for Linux and Windows runners
 - [ ] all release checklist items in `docs/release-readiness-checklist.md` checked
 
 ## Safety and Controls

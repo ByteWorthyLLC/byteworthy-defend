@@ -26,4 +26,4 @@ All operational commands support `--json`.
 - `ai remediate` requires `edition = "ai"` in config.
 - destructive actions (`delete`, `kill`, `network_block`) require `--approve` when policy enforces approval.
 - `bw-defend rules verify` exits `2` if verification fails.
-- `bw-defend doctor --strict` exits `2` if any health check fails.
+- `bw-defend doctor --strict` exits `2` if any health check fails, including unsupported runtime platform (supported: Windows and Linux).

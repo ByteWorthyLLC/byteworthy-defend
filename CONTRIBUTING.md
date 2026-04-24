@@ -1,6 +1,6 @@
 # Contributing to ByteWorthy Defend
 
-ByteWorthy Defend is an open-source Linux security project. Every change must preserve operational safety, reproducibility, and clear rollback behavior.
+ByteWorthy Defend is an open-source Windows and Linux security project. Every change must preserve operational safety, reproducibility, and clear rollback behavior.
 
 ## Branching and Commits
 
@@ -30,6 +30,12 @@ Run these before opening or updating a PR:
 pytest
 bw-defend doctor --strict --json
 ./scripts/validate-docs.sh
+```
+
+On Windows hosts, run:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
 ```
 
 For release-bound changes, also ensure:

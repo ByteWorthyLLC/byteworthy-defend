@@ -7,13 +7,25 @@ on:
 
 jobs:
   gate:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: '3.11'
+            gate-command: ./scripts/linux-gate.sh
+            shell: bash
+          - os: windows-latest
+            python-version: '3.11'
+            gate-command: ./scripts/windows-gate.ps1
+            shell: pwsh
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: |
+          python-version: ${{ matrix.python-version }}
+      - shell: ${{ matrix.shell }}
+        run: |
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
-          ./scripts/linux-gate.sh
+          ${{ matrix.gate-command }}

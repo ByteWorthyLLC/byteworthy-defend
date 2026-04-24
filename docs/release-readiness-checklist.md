@@ -1,11 +1,13 @@
 # Release Readiness Checklist (Single Production Cut)
 
-## Linux Packaging and Installability
+## Windows and Linux Packaging and Installability
 
 - [ ] Linux package/install instructions verified on clean host
+- [ ] Windows package/install instructions verified on clean host
 - [ ] rollback instructions validated in dry-run and live-safe test
 - [ ] command completion and help text verified for all required commands
-- [ ] `bw-defend doctor --strict --json` passes on release candidate host
+- [ ] `bw-defend doctor --strict --json` passes on Linux release candidate host
+- [ ] `bw-defend doctor --strict --json` passes on Windows release candidate host
 
 ## Security and Safety Gates
 

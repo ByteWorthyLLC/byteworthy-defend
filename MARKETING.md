@@ -4,7 +4,7 @@ This file is the buyer-facing reference for repository listings, partner pages, 
 
 ## Canonical Positioning
 
-- ByteWorthy Defend is open-source (MIT), Linux-first endpoint defense operated through a terminal CLI.
+- ByteWorthy Defend is open-source (MIT), Windows and Linux endpoint defense operated through a terminal CLI.
 - The project focuses on continuous host protection with explicit operator controls.
 - The AI edition is optional and policy-gated; destructive actions always require approval when policy enforces it.
 
@@ -39,8 +39,8 @@ ByteWorthy product-line references for cross-repo positioning:
 
 ## Core Query Themes
 
-- open source linux antivirus cli
-- linux endpoint protection with quarantine and policy engine
+- open source windows linux antivirus cli
+- windows and linux endpoint protection with quarantine and policy engine
 - ai remediation with human approval gates
 - terminal antivirus for devops and security teams
 - auditable malware response workflow

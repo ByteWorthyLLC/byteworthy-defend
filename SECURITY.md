@@ -48,4 +48,4 @@ Out of scope:
 - [ ] Store config at `~/.config/bw-defend/config.toml` with least-privilege permissions
 - [ ] Keep rules bundles signed/checksummed by trusted source
 - [ ] Validate rollback and incident runbooks quarterly
-- [ ] Keep Linux host patched and endpoint telemetry enabled
+- [ ] Keep Windows and Linux hosts patched and endpoint telemetry enabled

@@ -5,7 +5,7 @@
 <h1 align="center">ByteWorthy Defend</h1>
 
 <p align="center">
-  <strong>Open-source Linux-first terminal antivirus for continuous host protection.</strong>
+  <strong>Open-source Windows and Linux terminal antivirus for continuous host protection.</strong>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
   <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ByteWorthyLLC/byteworthy-defend/ci.yml?branch=main&style=flat-square&label=ci" alt="CI Status" /></a>
   <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/ByteWorthyLLC/byteworthy-defend/security.yml?branch=main&style=flat-square&label=security" alt="Security Status" /></a>
-  <img src="https://img.shields.io/badge/platform-Linux-informational?style=flat-square" alt="Linux target" />
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-informational?style=flat-square" alt="Windows and Linux target" />
   <img src="https://img.shields.io/badge/interface-bw--defend-black?style=flat-square" alt="bw-defend CLI" />
 </p>
 
@@ -44,7 +44,7 @@
 
 > **Most endpoint tools either hide internals or skip operator controls.**
 > ByteWorthy Defend keeps security actions explicit, auditable, and scriptable.
-> Open source, MIT-licensed, Linux-first.
+> Open source, MIT-licensed, Windows-and-Linux.
 
 <br/>
 
@@ -79,6 +79,13 @@ cp config.example.toml ~/.config/bw-defend/config.toml
 # set: edition = "ai"
 ```
 
+Windows PowerShell config path:
+
+```powershell
+Copy-Item config.example.toml \"$env:APPDATA\\bw-defend\\config.toml\" -Force
+# set: edition = \"ai\"
+```
+
 <details>
 <summary><strong>First full verification path</strong> (scan + controls + rules)</summary>
 
@@ -110,7 +117,7 @@ Canonical routes:
 
 ## 🔍 Why ByteWorthy Defend
 
-For Linux security operators, platform teams, and engineering-led security programs:
+For Windows and Linux security operators, platform teams, and engineering-led security programs:
 
 - Continuous host scanning and deterministic detection workflows
 - Reversible quarantine and firewall actions
@@ -125,7 +132,7 @@ ByteWorthy ships a clear product continuum:
 1. **Sovra**: open-source AI SaaS baseline
 2. **Klienta**: paid white-label agency baseline
 3. **Clynova**: paid healthcare launch baseline
-4. **ByteWorthy Defend**: open-source Linux endpoint defense CLI
+4. **ByteWorthy Defend**: open-source Windows and Linux endpoint defense CLI
 
 <br/>
 
@@ -165,7 +172,7 @@ Discoverability and answer-engine assets ship in-repo:
 - Strict health gate: `bw-defend doctor --strict --json`
 - Machine-readable exit codes for CI and automation
 - Documentation validation gate: `./scripts/validate-docs.sh`
-- Release-readiness workflows on GitHub Actions
+- Release-readiness workflows on GitHub Actions for Windows and Linux
 - Windows development gate on `windows-latest`: `scripts/windows-gate.ps1`
 
 <br/>

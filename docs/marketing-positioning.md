@@ -2,7 +2,7 @@
 
 ## Tagline
 
-Linux-first terminal antivirus with policy-gated AI remediation.
+Windows and Linux terminal antivirus with policy-gated AI remediation.
 
 ## Value Proposition
 
@@ -13,7 +13,7 @@ Linux-first terminal antivirus with policy-gated AI remediation.
 ## Audience
 
 - platform security teams
-- DevOps/SRE teams running Linux workloads
+- DevOps/SRE teams running Windows and Linux workloads
 - engineering teams that need transparent endpoint controls
 
 ## Core Claims

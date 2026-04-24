@@ -1,13 +1,12 @@
-# Deployment Guide (Linux)
+# Deployment Guide (Windows and Linux)
 
 ## Target
 
-- Production support declaration: Linux only.
-- Windows support: development and CI validation only (not production declaration scope).
+- Production support declaration: Windows and Linux.
 
 ## Install Path
 
-1. Build and install package:
+Linux:
 
 ```bash
 python3 -m venv /opt/bw-defend/.venv
@@ -15,17 +14,32 @@ source /opt/bw-defend/.venv/bin/activate
 pip install byteworthy-defend
 ```
 
-2. Seed config:
+Windows PowerShell:
+
+```powershell
+python -m venv $env:USERPROFILE\\.bw-defend\\.venv
+& $env:USERPROFILE\\.bw-defend\\.venv\\Scripts\\Activate.ps1
+pip install byteworthy-defend
+```
+
+Seed config:
 
 ```bash
 mkdir -p ~/.config/bw-defend
 cp config.example.toml ~/.config/bw-defend/config.toml
 ```
 
-3. Validate runtime:
+Windows PowerShell config seed:
+
+```powershell
+New-Item -ItemType Directory -Force -Path \"$env:APPDATA\\bw-defend\" | Out-Null
+Copy-Item config.example.toml \"$env:APPDATA\\bw-defend\\config.toml\" -Force
+```
+
+Validate runtime:
 
 ```bash
-bw-defend doctor --json
+bw-defend doctor --strict --json
 ```
 
 ## Linux Runtime Mimic (Containerized)
@@ -43,7 +57,7 @@ Or use compose:
 docker compose run --rm linux-gate
 ```
 
-## Native Windows Validation
+## Native Windows Validation Gate
 
 Run the Windows CI-equivalent gate:
 

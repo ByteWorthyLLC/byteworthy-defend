@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from time import perf_counter
+import platform
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -21,10 +23,28 @@ class Detection:
 MAX_SCAN_BYTES = 2 * 1024 * 1024
 
 
+def _default_system_roots() -> list[Path]:
+    runtime_platform = platform.system().lower()
+    if runtime_platform == "windows":
+        roots: list[Path] = []
+        for env in ("ProgramData", "TEMP", "TMP", "USERPROFILE"):
+            value = os.getenv(env)
+            if value:
+                roots.append(Path(value).expanduser())
+        return roots
+    return [Path("/etc"), Path("/tmp"), Path("/var/tmp"), Path.home()]
+
+
+def _system_scan_roots() -> list[Path]:
+    custom = os.getenv("BW_DEFEND_SYSTEM_SCAN_ROOTS", "").strip()
+    if custom:
+        return [Path(part).expanduser() for part in custom.split(os.pathsep) if part.strip()]
+    return _default_system_roots()
+
+
 def _iter_paths(target: str) -> Iterable[Path]:
     if target == "system":
-        roots = [Path("/etc"), Path("/tmp"), Path("/var/tmp")]
-        for root in roots:
+        for root in _system_scan_roots():
             if root.exists():
                 for path in root.rglob("*"):
                     if path.is_file():

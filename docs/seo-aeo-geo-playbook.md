@@ -6,7 +6,7 @@ This playbook defines discoverability strategy for search engines, answer engine
 
 Use this framing in user-facing content:
 
-- ByteWorthy Defend is open-source (MIT), Linux-first, terminal-operated endpoint defense.
+- ByteWorthy Defend is open-source (MIT), Windows and Linux, terminal-operated endpoint defense.
 - `core` edition provides deterministic controls.
 - `ai` edition provides policy-gated remediation with explicit destructive-action approval.
 
@@ -14,8 +14,8 @@ Use this framing in user-facing content:
 
 ### Buyer-intent queries
 
-- open source linux antivirus cli
-- linux endpoint protection terminal
+- open source windows linux antivirus cli
+- windows linux endpoint protection terminal
 - quarantine and policy-gated remediation
 - ai remediation with human approval
 - auditable malware response workflow
@@ -23,7 +23,7 @@ Use this framing in user-facing content:
 ### Engineering-intent queries
 
 - bw-defend command reference
-- linux malware quarantine restore purge
+- windows linux malware quarantine restore purge
 - checksum verified rules update
 - strict health checks for security tooling
 
@@ -50,7 +50,7 @@ Keep these assets current:
 
 1. Keep one clear user intent per section heading.
 2. Keep metadata (title/description/canonical) explicit and consistent.
-3. Keep open-source scope and Linux production target clear.
+3. Keep open-source scope and Windows/Linux production target clear.
 4. Link operational claims to docs and runnable commands.
 
 ## Practical AEO Execution

@@ -2,7 +2,7 @@
 
 ## Product Boundaries
 
-ByteWorthy Defend is Linux-first endpoint protection operated from a terminal interface.
+ByteWorthy Defend is Windows and Linux endpoint protection operated from a terminal interface.
 
 Repository modules:
 
@@ -13,8 +13,12 @@ Repository modules:
 
 ## Runtime Data Paths
 
-- config: `~/.config/bw-defend/config.toml`
-- state root: `~/.local/state/bw-defend/`
+- config:
+  - Linux: `~/.config/bw-defend/config.toml`
+  - Windows: `%APPDATA%\\bw-defend\\config.toml`
+- state root:
+  - Linux: `~/.local/state/bw-defend/`
+  - Windows: `%LOCALAPPDATA%\\bw-defend\\state\\`
 - incidents log: `incidents.jsonl`
 - audit trail: `audit.log`
 - monitor state: `monitor.json`

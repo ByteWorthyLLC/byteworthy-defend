@@ -4,9 +4,17 @@ import os
 from pathlib import Path
 
 
+def _is_windows() -> bool:
+    return os.name == "nt"
+
+
 def config_dir() -> Path:
     if custom := os.getenv("BW_DEFEND_CONFIG_DIR"):
         return Path(custom).expanduser()
+    if _is_windows():
+        appdata = os.getenv("APPDATA")
+        if appdata:
+            return Path(appdata) / "bw-defend"
     return Path.home() / ".config" / "bw-defend"
 
 
@@ -17,6 +25,10 @@ def config_file() -> Path:
 def state_dir() -> Path:
     if custom := os.getenv("BW_DEFEND_STATE_DIR"):
         return Path(custom).expanduser()
+    if _is_windows():
+        local_appdata = os.getenv("LOCALAPPDATA")
+        if local_appdata:
+            return Path(local_appdata) / "bw-defend" / "state"
     return Path.home() / ".local" / "state" / "bw-defend"
 
 
