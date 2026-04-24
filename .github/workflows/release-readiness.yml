@@ -6,26 +6,31 @@ on:
     branches: [main]
 
 jobs:
-  gate:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            python-version: '3.11'
-            gate-command: ./scripts/linux-gate.sh
-            shell: bash
-          - os: windows-latest
-            python-version: '3.11'
-            gate-command: ./scripts/windows-gate.ps1
-            shell: pwsh
-    runs-on: ${{ matrix.os }}
+  gate-linux:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - shell: ${{ matrix.shell }}
+          python-version: '3.11'
+      - name: Install
         run: |
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
-          ${{ matrix.gate-command }}
+      - name: Linux Gate
+        run: ./scripts/linux-gate.sh
+
+  gate-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+      - name: Windows Gate
+        shell: pwsh
+        run: ./scripts/windows-gate.ps1
