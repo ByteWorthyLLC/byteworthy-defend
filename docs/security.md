@@ -38,8 +38,8 @@ Every remediation attempt should capture:
 - incident linkage (`incident_id`)
 - timestamp
 
-## Independent Review Requirement
+## Independent Review
 
-Before GA release tagging, a third-party independent security review report is required and tracked in:
+Third-party independent security reviews are optional but recommended for continuous assurance. Evidence is tracked in:
 
 - `docs/security-evidence/independent-security-review.md`

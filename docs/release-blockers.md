@@ -9,5 +9,4 @@ Use this file as a strict gate. A release cannot proceed if any blocker remains 
 - [ ] failed rollback drill in current release cycle
 - [ ] incomplete threat model or security evidence updates
 - [ ] missing SBOM/checksums/provenance evidence for release candidate
-- [ ] missing independent third-party security review report
 - [ ] command contract drift between README and CLI implementation

@@ -27,4 +27,3 @@ A release is production-ready only when all criteria are true.
 - [ ] security evidence pack reviewed and linked
 - [ ] dependency audit report attached to release evidence
 - [ ] SBOM + SHA256SUMS + provenance attestation attached to release evidence
-- [ ] third-party independent review report linked

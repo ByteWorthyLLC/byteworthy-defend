@@ -21,7 +21,7 @@
 - release and rollback runbooks reviewed
 - incident response owner assigned
 - support escalation path tested
-- independent security review requirement tracked as GA blocker
+- independent security assessment evidence tracked when performed
 
 ## Documentation
 

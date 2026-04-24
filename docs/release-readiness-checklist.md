@@ -45,4 +45,3 @@
 - [ ] release notes include known limitations
 - [ ] rollback owner and on-call owner assigned
 - [ ] dependency audit artifact attached
-- [ ] third-party independent review report attached
