@@ -163,3 +163,73 @@ def test_update_rules_rejects_invalid_sha256_pattern(tmp_path: Path, monkeypatch
     result = update_rules(str(bundle))
     assert result["updated"] is False
     assert "sha256 pattern must be a 64-character lowercase hex digest" in str(result["reason"])
+
+
+def test_verify_rejects_malformed_checksum_file(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    bundle.write_text(json.dumps({"version": "x", "rules": []}))
+    bundle.with_suffix(".json.sha256").write_text("not-a-digest rules.json\n")
+
+    result = verify_rules(bundle)
+    assert result["verified"] is False
+    assert "invalid digest format" in str(result["reason"])
+
+
+def test_verify_rejects_checksum_filename_mismatch(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(bundle, {"version": "x", "rules": []})
+    digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+    bundle.with_suffix(".json.sha256").write_text(f"{digest}  other-rules.json\n")
+
+    result = verify_rules(bundle)
+    assert result["verified"] is False
+    assert "file name does not match target bundle" in str(result["reason"])
+
+
+def test_update_rules_rejects_duplicate_rule_ids(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(
+        bundle,
+        {
+            "version": "x",
+            "rules": [
+                {"id": "DUP-001", "pattern": "foo", "severity": "high"},
+                {"id": "dup-001", "pattern": "bar", "severity": "medium"},
+            ],
+        },
+    )
+
+    result = update_rules(str(bundle))
+    assert result["updated"] is False
+    assert "duplicate id" in str(result["reason"])
+
+
+def test_update_rules_rejects_invalid_case_sensitive_type(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(
+        bundle,
+        {
+            "version": "x",
+            "rules": [
+                {
+                    "id": "REG-002",
+                    "pattern_type": "regex",
+                    "pattern": "powershell.*",
+                    "severity": "high",
+                    "case_sensitive": "false",
+                }
+            ],
+        },
+    )
+
+    result = update_rules(str(bundle))
+    assert result["updated"] is False
+    assert "case_sensitive must be boolean" in str(result["reason"])

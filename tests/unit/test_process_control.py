@@ -2,7 +2,7 @@ import subprocess
 
 import pytest
 
-from bw_defend.security.process_control import _list_processes_unix, _list_processes_windows, list_processes
+from bw_defend.security.process_control import _list_processes_unix, _list_processes_windows, kill_process, list_processes
 
 
 def test_list_processes_limit_validation() -> None:
@@ -35,3 +35,9 @@ def test_windows_process_listing_parses_tasklist_csv(monkeypatch) -> None:
         {"pid": "1234", "command": "python.exe", "etime": "unknown"},
         {"pid": "2222", "command": "cmd.exe", "etime": "unknown"},
     ]
+
+
+def test_kill_process_refuses_critical_pid() -> None:
+    result = kill_process(1, approve=True)
+    assert result["killed"] is False
+    assert "critical system pid" in result["reason"]

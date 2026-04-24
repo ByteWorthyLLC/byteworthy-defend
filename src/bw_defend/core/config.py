@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import tomllib
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from .errors import ConfigValidationError
 from .fs import atomic_write_text
@@ -52,6 +54,7 @@ auth_token_env = "BW_DEFEND_TELEMETRY_TOKEN"
 
 
 KEY_PREFIX = "config key "
+TOKEN_ENV_PATTERN = re.compile(r"^[A-Z_][A-Z0-9_]*$")
 
 
 def ensure_config_exists() -> Path:
@@ -130,12 +133,20 @@ def _parse_telemetry(data: dict[str, Any]) -> TelemetryConfig:
     )
     if telemetry.enabled and not telemetry.endpoint:
         raise ConfigValidationError("telemetry endpoint is required when telemetry.enabled is true")
+    if telemetry.endpoint:
+        parsed = urlparse(telemetry.endpoint)
+        if not parsed.scheme or not parsed.netloc:
+            raise ConfigValidationError("telemetry endpoint must be an absolute URL")
+        if parsed.scheme != "https":
+            raise ConfigValidationError("telemetry endpoint must use https")
     if not 0 < telemetry.timeout_seconds <= 30:
         raise ConfigValidationError("telemetry timeout_seconds must be between 0 and 30")
     if not 0 <= telemetry.max_retries <= 10:
         raise ConfigValidationError("telemetry max_retries must be between 0 and 10")
     if not telemetry.auth_token_env:
         raise ConfigValidationError("telemetry auth_token_env must be non-empty")
+    if not TOKEN_ENV_PATTERN.fullmatch(telemetry.auth_token_env):
+        raise ConfigValidationError("telemetry auth_token_env must match pattern ^[A-Z_][A-Z0-9_]*$")
     return telemetry
 
 
