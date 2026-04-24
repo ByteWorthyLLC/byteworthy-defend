@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import shutil
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,7 @@ KEY_RULES = "rules"
 KEY_RULE_ID = "id"
 KEY_PATTERN = "pattern"
 KEY_SEVERITY = "severity"
+KEY_PATTERN_TYPE = "pattern_type"
 KEY_REASON = "reason"
 KEY_VERIFIED = "verified"
 KEY_EXPECTED = "expected"
@@ -36,6 +38,7 @@ KEY_ACTUAL = "actual"
 KEY_UPDATED = "updated"
 CHECKSUM_SUFFIX = ".sha256"
 SIGNATURE_SUFFIX = ".sig"
+RULE_PATTERN_TYPES = {"literal", "regex", "hex", "sha256"}
 
 
 def ensure_rules() -> Path:
@@ -86,6 +89,37 @@ def _validate_rule(rule: Any, *, index: int) -> None:
             f"rules[{index}] severity '{rule[KEY_SEVERITY]}' is invalid; "
             f"allowed={', '.join(sorted(VALID_SEVERITIES))}"
         )
+    pattern_type = str(rule.get(KEY_PATTERN_TYPE, "literal")).strip().lower()
+    if pattern_type not in RULE_PATTERN_TYPES:
+        raise RuleValidationError(
+            f"rules[{index}] pattern_type '{pattern_type}' is invalid; "
+            f"allowed={', '.join(sorted(RULE_PATTERN_TYPES))}"
+        )
+    _validate_pattern_by_type(pattern=str(rule[KEY_PATTERN]), pattern_type=pattern_type, index=index)
+
+
+def _validate_pattern_by_type(*, pattern: str, pattern_type: str, index: int) -> None:
+    if pattern_type == "regex":
+        try:
+            re.compile(pattern)
+        except re.error as exc:
+            raise RuleValidationError(f"rules[{index}] regex pattern is invalid: {exc}") from exc
+        return
+    if pattern_type == "hex":
+        compact = "".join(pattern.split())
+        if not compact:
+            raise RuleValidationError(f"rules[{index}] hex pattern must be non-empty")
+        if len(compact) % 2 != 0:
+            raise RuleValidationError(f"rules[{index}] hex pattern must contain an even number of characters")
+        try:
+            bytes.fromhex(compact)
+        except ValueError as exc:
+            raise RuleValidationError(f"rules[{index}] hex pattern is invalid: {exc}") from exc
+        return
+    if pattern_type == "sha256":
+        compact = pattern.strip().lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", compact):
+            raise RuleValidationError(f"rules[{index}] sha256 pattern must be a 64-character lowercase hex digest")
 
 
 def _validate_rules_bundle(bundle: dict[str, Any]) -> None:

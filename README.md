@@ -155,6 +155,7 @@ Discoverability and answer-engine assets ship in-repo:
 ### Core Edition (`edition = "core"`)
 
 - Signature-based scanning engine
+- Rule pattern support for `literal`, `regex`, `hex`, and `sha256`
 - Quarantine list/restore/purge lifecycle
 - Monitor state management (`start|stop|status`)
 - Firewall apply/revert lifecycle

@@ -36,6 +36,13 @@ KEY_TIMESTAMP = "timestamp"
 REQUIRED_ENTRY_KEYS = (KEY_ID, KEY_ORIGINAL_PATH, KEY_QUARANTINED_PATH, KEY_TIMESTAMP)
 
 
+def _best_effort_chmod(path: Path, mode: int) -> None:
+    try:
+        path.chmod(mode)
+    except OSError:
+        return
+
+
 def _path_within(parent: Path, candidate: Path) -> bool:
     try:
         candidate.relative_to(parent)
@@ -47,6 +54,7 @@ def _path_within(parent: Path, candidate: Path) -> bool:
 def _move_file_into_quarantine(src: Path, dst: Path) -> None:
     with src.open("rb") as src_handle, dst.open("xb") as dst_handle:
         shutil.copyfileobj(src_handle, dst_handle, length=1024 * 64)
+    _best_effort_chmod(dst, 0o600)
     src.unlink()
 
 
@@ -76,8 +84,9 @@ def _load_manifest() -> list[dict[str, str]]:
 
 def _save_manifest(entries: list[dict[str, str]]) -> None:
     q_dir = quarantine_dir()
-    q_dir.mkdir(parents=True, exist_ok=True)
-    atomic_write_json(_manifest_path(), entries)
+    q_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    _best_effort_chmod(q_dir, 0o700)
+    atomic_write_json(_manifest_path(), entries, mode=0o600)
 
 
 def quarantine_file(path: str) -> QuarantineItem:
@@ -88,7 +97,8 @@ def quarantine_file(path: str) -> QuarantineItem:
         raise QuarantineError(f"artifact must be a regular file: {src}")
     state_dir().mkdir(parents=True, exist_ok=True)
     q_dir = quarantine_dir()
-    q_dir.mkdir(parents=True, exist_ok=True)
+    q_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    _best_effort_chmod(q_dir, 0o700)
     if q_dir in src.parents:
         raise QuarantineError("artifact is already under quarantine directory")
 

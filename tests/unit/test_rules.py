@@ -104,3 +104,62 @@ def test_update_rules_rejects_invalid_signature_when_required(tmp_path: Path, mo
     result = update_rules(str(bundle))
     assert result["updated"] is False
     assert result["reason"] == "signature mismatch"
+
+
+def test_update_rules_accepts_hex_and_sha256_pattern_types(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(
+        bundle,
+        {
+            "version": "x",
+            "rules": [
+                {"id": "HEX-001", "pattern_type": "hex", "pattern": "45 49 43 41 52", "severity": "high"},
+                {
+                    "id": "HASH-001",
+                    "pattern_type": "sha256",
+                    "pattern": "a" * 64,
+                    "severity": "critical",
+                },
+            ],
+        },
+    )
+    result = update_rules(str(bundle))
+    assert result["updated"] is True
+
+
+def test_update_rules_rejects_invalid_regex_pattern(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(
+        bundle,
+        {
+            "version": "x",
+            "rules": [
+                {"id": "REG-001", "pattern_type": "regex", "pattern": "(unterminated", "severity": "high"},
+            ],
+        },
+    )
+    result = update_rules(str(bundle))
+    assert result["updated"] is False
+    assert "regex pattern is invalid" in str(result["reason"])
+
+
+def test_update_rules_rejects_invalid_sha256_pattern(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("BW_DEFEND_RULES_SIGNATURE_REQUIRED", "false")
+    bundle = tmp_path / "rules.json"
+    _write_bundle(
+        bundle,
+        {
+            "version": "x",
+            "rules": [
+                {"id": "HASH-001", "pattern_type": "sha256", "pattern": "not-a-digest", "severity": "high"},
+            ],
+        },
+    )
+    result = update_rules(str(bundle))
+    assert result["updated"] is False
+    assert "sha256 pattern must be a 64-character lowercase hex digest" in str(result["reason"])

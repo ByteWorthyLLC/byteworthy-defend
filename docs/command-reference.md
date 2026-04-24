@@ -29,3 +29,14 @@ All operational commands support `--json`.
 - `bw-defend rules verify` exits `2` if verification fails.
 - `bw-defend audit verify` exits `2` if tampered or legacy log entries are detected.
 - `bw-defend doctor --strict` exits `2` if any health check fails, including unsupported runtime platform (supported: Windows and Linux).
+
+## Rule Bundle Pattern Types
+
+Rules support the following `pattern_type` values:
+
+- `literal` (default): UTF-8 string match against file content.
+- `regex`: regular expression match against decoded file text.
+- `hex`: byte-signature match using a hex string (spaces optional).
+- `sha256`: exact file digest match using a 64-character lowercase hex digest.
+
+For scan sizing controls, set `BW_DEFEND_MAX_SCAN_BYTES` to override the per-file maximum read size.

@@ -60,6 +60,12 @@ export BW_DEFEND_TELEMETRY_ENABLED=true
 export BW_DEFEND_TELEMETRY_TOKEN='<bearer-token>'
 ```
 
+Tune per-file scan limit (bytes):
+
+```bash
+export BW_DEFEND_MAX_SCAN_BYTES=8388608
+```
+
 ## Linux Runtime Mimic (Containerized)
 
 For non-Linux developer machines, use Docker to mimic production checks:

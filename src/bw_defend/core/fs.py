@@ -17,8 +17,15 @@ def atomic_write_text(path: Path, content: str, mode: int | None = None) -> None
     os.replace(temp_name, path)
 
 
-def atomic_write_json(path: Path, payload: Any, *, indent: int = 2, sort_keys: bool = True) -> None:
-    atomic_write_text(path, json.dumps(payload, indent=indent, sort_keys=sort_keys) + "\n")
+def atomic_write_json(
+    path: Path,
+    payload: Any,
+    *,
+    indent: int = 2,
+    sort_keys: bool = True,
+    mode: int | None = None,
+) -> None:
+    atomic_write_text(path, json.dumps(payload, indent=indent, sort_keys=sort_keys) + "\n", mode=mode)
 
 
 def append_jsonl(path: Path, payload: Any) -> None:
