@@ -1,6 +1,6 @@
 # ByteWorthy Defend Marketing Reference
 
-This file is the buyer-facing reference for repository listings, partner pages, and outbound messaging.
+This file is the public messaging reference for repository listings and community-facing pages.
 
 ## Canonical Positioning
 
@@ -18,8 +18,7 @@ This file is the buyer-facing reference for repository listings, partner pages, 
 - Security policy: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SECURITY.md>
 - Command reference: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/command-reference.md>
 - Release readiness: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md>
-- Services: <https://byteworthy.io/services>
-- Contact: <https://byteworthy.io/contact>
+- Support policy: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SUPPORT.md>
 
 ## Discoverability Controls
 
@@ -31,11 +30,11 @@ This file is the buyer-facing reference for repository listings, partner pages, 
 
 ## Product Context
 
-ByteWorthy product-line references for cross-repo positioning:
+ByteWorthy project references for cross-repo positioning:
 
 - Sovra (open-source AI SaaS baseline): <https://github.com/ByteWorthyLLC/sovra>
-- Klienta (paid white-label baseline): <https://github.com/ByteWorthyLLC/klienta>
-- Clynova (paid healthcare baseline): <https://github.com/ByteWorthyLLC/clynova>
+- Klienta (AI workflow reference): <https://github.com/ByteWorthyLLC/klienta>
+- Clynova (healthcare reference): <https://github.com/ByteWorthyLLC/clynova>
 
 ## Core Query Themes
 
@@ -49,6 +48,14 @@ ByteWorthy product-line references for cross-repo positioning:
 
 1. Tie claims to shipped repository assets (commands, docs, workflows, tests).
 2. Keep open-source and MIT licensing explicit.
-3. Keep destructive-action approval guarantees explicit.
+3. Keep destructive-action approval controls explicit.
 4. Keep product-context references consistent with Sovra/Klienta/Clynova framing.
 5. Avoid marketing claims that cannot be validated from repository evidence.
+
+## Required Public Disclaimer
+
+All marketing copy must state:
+
+- this is an open-source project/tool,
+- use is at user discretion and risk,
+- no security outcome is guaranteed.

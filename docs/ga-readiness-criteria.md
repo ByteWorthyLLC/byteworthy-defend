@@ -1,6 +1,8 @@
 # GA Readiness Criteria
 
-A release is production-ready only when all criteria are true.
+These are maintainer quality criteria for project GA tags.
+
+They are not contractual service guarantees and do not create SLA obligations.
 
 ## Mandatory Gates
 

@@ -14,7 +14,7 @@ Use this guide for all user-facing content in README, docs, and site pages.
 1. Use short paragraphs and explicit sections.
 2. Prefer checklists, commands, and tables over vague prose.
 3. Keep naming consistent: `ByteWorthy Defend` and `bw-defend`.
-4. Keep Windows and Linux scope explicit for production declarations.
+4. Keep Windows and Linux scope explicit for project release targets.
 
 ## Phrase Policy
 
@@ -32,8 +32,8 @@ Do not use these phrases in user-facing copy:
 Keep ByteWorthy references explicit and accurate:
 
 1. Sovra: open-source AI SaaS baseline
-2. Klienta: paid white-label baseline
-3. Clynova: paid healthcare baseline
+2. Klienta: AI workflow reference
+3. Clynova: healthcare reference
 4. ByteWorthy Defend: open-source Windows and Linux endpoint defense CLI
 
 ## Offer Clarity Checklist
@@ -46,6 +46,7 @@ Every public page should answer:
 4. How quickly can teams start?
 5. How is production readiness validated?
 6. Where are security and support policies documented?
+7. Is the OSS disclaimer explicit (use-at-your-own-risk, no guaranteed outcome)?
 
 ## Proof-First Checklist
 

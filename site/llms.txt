@@ -21,3 +21,9 @@
 - Sovra: https://github.com/ByteWorthyLLC/sovra
 - Klienta: https://github.com/ByteWorthyLLC/klienta
 - Clynova: https://github.com/ByteWorthyLLC/clynova
+
+## Disclaimer
+
+- Open-source project/tool, not a managed security service.
+- Use at your own discretion and risk.
+- No security outcome is guaranteed.

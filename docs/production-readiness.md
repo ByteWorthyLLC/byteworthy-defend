@@ -1,5 +1,8 @@
 # Production Readiness
 
+This document defines maintainer release quality targets for the project.
+It does not provide a warranty, managed service commitment, or guaranteed security outcome.
+
 ## Reliability
 
 - monitor lifecycle tested under repeated starts/stops
