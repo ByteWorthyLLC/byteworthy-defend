@@ -1,6 +1,7 @@
 import pytest
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from bw_defend.core.engine import scan_target
@@ -92,3 +93,18 @@ def test_scan_target_honors_max_scan_bytes_env(tmp_path, monkeypatch) -> None:
     assert result["detection_count"] == 0
     assert result["skipped_large"] == 1
     assert result["max_scan_bytes"] == 16
+
+
+def test_scan_target_skips_symlink_files(tmp_path, monkeypatch) -> None:
+    if os.name == "nt":
+        pytest.skip("symlink creation is not reliable across all windows CI environments")
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    ensure_rules()
+    real_file = tmp_path / "real.txt"
+    real_file.write_text("EICAR-STANDARD-ANTIVIRUS-TEST-FILE")
+    linked = tmp_path / "linked.txt"
+    linked.symlink_to(real_file)
+
+    result = scan_target(str(linked))
+    assert result["detection_count"] == 0
+    assert result["scanned_files"] == 0

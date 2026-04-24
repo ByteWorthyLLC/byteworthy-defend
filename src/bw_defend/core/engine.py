@@ -59,7 +59,7 @@ def _max_scan_bytes() -> int:
 def _iter_files_in_root(root: Path) -> Iterable[Path]:
     if not root.exists():
         return
-    yield from (path for path in root.rglob("*") if path.is_file())
+    yield from (path for path in root.rglob("*") if path.is_file() and not path.is_symlink())
 
 
 def _iter_paths(target: str) -> Iterable[Path]:
@@ -70,11 +70,13 @@ def _iter_paths(target: str) -> Iterable[Path]:
 
     start = Path(target).expanduser()
     if start.is_file():
+        if start.is_symlink():
+            return
         yield start
         return
     if start.is_dir():
         for path in start.rglob("*"):
-            if path.is_file():
+            if path.is_file() and not path.is_symlink():
                 yield path
         return
     raise ScanTargetError(f"scan target does not exist: {start}")
@@ -172,9 +174,13 @@ def scan_target(target: str) -> dict:
         "skipped_unreadable": 0,
         "skipped_large": 0,
         "skipped_binary": 0,
+        "skipped_symlink": 0,
     }
 
     for path in _iter_paths(target):
+        if path.is_symlink():
+            counters["skipped_symlink"] += 1
+            continue
         counters["scanned_files"] += 1
         data, skip_reason = _scan_file(path, max_scan_bytes=max_scan_bytes)
         if skip_reason == "unreadable":

@@ -39,6 +39,9 @@ KEY_UPDATED = "updated"
 CHECKSUM_SUFFIX = ".sha256"
 SIGNATURE_SUFFIX = ".sig"
 RULE_PATTERN_TYPES = {"literal", "regex", "hex", "sha256"}
+MAX_RULE_ID_LENGTH = 128
+MAX_PATTERN_LENGTH = 8192
+MAX_RULE_COUNT = 5000
 
 
 def ensure_rules() -> Path:
@@ -76,6 +79,26 @@ def _hmac_sha256(path: Path, key: str) -> str:
     return digest.hexdigest()
 
 
+def _is_sha256_hex(value: str) -> bool:
+    return re.fullmatch(r"[0-9a-f]{64}", value.strip().lower()) is not None
+
+
+def _read_integrity_digest(path: Path, *, label: str, expected_name: str) -> tuple[str | None, str | None]:
+    if not path.exists():
+        return None, f"missing {label} file"
+    raw = path.read_text().strip()
+    if not raw:
+        return None, f"{label} file is empty"
+
+    parts = raw.split()
+    digest = parts[0].strip().lower()
+    if not _is_sha256_hex(digest):
+        return None, f"{label} file has invalid digest format"
+    if len(parts) > 1 and parts[1] != expected_name:
+        return None, f"{label} file name does not match target bundle"
+    return digest, None
+
+
 def _validate_rule(rule: Any, *, index: int) -> None:
     if not isinstance(rule, dict):
         raise RuleValidationError(f"rules[{index}] must be an object")
@@ -83,19 +106,29 @@ def _validate_rule(rule: Any, *, index: int) -> None:
     missing = [key for key in required if not isinstance(rule.get(key), str) or not str(rule.get(key)).strip()]
     if missing:
         raise RuleValidationError(f"rules[{index}] missing valid string '{missing[0]}'")
+    rule_id = str(rule[KEY_RULE_ID]).strip()
+    if len(rule_id) > MAX_RULE_ID_LENGTH:
+        raise RuleValidationError(f"rules[{index}] id exceeds max length {MAX_RULE_ID_LENGTH}")
+
+    pattern = str(rule[KEY_PATTERN])
+    if len(pattern) > MAX_PATTERN_LENGTH:
+        raise RuleValidationError(f"rules[{index}] pattern exceeds max length {MAX_PATTERN_LENGTH}")
+
     severity = str(rule[KEY_SEVERITY]).lower()
     if severity not in VALID_SEVERITIES:
         raise RuleValidationError(
             f"rules[{index}] severity '{rule[KEY_SEVERITY]}' is invalid; "
             f"allowed={', '.join(sorted(VALID_SEVERITIES))}"
         )
+    if "case_sensitive" in rule and not isinstance(rule.get("case_sensitive"), bool):
+        raise RuleValidationError(f"rules[{index}] case_sensitive must be boolean when provided")
     pattern_type = str(rule.get(KEY_PATTERN_TYPE, "literal")).strip().lower()
     if pattern_type not in RULE_PATTERN_TYPES:
         raise RuleValidationError(
             f"rules[{index}] pattern_type '{pattern_type}' is invalid; "
             f"allowed={', '.join(sorted(RULE_PATTERN_TYPES))}"
         )
-    _validate_pattern_by_type(pattern=str(rule[KEY_PATTERN]), pattern_type=pattern_type, index=index)
+    _validate_pattern_by_type(pattern=pattern, pattern_type=pattern_type, index=index)
 
 
 def _validate_pattern_by_type(*, pattern: str, pattern_type: str, index: int) -> None:
@@ -118,7 +151,7 @@ def _validate_pattern_by_type(*, pattern: str, pattern_type: str, index: int) ->
         return
     if pattern_type == "sha256":
         compact = pattern.strip().lower()
-        if not re.fullmatch(r"[0-9a-f]{64}", compact):
+        if not _is_sha256_hex(compact):
             raise RuleValidationError(f"rules[{index}] sha256 pattern must be a 64-character lowercase hex digest")
 
 
@@ -130,8 +163,15 @@ def _validate_rules_bundle(bundle: dict[str, Any]) -> None:
     rules = bundle.get(KEY_RULES)
     if not isinstance(rules, list):
         raise RuleValidationError("rules bundle must contain list 'rules'")
+    if len(rules) > MAX_RULE_COUNT:
+        raise RuleValidationError(f"rules bundle exceeds max rule count {MAX_RULE_COUNT}")
+    seen_rule_ids: set[str] = set()
     for index, rule in enumerate(rules):
         _validate_rule(rule, index=index)
+        rule_id = str(rule[KEY_RULE_ID]).strip().lower()
+        if rule_id in seen_rule_ids:
+            raise RuleValidationError(f"rules[{index}] duplicate id '{rule[KEY_RULE_ID]}'")
+        seen_rule_ids.add(rule_id)
 
 
 def _signature_is_required() -> bool:
@@ -140,36 +180,31 @@ def _signature_is_required() -> bool:
 
 def _verify_detached_signature(path: Path, *, required: bool) -> tuple[bool, dict[str, str]]:
     signature_file = path.with_suffix(path.suffix + SIGNATURE_SUFFIX)
-    ok = True
-    payload: dict[str, str] = {}
     if not signature_file.exists():
         if required:
-            ok = False
-            payload = {KEY_REASON: "missing signature file"}
-        return ok, payload
+            return False, {KEY_REASON: "missing signature file"}
+        return True, {}
 
     signing_key = os.getenv(RULES_SIGNING_KEY_ENV, "").strip()
     if not signing_key:
         return False, {KEY_REASON: f"missing signing key env '{RULES_SIGNING_KEY_ENV}'"}
 
-    signature_text = signature_file.read_text().strip()
-    if not signature_text:
-        return False, {KEY_REASON: "signature file is empty"}
-
-    expected = signature_text.split()[0]
+    expected, parse_error = _read_integrity_digest(signature_file, label="signature", expected_name=path.name)
+    if parse_error or expected is None:
+        return False, {KEY_REASON: parse_error or "signature parse failed"}
     actual = _hmac_sha256(path, signing_key)
-    if not hmac.compare_digest(expected.lower(), actual.lower()):
+    if not hmac.compare_digest(expected, actual.lower()):
         return False, {KEY_REASON: "signature mismatch", KEY_EXPECTED: expected, KEY_ACTUAL: actual}
-    return True, payload
+    return True, {}
 
 
 def verify_rules(path: Path | None = None) -> dict[str, str | bool]:
     target = path or ensure_rules()
     hash_file = target.with_suffix(target.suffix + CHECKSUM_SUFFIX)
     actual = _sha256(target)
-    if not hash_file.exists():
-        return {KEY_VERIFIED: False, KEY_REASON: "missing checksum file", "sha256": actual}
-    expected = hash_file.read_text().strip().split()[0]
+    expected, parse_error = _read_integrity_digest(hash_file, label="checksum", expected_name=target.name)
+    if parse_error or expected is None:
+        return {KEY_VERIFIED: False, KEY_REASON: parse_error or "checksum parse failed", "sha256": actual}
     if expected != actual:
         return {KEY_VERIFIED: False, KEY_EXPECTED: expected, KEY_ACTUAL: actual, KEY_REASON: "checksum mismatch"}
 
@@ -190,13 +225,13 @@ def verify_rules(path: Path | None = None) -> dict[str, str | bool]:
 def update_rules(bundle_path: str) -> dict[str, str | bool]:
     src = Path(bundle_path.strip()).expanduser().resolve()
     checksum = src.with_suffix(src.suffix + CHECKSUM_SUFFIX)
-    if not src.exists():
+    if not src.exists() or not src.is_file():
         raise FileNotFoundError(f"bundle not found: {src}")
-    if not checksum.exists():
-        raise FileNotFoundError(f"checksum file not found: {checksum}")
 
     actual = _sha256(src)
-    expected = checksum.read_text().strip().split()[0]
+    expected, parse_error = _read_integrity_digest(checksum, label="checksum", expected_name=src.name)
+    if parse_error or expected is None:
+        return {KEY_UPDATED: False, KEY_REASON: parse_error or "checksum parse failed", KEY_ACTUAL: actual}
     if actual != expected:
         return {KEY_UPDATED: False, KEY_REASON: "bundle integrity verification failed", KEY_EXPECTED: expected, KEY_ACTUAL: actual}
 

@@ -10,6 +10,7 @@ KEY_KILLED = "killed"
 KEY_APPROVAL_REQUIRED = "approval_required"
 KEY_REASON = "reason"
 KEY_PID = "pid"
+CRITICAL_PIDS = {1}
 
 
 def _list_processes_unix(limit: int) -> list[dict[str, str]]:
@@ -71,6 +72,8 @@ def kill_process(pid: int, *, approve: bool) -> dict:
     base = {KEY_PID: pid}
     if pid <= 0:
         return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "pid must be a positive integer"}
+    if pid in CRITICAL_PIDS:
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "refusing to terminate critical system pid"}
     if pid == os.getpid():
         return {
             **base,

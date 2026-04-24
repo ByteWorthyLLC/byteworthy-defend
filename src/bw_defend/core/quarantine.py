@@ -69,6 +69,10 @@ def _validate_manifest_entry(entry: object, index: int) -> dict[str, str]:
         value = entry.get(key)
         if not isinstance(value, str):
             raise QuarantineError(f"quarantine manifest entry {index} missing '{key}'")
+        if not value.strip():
+            raise QuarantineError(f"quarantine manifest entry {index} has empty '{key}'")
+    if not str(entry[KEY_ID]).startswith("q-"):
+        raise QuarantineError(f"quarantine manifest entry {index} has invalid id format")
     return entry  # type: ignore[return-value]
 
 
@@ -76,7 +80,10 @@ def _load_manifest() -> list[dict[str, str]]:
     path = _manifest_path()
     if not path.exists():
         return []
-    data = json.loads(path.read_text())
+    try:
+        data = json.loads(path.read_text())
+    except json.JSONDecodeError as exc:
+        raise QuarantineError("quarantine manifest is not valid JSON") from exc
     if not isinstance(data, list):
         raise QuarantineError("quarantine manifest must be a list")
     return [_validate_manifest_entry(entry, index) for index, entry in enumerate(data)]
@@ -90,7 +97,10 @@ def _save_manifest(entries: list[dict[str, str]]) -> None:
 
 
 def quarantine_file(path: str) -> QuarantineItem:
-    src = Path(path).expanduser().resolve()
+    raw = Path(path).expanduser()
+    if raw.is_symlink():
+        raise QuarantineError(f"artifact must not be a symlink: {raw}")
+    src = raw.resolve()
     if not src.exists():
         raise QuarantineError(f"artifact does not exist: {src}")
     if not src.is_file():
@@ -135,6 +145,8 @@ def restore_item(item_id: str) -> dict[str, str]:
             dst = Path(entry[KEY_ORIGINAL_PATH]).expanduser().resolve(strict=False)
             if _path_within(q_root, dst):
                 raise QuarantineError("refusing to restore into quarantine directory")
+            if dst.exists():
+                raise QuarantineError(f"refusing to overwrite existing destination: {dst}")
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(src), str(dst))
             entries.remove(entry)
@@ -146,9 +158,14 @@ def restore_item(item_id: str) -> dict[str, str]:
 def purge_quarantine() -> int:
     entries = _load_manifest()
     removed = 0
+    q_root = quarantine_dir().resolve()
     for entry in entries:
         q_path = Path(entry[KEY_QUARANTINED_PATH]).expanduser().resolve()
+        if not _path_within(q_root, q_path):
+            raise QuarantineError(f"quarantined artifact path escapes quarantine directory: {q_path}")
         if q_path.exists():
+            if not q_path.is_file():
+                raise QuarantineError(f"quarantined artifact is not a regular file: {q_path}")
             q_path.unlink()
             removed += 1
     _save_manifest([])

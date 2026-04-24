@@ -212,8 +212,11 @@ All operational commands support `--json`.
 - Confidence thresholds control non-destructive auto-execution.
 - Rules bundles require integrity + schema validation before activation.
 - Optional detached signature verification can be enforced for rules bundles.
+- Checksum/signature metadata must use valid SHA-256 digests and match target bundle names.
 - Every incident/remediation step is audit-logged with tamper-evident chain metadata.
 - Optional outbound audit telemetry can stream to a central endpoint.
+- Quarantine restore refuses overwrite and purge refuses path-escape entries.
+- Scanner and quarantine flows refuse symlink-based file inputs.
 
 ### Incident Schema v1
 
