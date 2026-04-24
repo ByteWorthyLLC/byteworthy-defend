@@ -1,0 +1,4 @@
+ByteWorthy Defend is an open-source Linux-first terminal antivirus project by ByteWorthy.
+Primary command: bw-defend.
+Two editions: core and ai.
+Security model: policy-gated remediation with mandatory approval on destructive actions.

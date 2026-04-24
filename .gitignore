@@ -1,92 +1,13 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual Environment
+*.pyc
+*.pyo
+*.pyd
 .venv/
-venv/
-ENV/
-env/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Testing
 .pytest_cache/
 .coverage
 htmlcov/
-.tox/
-.hypothesis/
-*.cover
-.cache
+build/
+dist/
+*.egg-info/
 
-# Logs
-logs/
-*.log
-
-# Reports
-reports/
-*.json
-*.html
-
-# Quarantine
-quarantine/
-
-# Configuration (user-specific)
-hifzdefend.toml
-!config/hifzdefend.toml.example
-!config/hifzdefend.defaults.toml
-
-# Security - Never commit malware samples
-*.com
-*.exe
-eicar.txt
-eicar*.txt
-test_malware.*
-*.vir
-
-# ClamAV
-clamav/build/
-clamav/.git/
-
-# OS
-Thumbs.db
-desktop.ini
-
-# Distribution
-*.egg
-*.whl
-.mypy_cache/
-.dmypy.json
-dmypy.json
-.ruff_cache/
-
-# Environment variables
-.env
-.env.local
+.tmp/

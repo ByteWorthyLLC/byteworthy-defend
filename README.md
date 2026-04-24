@@ -1,333 +1,128 @@
-# HifzDefend
+<p align="center">
+  <img src="site/assets/brand-mark.svg" width="150" alt="ByteWorthy Defend" />
+</p>
 
-**حفظ (Hifz) - Protection/Preservation**
+<h1 align="center">ByteWorthy Defend</h1>
 
-> Preserving Your Digital Safety
+<p align="center">
+  <strong>Open-source Linux-first terminal antivirus for production operations.</strong>
+</p>
 
-HifzDefend is a custom Windows antivirus solution built on top of ClamAV, featuring a modern CLI interface, structured logging, quarantine management, and extensible architecture for real-time monitoring and web-based dashboards.
+<p align="center">
+  One repo, two editions: <code>core</code> (no AI) and <code>ai</code> (policy-gated remediation).
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<p align="center">
+  <a href="#quick-start">Quick Start</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#command-surface">Commands</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#editions">Editions</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#security-model">Security Model</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#docs">Docs</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#production-gate">Production Gate</a>
+</p>
 
-## Features
-
-### Phase 1: MVP ✅
-- **CLI Scanner**: Scan files and directories for malware
-- **ClamAV Integration**: Enterprise-grade virus detection engine
-- **Quarantine Management**: Automatic quarantine of detected threats
-- **Structured Logging**: JSON-formatted logs with rotation
-- **Configuration System**: TOML-based config with Pydantic validation
-- **Rich Terminal Output**: Beautiful progress bars and tables
-- **EICAR Test Support**: Safe malware testing with encrypted samples
-
-### Phase 2: Web Application ✅ (v0.2.0)
-- **FastAPI Backend**: REST API with async support
-- **React TypeScript Frontend**: Modern, responsive web UI
-- **Real-time Dashboard**: Live statistics and threat timeline
-- **Scan Management**: Start and monitor scans from web browser
-- **Quarantine UI**: Manage quarantined files with restore/delete
-- **Settings Panel**: Configure scanning and quarantine options
-- **WebSocket Support**: Real-time updates (infrastructure ready)
-
-### Phase 3: Real-Time Monitoring (Planned)
-- File system monitoring with watchdog
-- Auto-scan on file creation/modification
-- Desktop notifications
-- Scheduled scans
-- Automatic virus definition updates
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
+  <img src="https://img.shields.io/badge/platform-Linux-informational?style=flat-square" alt="Linux target" />
+  <img src="https://img.shields.io/badge/interface-bw--defend-black?style=flat-square" alt="bw-defend CLI" />
+</p>
 
 ## Quick Start
 
-### Prerequisites
-- Windows 10/11
-- Python 3.10 or higher
-- ClamAV Windows installation
-- Git (optional, for development)
-
-### Installation
-
-1. **Install ClamAV** (see [INSTALLATION.md](docs/INSTALLATION.md) for details)
-   ```powershell
-   # Download from https://www.clamav.net/downloads
-   # Install to C:\Program Files\ClamAV
-   ```
-
-2. **Clone or Download HifzDefend**
-   ```bash
-   git clone <repository-url>
-   cd HifzDefend
-   ```
-
-3. **Run Bootstrap Script**
-   ```bash
-   python scripts/bootstrap_dev.py
-   ```
-
-4. **Activate Virtual Environment**
-   ```powershell
-   .venv\Scripts\activate
-   ```
-
-5. **Set Up Windows Defender Exclusions** (Administrator PowerShell)
-   ```powershell
-   .\scripts\setup_defender_exclusions.ps1
-   ```
-
-6. **Start ClamAV Daemon**
-   ```powershell
-   cd "C:\Program Files\ClamAV"
-   .\clamd.exe
-   ```
-
-7. **Verify Installation**
-   ```bash
-   hifzdefend --version
-   hifzdefend status
-   ```
-
-## Usage
-
-### Web Application (NEW in v0.2.0)
-
-Start the web application with a single command:
-
 ```bash
-hifzdefend web
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev]'
+bw-defend doctor --json
 ```
 
-This will:
-- Start the FastAPI backend server
-- Serve the React frontend
-- Automatically open your browser to http://localhost:8000
+Enable AI edition:
 
-**Web Features:**
-- **Dashboard**: Real-time statistics and threat timeline
-- **Scan Management**: Start scans and monitor progress
-- **Quarantine**: Manage quarantined files
-- **Settings**: Configure scanning and quarantine options
-
-**Options:**
 ```bash
-hifzdefend web --host 0.0.0.0 --port 8000  # Custom host/port
-hifzdefend web --reload                    # Enable auto-reload for development
+pip install -e '.[ai]'
+mkdir -p ~/.config/bw-defend
+cat > ~/.config/bw-defend/config.toml <<'CFG'
+edition = "ai"
+
+[remediation_policy]
+allow_auto_quarantine = true
+allow_auto_temp_isolation = true
+destructive_requires_approval = true
+auto_execute_min_confidence = 0.85
+CFG
 ```
 
-### CLI Commands
+## Command Surface
 
-### Scan a File
-```bash
-hifzdefend scan path/to/file.exe
-```
+- `bw-defend scan <path|system>`
+- `bw-defend monitor start|stop|status`
+- `bw-defend quarantine list|restore|purge`
+- `bw-defend firewall status|apply|revert`
+- `bw-defend process list|kill --pid <id> --approve`
+- `bw-defend ai remediate <incident-id> [--approve]`
+- `bw-defend rules update|list|verify`
+- `bw-defend doctor`
 
-### Scan a Directory
-```bash
-hifzdefend scan C:\Users\YourName\Downloads
-```
+All operational commands support `--json` for machine-readable output.
 
-### Check System Status
-```bash
-hifzdefend status
-```
+## Editions
 
-### Update Virus Definitions
-```bash
-hifzdefend update
-```
+- **Core edition**: scanning, monitoring, quarantine, rules, firewall/process controls.
+- **AI edition**: adds AI remediation planner/executor with policy enforcement.
 
-### Quarantine Management
-```bash
-# List quarantined files
-hifzdefend list-quarantine
+Edition is controlled in `~/.config/bw-defend/config.toml` via:
 
-# Manually quarantine a file
-hifzdefend quarantine path/to/suspicious.exe --threat-name "Suspicious.File"
-```
-
-### View Configuration
-```bash
-hifzdefend config-show
-```
-
-## Configuration
-
-Configuration file location: `%LOCALAPPDATA%\HifzDefend\hifzdefend.toml`
-
-Example configuration:
 ```toml
-[clamav]
-host = "localhost"
-port = 3310
-timeout = 60
-
-[scanning]
-max_file_size = 104857600  # 100 MB
-scan_archives = true
-excluded_paths = [
-    "C:\\Windows\\System32",
-]
-
-[quarantine]
-enabled = true
-auto_quarantine = true
+edition = "core" # or "ai"
 ```
 
-See [config/hifzdefend.toml.example](config/hifzdefend.toml.example) for full configuration options.
+## Security Model
 
-## Architecture
+- AI never bypasses policy evaluation.
+- Destructive actions (`delete`, `kill`, `network_block`) require `--approve`.
+- Non-destructive actions can auto-execute only when policy allows and confidence threshold is met.
+- All proposed and executed remediation actions are appended to an immutable audit trail file.
 
-```
-HifzDefend
-├── Core Scanner (ClamAV Integration)
-├── Configuration System (TOML + Pydantic)
-├── Logging (JSON Structured Logs)
-├── Scan Engine (Orchestration + Quarantine)
-├── CLI Interface (Click + Rich)
-└── Testing (Pytest + EICAR)
-```
+## Incident Schema v1
 
-See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed design documentation.
+Stable required fields:
 
-## Development
+- `id`
+- `timestamp`
+- `source`
+- `artifact`
+- `detection_type`
+- `severity`
+- `confidence`
+- `action_state`
+- `approval_required`
+- `remediation_plan`
+- `final_outcome`
 
-### Setup Development Environment
-```bash
-# Clone with submodules
-git clone --recurse-submodules <repository-url>
-cd HifzDefend
+## Project Site
 
-# Run bootstrap
-python scripts/bootstrap_dev.py
+- Product page: `site/index.html`
+- Trust center: `site/trust.html`
 
-# Activate venv
-.venv\Scripts\activate
+## Docs
 
-# Install pre-commit hooks
-pre-commit install
-```
+- [Quickstart Guide](docs/quickstart.md)
+- [Command Reference](docs/command-reference.md)
+- [Architecture](docs/architecture.md)
+- [Deployment Guide](docs/deployment-guide.md)
+- [Operations Runbook](docs/operations-runbook.md)
+- [Release Process](docs/release-process.md)
+- [Production Readiness](docs/production-readiness.md)
+- [GA Readiness Criteria](docs/ga-readiness-criteria.md)
+- [Release Blockers](docs/release-blockers.md)
+- [Support and Release Cadence](docs/support-and-release-cadence.md)
+- [Testing Strategy](docs/testing.md)
+- [GitHub Hardening](docs/github-hardening.md)
+- [Security Policy](SECURITY.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [GitHub Cutover Runbook](docs/github-cutover-runbook.md)
+- [Docs Index](docs/index.md)
 
-### Running Tests
-```bash
-# All tests
-pytest
+## Production Gate
 
-# With coverage
-pytest --cov=hifzdefend --cov-report=html
-
-# Integration tests only
-pytest tests/integration/
-
-# Skip slow tests
-pytest -m "not slow"
-```
-
-### Code Quality
-```bash
-# Format code
-black src/ tests/
-
-# Lint
-ruff check src/ tests/
-
-# Type check
-mypy src/
-
-# Run all pre-commit hooks
-pre-commit run --all-files
-```
-
-See [DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed development guidelines.
-
-## Security Considerations
-
-### Windows Defender Exclusions
-HifzDefend requires Windows Defender exclusions for development and testing. These exclusions reduce system security and should only be used in development environments.
-
-**Remove exclusions when done:**
-```powershell
-.\scripts\setup_defender_exclusions.ps1 -Remove
-```
-
-### EICAR Test Files
-HifzDefend uses EICAR test files for malware detection testing. These are harmless test patterns recognized by all antivirus software. They are stored encrypted and never committed to the repository in plaintext.
-
-### Secure Coding
-- Input validation (path traversal prevention)
-- Parameterized logging (injection prevention)
-- Read-only quarantine files
-- Atomic file operations
-- Regular dependency audits
-
-See [SECURITY.md](docs/SECURITY.md) for comprehensive security documentation.
-
-## Documentation
-
-- [Installation Guide](docs/INSTALLATION.md) - Detailed setup instructions
-- [Usage Guide](docs/USAGE.md) - Complete CLI reference and examples
-- [Development Guide](docs/DEVELOPMENT.md) - Contributing and development workflow
-- [Architecture Guide](docs/ARCHITECTURE.md) - System design and components
-- [Security Guide](docs/SECURITY.md) - Security considerations and best practices
-
-## Roadmap
-
-- [x] **v0.1.0** - MVP CLI Scanner (Phase 1)
-  - [x] ClamAV integration
-  - [x] File/directory scanning
-  - [x] Quarantine management
-  - [x] Configuration system
-  - [x] Structured logging
-  - [x] Test suite
-
-- [ ] **v0.2.0** - Real-Time Monitoring (Phase 2)
-  - [ ] File system monitoring
-  - [ ] Auto-scan on file events
-  - [ ] Desktop notifications
-  - [ ] Scheduled scans
-  - [ ] Auto-update definitions
-
-- [ ] **v0.3.0** - Web Dashboard (Phase 3)
-  - [ ] REST API backend
-  - [ ] Web UI (React)
-  - [ ] Real-time statistics
-  - [ ] Report viewer
-  - [ ] Configuration UI
-
-- [ ] **v1.0.0** - Production Ready
-  - [ ] Performance optimization
-  - [ ] Windows service
-  - [ ] Installer package
-  - [ ] Documentation site
-  - [ ] CI/CD pipeline
-
-## Contributing
-
-Contributions are welcome! Please read [DEVELOPMENT.md](docs/DEVELOPMENT.md) for guidelines.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and code quality checks
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- **ClamAV** - Open-source antivirus engine
-- **EICAR** - Standard Anti-Virus test file
-- **Python Community** - Amazing libraries and tools
-
-## Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check the [documentation](docs/)
-- Review [SECURITY.md](docs/SECURITY.md) for security concerns
-
----
-
-**HifzDefend** - حفظ - Preserving Your Digital Safety
+A production tag must not be created until all gates in [`docs/release-readiness-checklist.md`](docs/release-readiness-checklist.md) and [`docs/ga-readiness-criteria.md`](docs/ga-readiness-criteria.md) are checked and evidence is attached.

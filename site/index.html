@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ByteWorthy Defend</title>
+    <meta name="description" content="Open-source Linux-first terminal antivirus with policy-gated AI remediation." />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #111936;
+        --text: #e8eefc;
+        --muted: #9fb0d7;
+        --accent: #2ec27e;
+        --accent-2: #00bcd4;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 20% 20%, #13224b, var(--bg));
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+      .hero {
+        background: linear-gradient(145deg, rgba(46, 194, 126, 0.12), rgba(0, 188, 212, 0.08));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 1.5rem;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      h1 { margin: 0.8rem 0; font-size: clamp(1.8rem, 5vw, 3rem); }
+      h2 { margin-top: 2rem; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+      code { background: rgba(255,255,255,0.08); padding: 0.12rem 0.3rem; border-radius: 4px; }
+      a { color: var(--accent-2); }
+      ul { padding-left: 1.1rem; }
+      .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <span class="badge">MIT Licensed · Linux-first</span>
+        <h1>ByteWorthy Defend</h1>
+        <p>Terminal antivirus with deterministic core controls and optional policy-gated AI remediation.</p>
+        <p><a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub Repository</a></p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>Core Edition</h2>
+          <ul>
+            <li>Scanning engine</li>
+            <li>Quarantine lifecycle</li>
+            <li>Rules integrity verification</li>
+            <li>Firewall and process controls</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h2>AI Edition</h2>
+          <ul>
+            <li>Remediation planning and execution</li>
+            <li>Mandatory approval gates for destructive actions</li>
+            <li>Full audit trail</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>CLI Surface</h2>
+        <p><code>bw-defend scan &lt;path|system&gt;</code></p>
+        <p><code>bw-defend monitor start|stop|status</code></p>
+        <p><code>bw-defend quarantine list|restore|purge</code></p>
+        <p><code>bw-defend firewall status|apply|revert</code></p>
+        <p><code>bw-defend process list|kill --pid &lt;id&gt; --approve</code></p>
+        <p><code>bw-defend ai remediate &lt;incident-id&gt; [--approve]</code></p>
+        <p><code>bw-defend rules update|list|verify</code></p>
+      </section>
+    </main>
+  </body>
+</html>

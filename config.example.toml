@@ -1,0 +1,7 @@
+edition = "core"
+
+[remediation_policy]
+allow_auto_quarantine = true
+allow_auto_temp_isolation = true
+destructive_requires_approval = true
+auto_execute_min_confidence = 0.85

@@ -1,0 +1,15 @@
+# Default owners
+* @byteworthy/maintainers
+
+# Security-critical surfaces
+/src/bw_defend/core/policy.py                @byteworthy/security @byteworthy/maintainers
+/src/bw_defend/ai/**                         @byteworthy/security @byteworthy/maintainers
+/src/bw_defend/security/**                   @byteworthy/security @byteworthy/maintainers
+/src/bw_defend/core/rules.py                 @byteworthy/security @byteworthy/maintainers
+/docs/security.md                            @byteworthy/security @byteworthy/maintainers
+/SECURITY.md                                 @byteworthy/security @byteworthy/maintainers
+/.github/workflows/**                        @byteworthy/security @byteworthy/maintainers
+
+# Documentation ownership
+/docs/**                                     @byteworthy/maintainers
+/README.md                                   @byteworthy/maintainers

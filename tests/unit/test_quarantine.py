@@ -1,0 +1,25 @@
+from pathlib import Path
+
+from bw_defend.core.quarantine import list_quarantine, purge_quarantine, quarantine_file, restore_item
+
+
+def test_quarantine_restore_and_purge(tmp_path: Path, monkeypatch) -> None:
+    state = tmp_path / "state"
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(state))
+
+    infected = tmp_path / "infected.txt"
+    infected.write_text("EICAR-STANDARD-ANTIVIRUS-TEST-FILE")
+
+    item = quarantine_file(str(infected))
+    assert not infected.exists()
+    assert len(list_quarantine()) == 1
+
+    restored = restore_item(item.id)
+    assert restored["id"] == item.id
+    assert infected.exists()
+
+    infected.write_text("new content")
+    quarantine_file(str(infected))
+    purged = purge_quarantine()
+    assert purged == 1
+    assert list_quarantine() == []
