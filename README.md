@@ -5,54 +5,165 @@
 <h1 align="center">ByteWorthy Defend</h1>
 
 <p align="center">
-  <strong>Open-source Linux-first terminal antivirus for production operations.</strong>
+  <strong>Open-source Linux-first terminal antivirus for continuous host protection.</strong>
 </p>
 
 <p align="center">
-  One repo, two editions: <code>core</code> (no AI) and <code>ai</code> (policy-gated remediation).
+  Continuous scanning controls, quarantine lifecycle, policy-gated remediation,<br/>
+  and machine-readable operations from one CLI: <code>bw-defend</code>.
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="#command-surface">Commands</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="#editions">Editions</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="#security-model">Security Model</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="#docs">Docs</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="#production-gate">Production Gate</a>
+  <sub>A <a href="https://byteworthy.io"><b>ByteWorthy</b></a> open-source security product · <a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub</a></sub>
+</p>
+
+<p align="center">
+  <sub>Built by the ByteWorthy software studio and dev shop · <a href="https://byteworthy.io/services">custom builds</a> · <a href="https://byteworthy.io/services/consulting">AI consulting</a></sub>
+</p>
+
+<p align="center">
+  <a href="#-quick-start">Quick Start</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-project-site">Project Site</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-why-byteworthy-defend">Why</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-seo--aeo--geo">SEO/AEO/GEO</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-what-you-get">Features</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-command-surface">Commands</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-security-model">Security</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="#-docs">Docs</a>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
+  <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ByteWorthyLLC/byteworthy-defend/ci.yml?branch=main&style=flat-square&label=ci" alt="CI Status" /></a>
+  <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/ByteWorthyLLC/byteworthy-defend/security.yml?branch=main&style=flat-square&label=security" alt="Security Status" /></a>
   <img src="https://img.shields.io/badge/platform-Linux-informational?style=flat-square" alt="Linux target" />
   <img src="https://img.shields.io/badge/interface-bw--defend-black?style=flat-square" alt="bw-defend CLI" />
 </p>
 
-## Quick Start
+<br/>
+
+> **Most endpoint tools either hide internals or skip operator controls.**
+> ByteWorthy Defend keeps security actions explicit, auditable, and scriptable.
+> Open source, MIT-licensed, Linux-first.
+
+<br/>
+
+## 🚀 Quick Start
 
 ```bash
+git clone https://github.com/ByteWorthyLLC/byteworthy-defend.git
+cd byteworthy-defend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 bw-defend doctor --strict --json
 ```
 
+Linux parity from macOS/Windows using Docker:
+
+```bash
+docker compose run --rm linux-gate
+```
+
 Enable AI edition:
 
 ```bash
 pip install -e '.[ai]'
-mkdir -p ~/.config/bw-defend
-cat > ~/.config/bw-defend/config.toml <<'CFG'
-edition = "ai"
-
-[remediation_policy]
-allow_auto_quarantine = true
-allow_auto_temp_isolation = true
-destructive_requires_approval = true
-auto_execute_min_confidence = 0.85
-CFG
+cp config.example.toml ~/.config/bw-defend/config.toml
+# set: edition = "ai"
 ```
 
-## Command Surface
+<details>
+<summary><strong>First full verification path</strong> (scan + controls + rules)</summary>
+
+```bash
+bw-defend scan /tmp --json
+bw-defend quarantine list --json
+bw-defend monitor start --json
+bw-defend firewall apply --json
+bw-defend firewall revert --json
+bw-defend monitor stop --json
+bw-defend rules verify --json
+```
+
+</details>
+
+<br/>
+
+## 🌐 Project Site
+
+Canonical routes:
+
+- Repository: https://github.com/ByteWorthyLLC/byteworthy-defend
+- GitHub Pages site: https://byteworthyllc.github.io/byteworthy-defend/
+- Trust center: https://byteworthyllc.github.io/byteworthy-defend/trust.html
+- ByteWorthy services: https://byteworthy.io/services
+- ByteWorthy contact: https://byteworthy.io/contact
+
+<br/>
+
+## 🔍 Why ByteWorthy Defend
+
+For Linux security operators, platform teams, and engineering-led security programs:
+
+- Continuous host scanning and deterministic detection workflows
+- Reversible quarantine and firewall actions
+- Policy-gated remediation that requires approval on destructive actions
+- Stable JSON contracts for CI/CD and SOC automation
+- Open-source transparency with enterprise-grade process rigor
+
+### ByteWorthy Product Context
+
+ByteWorthy ships a clear product continuum:
+
+1. **Sovra**: open-source AI SaaS baseline
+2. **Klienta**: paid white-label agency baseline
+3. **Clynova**: paid healthcare launch baseline
+4. **ByteWorthy Defend**: open-source Linux endpoint defense CLI
+
+<br/>
+
+## 🔎 SEO / AEO / GEO
+
+Discoverability and answer-engine assets ship in-repo:
+
+- Root model-retrieval index: [`llms.txt`](llms.txt)
+- Site model-retrieval index: [`site/llms.txt`](site/llms.txt)
+- Crawl assets: [`site/robots.txt`](site/robots.txt), [`site/sitemap.xml`](site/sitemap.xml)
+- Editorial controls: [`docs/marketing-editorial-guidelines.md`](docs/marketing-editorial-guidelines.md)
+- Search/answer/generative playbook: [`docs/seo-aeo-geo-playbook.md`](docs/seo-aeo-geo-playbook.md)
+- Marketing reference: [`MARKETING.md`](MARKETING.md)
+
+<br/>
+
+## ✨ What You Get
+
+### Core Edition (`edition = "core"`)
+
+- Signature-based scanning engine
+- Quarantine list/restore/purge lifecycle
+- Monitor state management (`start|stop|status`)
+- Firewall apply/revert lifecycle
+- Process visibility and guarded process termination
+- Rules update/list/verify with checksum and schema validation
+
+### AI Edition (`edition = "ai"`)
+
+- Remediation planner/executor workflow
+- Policy engine enforcement for every action
+- Mandatory explicit approval for destructive operations
+- Audit records for proposed and executed actions
+
+### Production Operations Layer
+
+- Strict health gate: `bw-defend doctor --strict --json`
+- Machine-readable exit codes for CI and automation
+- Documentation validation gate: `./scripts/validate-docs.sh`
+- Release-readiness workflows on GitHub Actions
+
+<br/>
+
+## 💻 Command Surface
 
 - `bw-defend scan <path|system>`
 - `bw-defend monitor start|stop|status`
@@ -61,31 +172,24 @@ CFG
 - `bw-defend process list|kill --pid <id> --approve`
 - `bw-defend ai remediate <incident-id> [--approve]`
 - `bw-defend rules update|list|verify`
-- `bw-defend doctor`
+- `bw-defend doctor [--strict]`
 
-All operational commands support `--json` for machine-readable output.
+All operational commands support `--json`.
 
-## Editions
+<br/>
 
-- **Core edition**: scanning, monitoring, quarantine, rules, firewall/process controls.
-- **AI edition**: adds AI remediation planner/executor with policy enforcement.
-
-Edition is controlled in `~/.config/bw-defend/config.toml` via:
-
-```toml
-edition = "core" # or "ai"
-```
-
-## Security Model
+## 🛡️ Security Model
 
 - AI never bypasses policy evaluation.
-- Destructive actions (`delete`, `kill`, `network_block`) require `--approve`.
-- Non-destructive actions can auto-execute only when policy allows and confidence threshold is met.
-- All proposed and executed remediation actions are appended to an immutable audit trail file.
+- Unknown remediation actions are denied by default.
+- Destructive actions (`delete`, `kill`, `network_block`) require explicit approval.
+- Confidence thresholds control non-destructive auto-execution.
+- Rules bundles require integrity + schema validation before activation.
+- Every incident/remediation step is audit-logged.
 
-## Incident Schema v1
+### Incident Schema v1
 
-Stable required fields:
+Required fields:
 
 - `id`
 - `timestamp`
@@ -99,30 +203,32 @@ Stable required fields:
 - `remediation_plan`
 - `final_outcome`
 
-## Project Site
+<br/>
 
-- Product page: `site/index.html`
-- Trust center: `site/trust.html`
+## 📚 Docs
 
-## Docs
-
-- [Quickstart Guide](docs/quickstart.md)
+- [Quickstart](docs/quickstart.md)
 - [Command Reference](docs/command-reference.md)
 - [Architecture](docs/architecture.md)
 - [Deployment Guide](docs/deployment-guide.md)
 - [Operations Runbook](docs/operations-runbook.md)
 - [Release Process](docs/release-process.md)
+- [Release Readiness Checklist](docs/release-readiness-checklist.md)
 - [Production Readiness](docs/production-readiness.md)
 - [GA Readiness Criteria](docs/ga-readiness-criteria.md)
-- [Release Blockers](docs/release-blockers.md)
-- [Support and Release Cadence](docs/support-and-release-cadence.md)
-- [Testing Strategy](docs/testing.md)
+- [Security Architecture](docs/security.md)
+- [Threat Model](docs/threat-model.md)
+- [SEO/AEO/GEO Playbook](docs/seo-aeo-geo-playbook.md)
+- [Marketing Editorial Guidelines](docs/marketing-editorial-guidelines.md)
 - [GitHub Hardening](docs/github-hardening.md)
-- [Security Policy](SECURITY.md)
-- [Contributing Guide](CONTRIBUTING.md)
-- [GitHub Cutover Runbook](docs/github-cutover-runbook.md)
+- [Support and Release Cadence](docs/support-and-release-cadence.md)
 - [Docs Index](docs/index.md)
 
 ## Production Gate
 
-A production tag must not be created until all gates in [`docs/release-readiness-checklist.md`](docs/release-readiness-checklist.md) and [`docs/ga-readiness-criteria.md`](docs/ga-readiness-criteria.md) are checked and evidence is attached.
+A production tag must not be created until all checks in:
+
+- [`docs/release-readiness-checklist.md`](docs/release-readiness-checklist.md)
+- [`docs/ga-readiness-criteria.md`](docs/ga-readiness-criteria.md)
+
+are complete with evidence attached.

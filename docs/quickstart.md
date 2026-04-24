@@ -21,6 +21,20 @@ pip install -e '.[dev]'
 bw-defend doctor --strict --json
 ```
 
+## Linux Parity via Docker (macOS/Windows Dev Hosts)
+
+Run the same Linux gate used by CI:
+
+```bash
+docker compose run --rm linux-gate
+```
+
+Open an interactive Linux shell with the project pre-installed:
+
+```bash
+docker compose run --rm linux-shell
+```
+
 ## First Scan
 
 ```bash

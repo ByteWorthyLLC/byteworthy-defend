@@ -18,3 +18,6 @@
 - [Security Evidence Pack](security-evidence/)
 - [GitHub Cutover Runbook](github-cutover-runbook.md)
 - [Marketing Positioning](marketing-positioning.md)
+- [Marketing Editorial Guidelines](marketing-editorial-guidelines.md)
+- [SEO/AEO/GEO Playbook](seo-aeo-geo-playbook.md)
+- [Docs Retrieval Index](llms.txt)

@@ -27,6 +27,21 @@ cp config.example.toml ~/.config/bw-defend/config.toml
 bw-defend doctor --json
 ```
 
+## Linux Runtime Mimic (Containerized)
+
+For non-Linux developer machines, use Docker to mimic production checks:
+
+```bash
+docker build -t byteworthy-defend:linux-gate .
+docker run --rm byteworthy-defend:linux-gate
+```
+
+Or use compose:
+
+```bash
+docker compose run --rm linux-gate
+```
+
 ## Rollback
 
 1. stop monitor mode

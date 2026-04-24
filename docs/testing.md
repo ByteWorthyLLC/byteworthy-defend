@@ -20,14 +20,13 @@
 Before production release, run:
 
 ```bash
-pytest
-bw-defend doctor --strict --json
-bw-defend scan /tmp --json
-bw-defend monitor start --json
-bw-defend firewall apply --json
-bw-defend firewall revert --json
-bw-defend monitor stop --json
-bw-defend rules verify --json
+./scripts/linux-gate.sh
+```
+
+For macOS/Windows developers who need Linux parity:
+
+```bash
+docker compose run --rm linux-gate
 ```
 
 ## Reliability and Regression Scenarios

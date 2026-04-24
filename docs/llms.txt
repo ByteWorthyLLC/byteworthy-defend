@@ -1,4 +1,13 @@
-ByteWorthy Defend is an open-source Linux-first terminal antivirus project by ByteWorthy.
-Primary command: bw-defend.
-Two editions: core and ai.
-Security model: policy-gated remediation with mandatory approval on destructive actions.
+# ByteWorthy Defend Docs Retrieval Index
+
+For canonical AI-retrieval references, use the root file:
+
+- https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/llms.txt
+
+This docs-local mirror exists for static docs tooling compatibility.
+
+- Project site: https://byteworthyllc.github.io/byteworthy-defend/
+- Trust center: https://byteworthyllc.github.io/byteworthy-defend/trust.html
+- Site retrieval index: https://byteworthyllc.github.io/byteworthy-defend/llms.txt
+- Security docs: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/security.md
+- Command docs: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/command-reference.md

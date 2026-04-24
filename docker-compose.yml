@@ -1,0 +1,16 @@
+services:
+  linux-gate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: byteworthy-defend:linux-gate
+    command: ["./scripts/linux-gate.sh"]
+
+  linux-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: byteworthy-defend:linux-gate
+    command: ["bash"]
+    stdin_open: true
+    tty: true

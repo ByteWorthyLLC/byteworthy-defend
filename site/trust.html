@@ -3,38 +3,291 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ByteWorthy Defend Trust Center</title>
+    <title>ByteWorthy Defend Trust Center | Security and Release Controls</title>
+    <meta
+      name="description"
+      content="Trust center for ByteWorthy Defend: security commitments, policy controls, disclosure process, auditability guarantees, and production readiness documentation."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://byteworthyllc.github.io/byteworthy-defend/trust.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ByteWorthy Defend Trust Center" />
+    <meta
+      property="og:description"
+      content="Security commitments and evidence links for policy-gated remediation, release readiness, and vulnerability disclosure."
+    />
+    <meta property="og:url" content="https://byteworthyllc.github.io/byteworthy-defend/trust.html" />
+    <meta property="og:image" content="https://byteworthyllc.github.io/byteworthy-defend/assets/brand-mark.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ByteWorthy Defend Trust Center" />
+    <meta
+      name="twitter:description"
+      content="Security commitments, runbooks, policy controls, and disclosure process for ByteWorthy Defend."
+    />
     <style>
-      body { margin: 0; font-family: ui-sans-serif, sans-serif; background: #0d1326; color: #e4edff; }
-      main { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
-      section { background: #121b36; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
-      h1, h2 { margin-top: 0; }
-      a { color: #39c4ff; }
+      :root {
+        --bg: #0a1522;
+        --panel: #11253a;
+        --panel-soft: #15314a;
+        --line: #31536c;
+        --text: #f0f7ff;
+        --muted: #b9ccdc;
+        --accent: #00c2ff;
+        --ok: #2fd59d;
+        --warn: #ffd4cc;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        color: var(--text);
+        line-height: 1.6;
+        background:
+          radial-gradient(circle at 14% 8%, rgba(0, 194, 255, 0.14), transparent 36%),
+          linear-gradient(160deg, #08121c 0%, #0d1d2d 44%, #12273b 100%);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      main {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 22px 16px 44px;
+      }
+
+      .top {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 20px;
+        background: linear-gradient(140deg, rgba(0, 194, 255, 0.12), rgba(47, 213, 157, 0.12));
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+        letter-spacing: -0.02em;
+      }
+
+      h1 {
+        margin: 10px 0;
+        font-size: clamp(1.9rem, 5vw, 3rem);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        background: linear-gradient(165deg, rgba(17, 37, 58, 0.95), rgba(21, 49, 74, 0.72));
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin-top: 0;
+      }
+
+      .status {
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(47, 213, 157, 0.45);
+        color: #cbf8ea;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        padding: 3px 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #365b76;
+        text-align: left;
+        padding: 8px;
+        vertical-align: top;
+      }
+
+      th {
+        color: #d6ecff;
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        padding: 0.1rem 0.3rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .callout {
+        border: 1px solid #4b6075;
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(10, 25, 39, 0.6);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "ByteWorthy Defend Trust Center",
+        "url": "https://byteworthyllc.github.io/byteworthy-defend/trust.html",
+        "about": {
+          "@type": "SoftwareApplication",
+          "name": "ByteWorthy Defend",
+          "operatingSystem": "Linux",
+          "applicationCategory": "SecurityApplication"
+        }
+      }
+    </script>
   </head>
   <body>
     <main>
-      <h1>ByteWorthy Defend Trust Center</h1>
-      <section>
-        <h2>Security Commitments</h2>
-        <ul>
-          <li>Destructive remediation actions require explicit operator approval.</li>
-          <li>Rule updates require integrity verification before activation.</li>
-          <li>Remediation proposals and executions are written to audit logs.</li>
-        </ul>
+      <section class="top">
+        <span class="status">Open Source</span>
+        <span class="status">MIT</span>
+        <span class="status">Linux Production Target</span>
+        <h1>ByteWorthy Defend Trust Center</h1>
+        <p class="muted">
+          This page centralizes security commitments, release controls, and disclosure channels for ByteWorthy Defend.
+          Claims below are mapped to public repository evidence.
+        </p>
+        <p>
+          <a href="https://github.com/ByteWorthyLLC/byteworthy-defend">Repository</a> ·
+          <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SECURITY.md">Security Policy</a> ·
+          <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md">Release Readiness</a>
+        </p>
       </section>
-      <section>
-        <h2>Policies and Docs</h2>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>Security Commitments</h2>
+          <ul>
+            <li>AI remediation never bypasses policy controls.</li>
+            <li>Destructive actions require explicit operator approval when policy requires it.</li>
+            <li>Rule updates require integrity and schema validation before activation.</li>
+            <li>Proposed and executed actions are written to audit records.</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>Operational Guarantees</h2>
+          <ul>
+            <li>Stable command surface for production scripts.</li>
+            <li><code>--json</code> output across operational commands.</li>
+            <li>Strict readiness gate: <code>bw-defend doctor --strict --json</code>.</li>
+            <li>Reversible monitor and firewall transitions.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Control-to-Evidence Matrix</h2>
+        <table aria-label="Control to evidence map">
+          <thead>
+            <tr>
+              <th>Control</th>
+              <th>Assurance</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Policy-gated remediation</td>
+              <td>No policy bypass for AI actions</td>
+              <td><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/src/bw_defend/core/policy.py">policy.py</a></td>
+            </tr>
+            <tr>
+              <td>Approval gate</td>
+              <td>Destructive actions require approval</td>
+              <td><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/src/bw_defend/ai/remediation.py">ai/remediation.py</a></td>
+            </tr>
+            <tr>
+              <td>Rules integrity</td>
+              <td>Checksum and schema verification</td>
+              <td><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/src/bw_defend/core/rules.py">core/rules.py</a></td>
+            </tr>
+            <tr>
+              <td>Auditability</td>
+              <td>Immutable event-style audit entries</td>
+              <td><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/src/bw_defend/core/audit.py">core/audit.py</a></td>
+            </tr>
+            <tr>
+              <td>Release gating</td>
+              <td>CI/security/readiness workflows</td>
+              <td><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/tree/main/.github/workflows">GitHub workflows</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h3>Disclosure Process</h3>
+          <p>
+            Report vulnerabilities through GitHub Security Advisories or email
+            <a href="mailto:security@byteworthy.io">security@byteworthy.io</a>.
+          </p>
+          <p class="muted">Public issue trackers should not be used for exploitable vulnerability details.</p>
+        </article>
+
+        <article class="panel">
+          <h3>Scope Clarifications</h3>
+          <ul>
+            <li>Production declaration scope is Linux.</li>
+            <li class="warn">Windows and macOS production support are not part of v1 commitments.</li>
+            <li>AI capabilities are optional by dependency and configuration.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel callout">
+        <h3>Primary Documentation</h3>
         <ul>
-          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SECURITY.md">Security Policy</a></li>
           <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/security.md">Security Architecture</a></li>
           <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/threat-model.md">Threat Model</a></li>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/operations-runbook.md">Operations Runbook</a></li>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-process.md">Release Process</a></li>
           <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md">Release Readiness Checklist</a></li>
         </ul>
-      </section>
-      <section>
-        <h2>Disclosure Channel</h2>
-        <p>Use GitHub Security Advisories or email <a href="mailto:security@byteworthy.io">security@byteworthy.io</a>.</p>
+        <p class="muted">
+          Product context alignment: Sovra, Klienta, and Clynova standards are applied to documentation quality and release process rigor.
+        </p>
       </section>
     </main>
   </body>

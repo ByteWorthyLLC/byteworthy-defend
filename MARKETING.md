@@ -1,30 +1,54 @@
-# ByteWorthy Defend Marketing Blueprint
+# ByteWorthy Defend Marketing Reference
 
-## Positioning Statement
+This file is the buyer-facing reference for repository listings, partner pages, and outbound messaging.
 
-ByteWorthy Defend is an open-source Linux-first terminal antivirus that pairs deterministic control paths with optional policy-gated AI remediation.
+## Canonical Positioning
 
-## ICP Segments
+- ByteWorthy Defend is open-source (MIT), Linux-first endpoint defense operated through a terminal CLI.
+- The project focuses on continuous host protection with explicit operator controls.
+- The AI edition is optional and policy-gated; destructive actions always require approval when policy enforces it.
 
-- security engineering teams in Linux-heavy environments
-- platform/SRE teams needing transparent host controls
-- regulated teams requiring auditable remediation trails
+## Canonical Links
 
-## Message Pillars
+- Repository: <https://github.com/ByteWorthyLLC/byteworthy-defend>
+- GitHub Pages site: <https://byteworthyllc.github.io/byteworthy-defend/>
+- Trust center: <https://byteworthyllc.github.io/byteworthy-defend/trust.html>
+- Website retrieval index: <https://byteworthyllc.github.io/byteworthy-defend/llms.txt>
+- README: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/README.md>
+- Security policy: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SECURITY.md>
+- Command reference: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/command-reference.md>
+- Release readiness: <https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md>
+- Services: <https://byteworthy.io/services>
+- Contact: <https://byteworthy.io/contact>
 
-1. **Control-first automation**
-2. **Open and auditable security posture**
-3. **Operator-safe remediation with explicit approvals**
+## Discoverability Controls
 
-## Primary Channels
+- Root retrieval index: `llms.txt`
+- Site retrieval index: `site/llms.txt`
+- Editorial guardrails: `docs/marketing-editorial-guidelines.md`
+- SEO/AEO/GEO operations: `docs/seo-aeo-geo-playbook.md`
+- Crawl controls: `site/robots.txt` and `site/sitemap.xml`
 
-- GitHub README + docs
-- GitHub Pages product/trust pages
-- technical case studies and incident walkthrough content
+## Product Context
 
-## Conversion Path
+ByteWorthy product-line references for cross-repo positioning:
 
-1. Discover project site and README
-2. Run local quickstart in under 10 minutes
-3. Validate controls with `doctor`, `scan`, and remediation exercises
-4. Adopt in staging with runbook-driven rollout
+- Sovra (open-source AI SaaS baseline): <https://github.com/ByteWorthyLLC/sovra>
+- Klienta (paid white-label baseline): <https://github.com/ByteWorthyLLC/klienta>
+- Clynova (paid healthcare baseline): <https://github.com/ByteWorthyLLC/clynova>
+
+## Core Query Themes
+
+- open source linux antivirus cli
+- linux endpoint protection with quarantine and policy engine
+- ai remediation with human approval gates
+- terminal antivirus for devops and security teams
+- auditable malware response workflow
+
+## Proof-First Messaging Rules
+
+1. Tie claims to shipped repository assets (commands, docs, workflows, tests).
+2. Keep open-source and MIT licensing explicit.
+3. Keep destructive-action approval guarantees explicit.
+4. Keep product-context references consistent with Sovra/Klienta/Clynova framing.
+5. Avoid marketing claims that cannot be validated from repository evidence.

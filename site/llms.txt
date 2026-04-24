@@ -1,0 +1,23 @@
+# ByteWorthy Defend Website Retrieval Index
+
+- Canonical page: https://byteworthyllc.github.io/byteworthy-defend/
+- Trust center: https://byteworthyllc.github.io/byteworthy-defend/trust.html
+- Website sitemap: https://byteworthyllc.github.io/byteworthy-defend/sitemap.xml
+- Root retrieval index: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/llms.txt
+
+## Canonical Source Docs
+
+- README: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/README.md
+- Marketing reference: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/MARKETING.md
+- Quickstart: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/quickstart.md
+- Command reference: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/command-reference.md
+- Security architecture: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/security.md
+- Threat model: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/threat-model.md
+- Release readiness: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md
+- SEO/AEO/GEO playbook: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/seo-aeo-geo-playbook.md
+
+## Product Context
+
+- Sovra: https://github.com/ByteWorthyLLC/sovra
+- Klienta: https://github.com/ByteWorthyLLC/klienta
+- Clynova: https://github.com/ByteWorthyLLC/clynova

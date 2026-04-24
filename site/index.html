@@ -3,93 +3,490 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ByteWorthy Defend</title>
-    <meta name="description" content="Open-source Linux-first terminal antivirus with policy-gated AI remediation." />
+    <title>ByteWorthy Defend | Open-Source Linux Antivirus CLI</title>
+    <meta
+      name="description"
+      content="ByteWorthy Defend is an open-source Linux-first antivirus CLI with continuous monitoring, quarantine lifecycle, policy-gated AI remediation, and machine-readable automation outputs."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#09141f" />
+    <link rel="canonical" href="https://byteworthyllc.github.io/byteworthy-defend/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ByteWorthy Defend | Open-Source Linux Antivirus CLI" />
+    <meta
+      property="og:description"
+      content="Linux endpoint defense from the terminal: scanning, quarantine, firewall controls, policy-gated AI remediation, and explicit auditability."
+    />
+    <meta property="og:url" content="https://byteworthyllc.github.io/byteworthy-defend/" />
+    <meta property="og:image" content="https://byteworthyllc.github.io/byteworthy-defend/assets/brand-mark.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ByteWorthy Defend | Open-Source Linux Antivirus CLI" />
+    <meta
+      name="twitter:description"
+      content="Continuous host protection with explicit operator control and JSON contracts from one CLI: bw-defend."
+    />
+    <meta name="twitter:image" content="https://byteworthyllc.github.io/byteworthy-defend/assets/brand-mark.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        --bg: #0b1020;
-        --panel: #111936;
-        --text: #e8eefc;
-        --muted: #9fb0d7;
-        --accent: #2ec27e;
-        --accent-2: #00bcd4;
+        --bg: #09141f;
+        --bg-elevated: #0f1f2f;
+        --panel: #11283c;
+        --panel-soft: #16324a;
+        --line: #2f4e66;
+        --text: #f3f9ff;
+        --muted: #b5cadb;
+        --accent: #30d49d;
+        --accent-strong: #00c2ff;
+        --danger: #ff7664;
+        --radius-lg: 22px;
+        --radius-md: 14px;
       }
-      * { box-sizing: border-box; }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
       body {
         margin: 0;
-        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: radial-gradient(circle at 20% 20%, #13224b, var(--bg));
+        padding: 0;
+      }
+
+      body {
         color: var(--text);
-        line-height: 1.5;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at 10% 8%, rgba(0, 194, 255, 0.18), transparent 35%),
+          radial-gradient(circle at 88% 20%, rgba(48, 212, 157, 0.13), transparent 42%),
+          linear-gradient(165deg, #08121b 0%, #0a1622 44%, #102030 100%);
+        line-height: 1.6;
       }
-      .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
-      .hero {
-        background: linear-gradient(145deg, rgba(46, 194, 126, 0.12), rgba(0, 188, 212, 0.08));
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 16px;
-        padding: 1.5rem;
+
+      a {
+        color: var(--accent-strong);
       }
-      .badge {
-        display: inline-block;
-        padding: 0.25rem 0.65rem;
+
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        background: rgba(9, 20, 31, 0.86);
+        border: 1px solid var(--line);
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 10px 16px;
+        backdrop-filter: blur(8px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .brand img {
+        width: 26px;
+        height: 26px;
+      }
+
+      .nav {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .nav a {
+        text-decoration: none;
         color: var(--muted);
-        font-size: 0.8rem;
+        font-size: 0.95rem;
       }
-      h1 { margin: 0.8rem 0; font-size: clamp(1.8rem, 5vw, 3rem); }
-      h2 { margin-top: 2rem; }
-      .panel {
-        background: var(--panel);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+
+      .hero {
+        margin-top: 20px;
+        padding: 28px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--line);
+        background: linear-gradient(145deg, rgba(48, 212, 157, 0.12), rgba(0, 194, 255, 0.09));
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -20% -58% auto;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0, 194, 255, 0.24), transparent 68%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(179, 242, 224, 0.35);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.82rem;
+        color: #d2f6ea;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+        letter-spacing: -0.02em;
+      }
+
+      h1 {
+        margin: 14px 0 12px;
+        font-size: clamp(2rem, 5.2vw, 3.35rem);
+        line-height: 1.1;
+        max-width: 14ch;
+      }
+
+      .hero p {
+        max-width: 74ch;
+        margin: 0 0 14px;
+        color: #d9e8f4;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .btn {
+        display: inline-block;
+        text-decoration: none;
         border-radius: 12px;
-        padding: 1rem;
-        margin-top: 1rem;
+        padding: 10px 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
       }
-      code { background: rgba(255,255,255,0.08); padding: 0.12rem 0.3rem; border-radius: 4px; }
-      a { color: var(--accent-2); }
-      ul { padding-left: 1.1rem; }
-      .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #03281c;
+      }
+
+      .btn-secondary {
+        background: rgba(6, 20, 30, 0.5);
+        color: #d8f3ff;
+        border-color: rgba(126, 190, 220, 0.45);
+      }
+
+      .section {
+        margin-top: 18px;
+        padding: 22px;
+        background: rgba(13, 29, 45, 0.85);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+
+      .card {
+        border: 1px solid #355772;
+        background: linear-gradient(165deg, rgba(17, 40, 60, 0.95), rgba(15, 36, 54, 0.75));
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+
+      .kicker {
+        color: var(--muted);
+        margin-top: 0;
+      }
+
+      .commands {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .command {
+        background: #0d1f2f;
+        border: 1px solid #365873;
+        border-radius: 10px;
+        padding: 10px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        font-size: 0.95rem;
+        overflow-x: auto;
+      }
+
+      .faq {
+        display: grid;
+        gap: 10px;
+      }
+
+      details {
+        border: 1px solid #345771;
+        background: #0d1f2f;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .footer {
+        margin-top: 18px;
+        padding: 18px;
+        border: 1px solid #345771;
+        background: linear-gradient(145deg, #0c1f2f, #11293e);
+        border-radius: 14px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .warn {
+        color: #ffd9d2;
+      }
+
+      @media (max-width: 700px) {
+        .hero,
+        .section,
+        .footer {
+          padding: 16px;
+        }
+
+        h1 {
+          max-width: unset;
+        }
+      }
     </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ByteWorthy Defend",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Linux",
+        "softwareVersion": "v1",
+        "license": "https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/LICENSE",
+        "codeRepository": "https://github.com/ByteWorthyLLC/byteworthy-defend",
+        "url": "https://byteworthyllc.github.io/byteworthy-defend/",
+        "publisher": {
+          "@type": "Organization",
+          "name": "ByteWorthy LLC",
+          "url": "https://byteworthy.io"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is ByteWorthy Defend open source?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. ByteWorthy Defend is MIT-licensed and developed in public at github.com/ByteWorthyLLC/byteworthy-defend."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does AI remediation run without policy controls?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. AI remediation is policy-gated. Destructive actions require explicit operator approval when policy enforcement is enabled."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which command runs health checks for production readiness?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Run bw-defend doctor --strict --json to validate strict readiness checks and use non-zero exit codes in automation."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <main class="wrap">
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <img src="assets/brand-mark.svg" alt="ByteWorthy Defend" />
+          <span>ByteWorthy Defend</span>
+        </div>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub</a>
+          <a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/README.md">README</a>
+          <a href="trust.html">Trust Center</a>
+          <a href="https://byteworthy.io/services">Services</a>
+        </nav>
+      </header>
+
       <section class="hero">
-        <span class="badge">MIT Licensed · Linux-first</span>
-        <h1>ByteWorthy Defend</h1>
-        <p>Terminal antivirus with deterministic core controls and optional policy-gated AI remediation.</p>
-        <p><a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub Repository</a></p>
+        <span class="eyebrow">MIT Licensed • Linux-first • CLI-native</span>
+        <h1>Endpoint defense built for operators, not dashboards.</h1>
+        <p>
+          ByteWorthy Defend is an open-source terminal antivirus for Linux. It combines deterministic scanning,
+          quarantine lifecycle controls, reversible firewall operations, and optional AI remediation that never bypasses policy.
+        </p>
+        <p class="muted">
+          Built by ByteWorthy alongside Sovra, Klienta, and Clynova to support production-grade engineering and security delivery.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/ByteWorthyLLC/byteworthy-defend">Start on GitHub</a>
+          <a class="btn btn-secondary" href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/quickstart.md">Read Quickstart</a>
+          <a class="btn btn-secondary" href="trust.html">Review Trust Controls</a>
+        </div>
       </section>
 
-      <section class="grid">
-        <article class="panel">
-          <h2>Core Edition</h2>
-          <ul>
-            <li>Scanning engine</li>
-            <li>Quarantine lifecycle</li>
-            <li>Rules integrity verification</li>
-            <li>Firewall and process controls</li>
-          </ul>
-        </article>
-        <article class="panel">
-          <h2>AI Edition</h2>
-          <ul>
-            <li>Remediation planning and execution</li>
-            <li>Mandatory approval gates for destructive actions</li>
-            <li>Full audit trail</li>
-          </ul>
-        </article>
+      <section class="section" id="offer">
+        <h2>What You Get</h2>
+        <p class="kicker">Two editions in one repository with explicit policy boundaries.</p>
+        <div class="cards">
+          <article class="card">
+            <h3>Core Edition</h3>
+            <ul>
+              <li>Signature/rule scanning engine</li>
+              <li>Quarantine list/restore/purge lifecycle</li>
+              <li>Rules checksum + schema verification</li>
+              <li>Monitor/firewall/process controls with JSON output</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>AI Edition</h3>
+            <ul>
+              <li>Policy-gated remediation planning and execution</li>
+              <li>Operator approval workflow for destructive actions</li>
+              <li>Audit records for proposed and executed steps</li>
+              <li>Confidence thresholds for non-destructive automation</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Production Operations</h3>
+            <ul>
+              <li>Strict health gate: <code>bw-defend doctor --strict --json</code></li>
+              <li>Workflow-based release readiness checks</li>
+              <li>Security, threat model, and runbook documentation</li>
+              <li>Machine-readable exit codes for CI and SOC pipelines</li>
+            </ul>
+          </article>
+        </div>
       </section>
 
-      <section class="panel">
-        <h2>CLI Surface</h2>
-        <p><code>bw-defend scan &lt;path|system&gt;</code></p>
-        <p><code>bw-defend monitor start|stop|status</code></p>
-        <p><code>bw-defend quarantine list|restore|purge</code></p>
-        <p><code>bw-defend firewall status|apply|revert</code></p>
-        <p><code>bw-defend process list|kill --pid &lt;id&gt; --approve</code></p>
-        <p><code>bw-defend ai remediate &lt;incident-id&gt; [--approve]</code></p>
-        <p><code>bw-defend rules update|list|verify</code></p>
+      <section class="section" id="commands">
+        <h2>Stable CLI Surface</h2>
+        <p class="kicker">All operational commands support <code>--json</code> for automation.</p>
+        <div class="commands">
+          <div class="command">bw-defend scan &lt;path|system&gt;</div>
+          <div class="command">bw-defend monitor start|stop|status</div>
+          <div class="command">bw-defend quarantine list|restore|purge</div>
+          <div class="command">bw-defend firewall status|apply|revert</div>
+          <div class="command">bw-defend process list|kill --pid &lt;id&gt; --approve</div>
+          <div class="command">bw-defend ai remediate &lt;incident-id&gt; [--approve]</div>
+          <div class="command">bw-defend rules update|list|verify</div>
+          <div class="command">bw-defend doctor [--strict]</div>
+        </div>
+      </section>
+
+      <section class="section" id="seo-aeo-geo">
+        <h2>SEO, AEO, and GEO Readiness</h2>
+        <div class="cards">
+          <article class="card">
+            <h3>SEO Assets</h3>
+            <ul>
+              <li><a href="sitemap.xml">sitemap.xml</a> and <a href="robots.txt">robots.txt</a> are published with canonical routes.</li>
+              <li>Head metadata is explicit for title, description, canonical, Open Graph, and Twitter cards.</li>
+              <li>Command and docs links are keyword-aligned to Linux security operator intent.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>AEO Assets</h3>
+            <ul>
+              <li>Short, direct answers exist in copy and structured FAQ schema.</li>
+              <li>Claims map to verifiable docs, commands, and workflow evidence.</li>
+              <li>Trust controls are exposed in a dedicated public page.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>GEO Assets</h3>
+            <ul>
+              <li><a href="llms.txt">llms.txt</a> publishes canonical AI retrieval links for agents and model tooling.</li>
+              <li>Brand framing aligns with Sovra, Klienta, and Clynova product context.</li>
+              <li>No claim is published without repository evidence.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <h2>Operator FAQ</h2>
+        <div class="faq">
+          <details>
+            <summary>Who is ByteWorthy Defend built for?</summary>
+            <p>Linux platform and security teams that need scriptable, auditable host defense controls from the terminal.</p>
+          </details>
+          <details>
+            <summary>What is included in production v1?</summary>
+            <p>Core scan/quarantine/rules/firewall/process controls and optional AI remediation with policy gating and approval paths.</p>
+          </details>
+          <details>
+            <summary>What is not included?</summary>
+            <p class="warn">Windows and macOS production support are out of scope for v1. Production declaration is Linux-only.</p>
+          </details>
+          <details>
+            <summary>How do I verify readiness fast?</summary>
+            <p>Run <code>bw-defend doctor --strict --json</code>, then validate docs and tests using repository workflows and runbooks.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="footer">
+        <h2>Proof-First Links</h2>
+        <ul>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/command-reference.md">Command Reference</a></li>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/security.md">Security Architecture</a></li>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/release-readiness-checklist.md">Release Readiness Checklist</a></li>
+          <li><a href="https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/docs/seo-aeo-geo-playbook.md">SEO/AEO/GEO Playbook</a></li>
+        </ul>
+        <p class="muted">
+          ByteWorthy product context: <a href="https://github.com/ByteWorthyLLC/sovra">Sovra</a>,
+          <a href="https://github.com/ByteWorthyLLC/klienta">Klienta</a>,
+          <a href="https://github.com/ByteWorthyLLC/clynova">Clynova</a>, and ByteWorthy Defend.
+        </p>
       </section>
     </main>
   </body>
