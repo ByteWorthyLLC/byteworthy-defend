@@ -6,6 +6,7 @@ import sys
 
 REQUIRED_FILES = [
     "README.md",
+    "config.example.toml",
     "MARKETING.md",
     "llms.txt",
     "Dockerfile",

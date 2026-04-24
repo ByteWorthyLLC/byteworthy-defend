@@ -20,6 +20,7 @@ pip install -e '.[dev]'
 
 ```bash
 bw-defend doctor --strict --json
+bw-defend audit verify --json
 ```
 
 ## Linux Runtime Parity via Docker (Optional)

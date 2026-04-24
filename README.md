@@ -57,6 +57,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 bw-defend doctor --strict --json
+bw-defend audit verify --json
 ```
 
 Linux parity from macOS/Windows using Docker:
@@ -186,6 +187,7 @@ Discoverability and answer-engine assets ship in-repo:
 - `bw-defend process list|kill --pid <id> --approve`
 - `bw-defend ai remediate <incident-id> [--approve]`
 - `bw-defend rules update|list|verify`
+- `bw-defend audit verify [--log-path <path>]`
 - `bw-defend doctor [--strict]`
 
 All operational commands support `--json`.
@@ -199,7 +201,9 @@ All operational commands support `--json`.
 - Destructive actions (`delete`, `kill`, `network_block`) require explicit approval.
 - Confidence thresholds control non-destructive auto-execution.
 - Rules bundles require integrity + schema validation before activation.
-- Every incident/remediation step is audit-logged.
+- Optional detached signature verification can be enforced for rules bundles.
+- Every incident/remediation step is audit-logged with tamper-evident chain metadata.
+- Optional outbound audit telemetry can stream to a central endpoint.
 
 ### Incident Schema v1
 

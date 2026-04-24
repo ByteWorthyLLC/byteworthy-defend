@@ -3,6 +3,8 @@ import json
 from typer.testing import CliRunner
 
 from bw_defend.cli.main import app
+from bw_defend.core.audit import log_audit
+from bw_defend.core.paths import audit_log_path
 from bw_defend.core.rules import ensure_rules
 
 
@@ -56,3 +58,38 @@ def test_scan_invalid_target_exits_nonzero(tmp_path, monkeypatch) -> None:
     result = runner.invoke(app, ["scan", str(tmp_path / "missing"), "--json"])
     assert result.exit_code == 1
     assert "does not exist" in result.stdout
+
+
+def test_audit_verify_empty_log_exit_zero(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    result = runner.invoke(app, ["audit", "verify", "--json"])
+    assert result.exit_code == 0
+    assert '"status": "empty"' in result.stdout
+
+
+def test_audit_verify_legacy_log_exit_two(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    log_path = audit_log_path()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path.write_text(
+        json.dumps(
+            {
+                "event_id": "audit-legacy",
+                "timestamp": "2026-01-01T00:00:00+00:00",
+                "event_type": "legacy",
+                "payload": {"ok": True},
+            }
+        )
+        + "\n"
+    )
+    result = runner.invoke(app, ["audit", "verify", "--json"])
+    assert result.exit_code == 2
+    assert '"status": "legacy_present"' in result.stdout
+
+
+def test_audit_verify_chained_log_exit_zero(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    log_audit("incident_created", {"id": "inc-123"})
+    result = runner.invoke(app, ["audit", "verify", "--json"])
+    assert result.exit_code == 0
+    assert '"status": "ok"' in result.stdout

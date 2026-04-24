@@ -19,6 +19,7 @@ All operational commands support `--json`.
 - `bw-defend process list|kill --pid <id> --approve`
 - `bw-defend ai remediate <incident-id> [--approve]`
 - `bw-defend rules update|list|verify`
+- `bw-defend audit verify [--log-path <path>]`
 - `bw-defend doctor`
 
 ## Notes
@@ -26,4 +27,5 @@ All operational commands support `--json`.
 - `ai remediate` requires `edition = "ai"` in config.
 - destructive actions (`delete`, `kill`, `network_block`) require `--approve` when policy enforces approval.
 - `bw-defend rules verify` exits `2` if verification fails.
+- `bw-defend audit verify` exits `2` if tampered or legacy log entries are detected.
 - `bw-defend doctor --strict` exits `2` if any health check fails, including unsupported runtime platform (supported: Windows and Linux).

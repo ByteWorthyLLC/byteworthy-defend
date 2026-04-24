@@ -6,12 +6,16 @@
 2. Verify firewall is in expected state: `bw-defend firewall status --json`
 3. Run health check: `bw-defend doctor --strict --json`
 4. Review new incidents and remediation outcomes
-5. Review audit log growth and archive policy
+5. Verify audit-chain integrity: `bw-defend audit verify --json`
+6. Review audit log growth and archive policy
 
 ## Weekly
 
 1. Verify rules integrity:
    - `bw-defend rules verify --json`
+   - if signature enforcement is required, set:
+     - `BW_DEFEND_RULES_SIGNATURE_REQUIRED=true`
+     - `BW_DEFEND_RULES_SIGNING_KEY=<secret>`
 2. Perform quarantine restore drill in staging
 3. Verify process control approval gates with non-production PID
 4. Validate docs remain aligned with live behavior
@@ -30,3 +34,4 @@
   3. evaluate blast radius
   4. if AI edition is enabled, use remediation with explicit approvals
 - Preserve `audit.log` and `incidents.jsonl` as forensic evidence.
+- If telemetry is enabled (`BW_DEFEND_TELEMETRY_ENDPOINT`), preserve `telemetry_failures.jsonl` for delivery diagnostics.

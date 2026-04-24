@@ -6,7 +6,7 @@ from pathlib import Path
 import typer
 
 from bw_defend.ai.remediation import remediate_incident
-from bw_defend.core.audit import log_audit
+from bw_defend.core.audit import log_audit, verify_audit_chain
 from bw_defend.core.config import config_as_dict, load_config
 from bw_defend.core.engine import scan_target
 from bw_defend.core.errors import ConfigValidationError, DefendError
@@ -28,6 +28,7 @@ firewall_app = typer.Typer()
 process_app = typer.Typer()
 ai_app = typer.Typer()
 rules_app = typer.Typer()
+audit_app = typer.Typer()
 
 app.add_typer(monitor_app, name="monitor")
 app.add_typer(quarantine_app, name="quarantine")
@@ -35,6 +36,7 @@ app.add_typer(firewall_app, name="firewall")
 app.add_typer(process_app, name="process")
 app.add_typer(ai_app, name="ai")
 app.add_typer(rules_app, name="rules")
+app.add_typer(audit_app, name="audit")
 
 
 def _must_be_ai_edition() -> None:
@@ -228,6 +230,21 @@ def rules_verify(
         _emit_error(str(exc), json_output)
     emit(result, json_output)
     if not result.get("verified"):
+        raise typer.Exit(2)
+
+
+@audit_app.command("verify")
+def audit_verify(
+    log_path: str | None = typer.Option(None, "--log-path", help="Optional audit log path to verify"),
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
+    try:
+        target = Path(log_path).expanduser().resolve() if log_path else None
+        result = verify_audit_chain(target)
+    except (DefendError, OSError, ValueError) as exc:
+        _emit_error(str(exc), json_output)
+    emit(result, json_output)
+    if result.get("status") not in {"ok", "empty"}:
         raise typer.Exit(2)
 
 

@@ -12,9 +12,11 @@
 ## Security and Safety Gates
 
 - [ ] rules update integrity verification passes with valid bundle and fails invalid bundle
+- [ ] detached rule signature enforcement tested (`BW_DEFEND_RULES_SIGNATURE_REQUIRED=true`)
 - [ ] quarantine lifecycle validated: list, restore, purge
 - [ ] firewall apply/revert verified reversible
 - [ ] process kill path requires approval and logs attempt
+- [ ] `bw-defend audit verify --json` returns `status=ok` or `status=empty` on release candidate
 - [ ] AI destructive actions blocked without `--approve`
 - [ ] AI destructive actions execute with `--approve` and are audited
 

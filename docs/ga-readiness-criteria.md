@@ -14,6 +14,8 @@ A release is production-ready only when all criteria are true.
 
 - [ ] policy gate tested for destructive actions without `--approve`
 - [ ] approved destructive action path tested and audited
+- [ ] audit-chain verification gate passes (`bw-defend audit verify --json`)
+- [ ] detached signature rules gate tested in required mode
 - [ ] quarantine restore and purge behavior validated
 - [ ] firewall apply/revert reversible in test environment
 

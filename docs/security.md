@@ -13,8 +13,10 @@
 - deny-by-default for unknown remediation action types
 - confidence thresholds for auto-remediation
 - explicit approval path for dangerous operations
-- append-only audit records for proposed/executed actions with unique audit event IDs
+- append-only audit records for proposed/executed actions with unique audit event IDs and hash chaining
 - rules bundle checksum validation plus schema validation before activation
+- optional detached bundle signature enforcement via `BW_DEFEND_RULES_SIGNATURE_REQUIRED=true`
+- optional outbound telemetry for audit events via `BW_DEFEND_TELEMETRY_ENDPOINT`
 
 ## Destructive Actions
 

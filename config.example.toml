@@ -5,3 +5,10 @@ allow_auto_quarantine = true
 allow_auto_temp_isolation = true
 destructive_requires_approval = true
 auto_execute_min_confidence = 0.85
+
+[telemetry]
+enabled = false
+endpoint = ""
+timeout_seconds = 3.0
+max_retries = 2
+auth_token_env = "BW_DEFEND_TELEMETRY_TOKEN"

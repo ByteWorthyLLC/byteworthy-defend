@@ -40,6 +40,24 @@ Validate runtime:
 
 ```bash
 bw-defend doctor --strict --json
+bw-defend audit verify --json
+```
+
+## Enterprise Control Flags
+
+Enforce detached rule signatures:
+
+```bash
+export BW_DEFEND_RULES_SIGNATURE_REQUIRED=true
+export BW_DEFEND_RULES_SIGNING_KEY='<signing-secret>'
+```
+
+Enable outbound audit telemetry:
+
+```bash
+export BW_DEFEND_TELEMETRY_ENDPOINT='https://security.example.com/ingest'
+export BW_DEFEND_TELEMETRY_ENABLED=true
+export BW_DEFEND_TELEMETRY_TOKEN='<bearer-token>'
 ```
 
 ## Linux Runtime Mimic (Containerized)
