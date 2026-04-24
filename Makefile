@@ -1,4 +1,4 @@
-.PHONY: test install-dev doctor docs-validate linux-gate docker-build docker-gate docker-shell
+.PHONY: test install-dev doctor docs-validate linux-gate windows-gate docker-build docker-gate docker-shell
 
 install-dev:
 	python -m pip install --upgrade pip
@@ -15,6 +15,9 @@ docs-validate:
 
 linux-gate:
 	./scripts/linux-gate.sh
+
+windows-gate:
+	pwsh -File scripts/windows-gate.ps1
 
 docker-build:
 	docker build -t byteworthy-defend:linux-gate .

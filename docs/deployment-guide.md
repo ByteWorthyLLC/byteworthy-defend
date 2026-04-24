@@ -3,6 +3,7 @@
 ## Target
 
 - Production support declaration: Linux only.
+- Windows support: development and CI validation only (not production declaration scope).
 
 ## Install Path
 
@@ -40,6 +41,14 @@ Or use compose:
 
 ```bash
 docker compose run --rm linux-gate
+```
+
+## Native Windows Validation
+
+Run the Windows CI-equivalent gate:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
 ```
 
 ## Rollback

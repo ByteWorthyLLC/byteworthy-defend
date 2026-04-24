@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - Linux host (production target)
+- Windows host (development validation gate only)
 - Python 3.11+
 
 ## Install
@@ -33,6 +34,14 @@ Open an interactive Linux shell with the project pre-installed:
 
 ```bash
 docker compose run --rm linux-shell
+```
+
+## Native Windows Development Gate
+
+Run the Windows CI-equivalent gate locally:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
 ```
 
 ## First Scan

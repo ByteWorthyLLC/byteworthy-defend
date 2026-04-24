@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import csv
+import io
 import os
 import signal
 import subprocess
 
 
-def list_processes(limit: int = 20) -> list[dict[str, str]]:
-    if limit < 1:
-        raise ValueError("process list limit must be at least 1")
+def _list_processes_unix(limit: int) -> list[dict[str, str]]:
     try:
         proc = subprocess.run(
             ["ps", "-eo", "pid=,comm=,etime="],
@@ -26,6 +26,40 @@ def list_processes(limit: int = 20) -> list[dict[str, str]]:
         pid, command, etime = parts
         items.append({"pid": pid, "command": command, "etime": etime})
     return items
+
+
+def _list_processes_windows(limit: int) -> list[dict[str, str]]:
+    try:
+        proc = subprocess.run(
+            ["tasklist", "/fo", "csv", "/nh"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (subprocess.SubprocessError, FileNotFoundError) as exc:
+        raise ValueError(f"unable to list processes: {exc}") from exc
+
+    reader = csv.reader(io.StringIO(proc.stdout))
+    items = []
+    for row in reader:
+        if len(row) < 2:
+            continue
+        command = row[0].strip()
+        pid = row[1].strip()
+        if not pid.isdigit():
+            continue
+        items.append({"pid": pid, "command": command, "etime": "unknown"})
+        if len(items) >= limit:
+            break
+    return items
+
+
+def list_processes(limit: int = 20) -> list[dict[str, str]]:
+    if limit < 1:
+        raise ValueError("process list limit must be at least 1")
+    if os.name == "nt":
+        return _list_processes_windows(limit)
+    return _list_processes_unix(limit)
 
 
 def kill_process(pid: int, approve: bool) -> dict:

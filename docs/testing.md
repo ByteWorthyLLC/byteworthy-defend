@@ -29,6 +29,12 @@ For macOS/Windows developers who need Linux parity:
 docker compose run --rm linux-gate
 ```
 
+For native Windows CI-equivalent validation:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
+```
+
 ## Reliability and Regression Scenarios
 
 - repeated monitor cycles

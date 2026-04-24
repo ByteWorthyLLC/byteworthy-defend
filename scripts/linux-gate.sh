@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-pytest
+python -m pytest
 bw-defend doctor --strict --json
 bw-defend rules verify --json
-./scripts/validate-docs.sh
+python3 scripts/validate-docs.py

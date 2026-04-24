@@ -65,6 +65,12 @@ Linux parity from macOS/Windows using Docker:
 docker compose run --rm linux-gate
 ```
 
+Native Windows validation gate:
+
+```powershell
+pwsh -File scripts/windows-gate.ps1
+```
+
 Enable AI edition:
 
 ```bash
@@ -160,6 +166,7 @@ Discoverability and answer-engine assets ship in-repo:
 - Machine-readable exit codes for CI and automation
 - Documentation validation gate: `./scripts/validate-docs.sh`
 - Release-readiness workflows on GitHub Actions
+- Windows development gate on `windows-latest`: `scripts/windows-gate.ps1`
 
 <br/>
 
