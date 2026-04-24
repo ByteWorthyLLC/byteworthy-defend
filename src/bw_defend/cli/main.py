@@ -5,21 +5,22 @@ from pathlib import Path
 
 import typer
 
-from bw_defend.ai.remediation import remediate_incident
-from bw_defend.core.audit import log_audit, verify_audit_chain
-from bw_defend.core.config import config_as_dict, load_config
-from bw_defend.core.engine import scan_target
-from bw_defend.core.errors import ConfigValidationError, DefendError
-from bw_defend.core.fs import ensure_writable_dir
-from bw_defend.core.incidents import create_incident
-from bw_defend.core.paths import config_file, state_dir
-from bw_defend.core.quarantine import list_quarantine, purge_quarantine, restore_item
-from bw_defend.core.rules import list_rules, update_rules, verify_rules
-from bw_defend.monitor.service import monitor_status, start_monitor, stop_monitor
-from bw_defend.security import firewall, process_control
-from bw_defend.cli.output import emit
+from ..ai.remediation import remediate_incident
+from ..core.audit import log_audit, verify_audit_chain
+from ..core.config import config_as_dict, load_config
+from ..core.engine import scan_target
+from ..core.errors import ConfigValidationError, DefendError
+from ..core.fs import ensure_writable_dir
+from ..core.incidents import create_incident
+from ..core.paths import config_file, state_dir
+from ..core.quarantine import list_quarantine, purge_quarantine, restore_item
+from ..core.rules import list_rules, update_rules, verify_rules
+from ..monitor.service import monitor_status, start_monitor, stop_monitor
+from ..security import firewall, process_control
+from .output import emit
 
 SUPPORTED_PLATFORMS = {"linux", "windows"}
+JSON_OPTION = "--json"
 
 app = typer.Typer(help="ByteWorthy Defend terminal antivirus for Windows and Linux")
 monitor_app = typer.Typer()
@@ -48,20 +49,21 @@ def _must_be_ai_edition() -> None:
         )
 
 
-def _emit_error(message: str, json_output: bool, *, code: int = 1) -> None:
-    emit({"ok": False, "error": message, "exit_code": code}, json_output)
+def _emit_error(message: str, *, json_output: bool, code: int = 1) -> None:
+    emit({"ok": False, "error": message, "exit_code": code}, json_output=json_output)
     raise typer.Exit(code)
 
 
 @app.command("scan")
 def scan(
     target: str = typer.Argument(..., help="Path to scan or literal 'system'"),
-    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON output"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION, help="Emit machine-readable JSON output"),
 ) -> None:
     try:
         results = scan_target(target)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
     incident_ids = []
     try:
@@ -78,157 +80,162 @@ def scan(
             incident_ids.append(incident.id)
             log_audit("incident_created", incident.to_dict())
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(f"scan succeeded but incident creation failed: {exc}", json_output)
+        _emit_error(f"scan succeeded but incident creation failed: {exc}", json_output=json_output)
     results["incidents_created"] = len(incident_ids)
     results["incident_ids"] = incident_ids
-    emit(results, json_output)
+    emit(results, json_output=json_output)
 
 
 @monitor_app.command("start")
-def monitor_start(json_output: bool = typer.Option(False, "--json")) -> None:
+def monitor_start(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(start_monitor(), json_output)
+        emit(start_monitor(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @monitor_app.command("stop")
-def monitor_stop(json_output: bool = typer.Option(False, "--json")) -> None:
+def monitor_stop(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(stop_monitor(), json_output)
+        emit(stop_monitor(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @monitor_app.command("status")
-def monitor_status_cmd(json_output: bool = typer.Option(False, "--json")) -> None:
+def monitor_status_cmd(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(monitor_status(), json_output)
+        emit(monitor_status(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @quarantine_app.command("list")
-def quarantine_list(json_output: bool = typer.Option(False, "--json")) -> None:
+def quarantine_list(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit({"items": list_quarantine()}, json_output)
+        emit({"items": list_quarantine()}, json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @quarantine_app.command("restore")
 def quarantine_restore(
     item_id: str = typer.Argument(..., help="Quarantine item id"),
-    json_output: bool = typer.Option(False, "--json"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
-        emit({"restored": restore_item(item_id)}, json_output)
+        emit({"restored": restore_item(item_id)}, json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @quarantine_app.command("purge")
-def quarantine_purge(json_output: bool = typer.Option(False, "--json")) -> None:
+def quarantine_purge(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit({"purged_count": purge_quarantine()}, json_output)
+        emit({"purged_count": purge_quarantine()}, json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @firewall_app.command("status")
-def firewall_status(json_output: bool = typer.Option(False, "--json")) -> None:
+def firewall_status(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(firewall.status(), json_output)
+        emit(firewall.status(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @firewall_app.command("apply")
-def firewall_apply(json_output: bool = typer.Option(False, "--json")) -> None:
+def firewall_apply(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(firewall.apply(), json_output)
+        emit(firewall.apply(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @firewall_app.command("revert")
-def firewall_revert(json_output: bool = typer.Option(False, "--json")) -> None:
+def firewall_revert(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(firewall.revert(), json_output)
+        emit(firewall.revert(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @process_app.command("list")
-def process_list(json_output: bool = typer.Option(False, "--json")) -> None:
+def process_list(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit({"processes": process_control.list_processes()}, json_output)
+        emit({"processes": process_control.list_processes()}, json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @process_app.command("kill")
 def process_kill(
+    *,
     pid: int = typer.Option(..., "--pid", help="Process ID to terminate"),
     approve: bool = typer.Option(False, "--approve", help="Required for destructive kill action"),
-    json_output: bool = typer.Option(False, "--json"),
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
         result = process_control.kill_process(pid, approve=approve)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
     log_audit("process_kill_attempt", result)
-    emit(result, json_output)
+    emit(result, json_output=json_output)
 
 
 @ai_app.command("remediate")
 def ai_remediate(
     incident_id: str = typer.Argument(..., help="Incident id"),
+    *,
     approve: bool = typer.Option(False, "--approve", help="Approve destructive actions"),
-    json_output: bool = typer.Option(False, "--json"),
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
         _must_be_ai_edition()
         config = load_config()
         result = remediate_incident(incident_id=incident_id, config=config, approve=approve)
-        emit(result, json_output)
+        emit(result, json_output=json_output)
     except (DefendError, OSError, ValueError, typer.BadParameter) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @rules_app.command("update")
 def rules_update(
     bundle_path: str = typer.Argument(..., help="Path to rule bundle JSON"),
-    json_output: bool = typer.Option(False, "--json"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
         result = update_rules(bundle_path)
     except (DefendError, OSError, ValueError, FileNotFoundError) as exc:
-        _emit_error(str(exc), json_output)
-    emit(result, json_output)
+        _emit_error(str(exc), json_output=json_output)
+    emit(result, json_output=json_output)
     if not result.get("updated"):
         raise typer.Exit(2)
 
 
 @rules_app.command("list")
-def rules_list(json_output: bool = typer.Option(False, "--json")) -> None:
+def rules_list(*, json_output: bool = typer.Option(False, JSON_OPTION)) -> None:
     try:
-        emit(list_rules(), json_output)
+        emit(list_rules(), json_output=json_output)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
+        _emit_error(str(exc), json_output=json_output)
 
 
 @rules_app.command("verify")
 def rules_verify(
     bundle_path: str | None = typer.Option(None, "--bundle", help="Optional file to verify instead of active rules"),
-    json_output: bool = typer.Option(False, "--json"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
         path = Path(bundle_path).expanduser().resolve() if bundle_path else None
         result = verify_rules(path)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
-    emit(result, json_output)
+        _emit_error(str(exc), json_output=json_output)
+    emit(result, json_output=json_output)
     if not result.get("verified"):
         raise typer.Exit(2)
 
@@ -236,21 +243,23 @@ def rules_verify(
 @audit_app.command("verify")
 def audit_verify(
     log_path: str | None = typer.Option(None, "--log-path", help="Optional audit log path to verify"),
-    json_output: bool = typer.Option(False, "--json"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION),
 ) -> None:
     try:
         target = Path(log_path).expanduser().resolve() if log_path else None
         result = verify_audit_chain(target)
     except (DefendError, OSError, ValueError) as exc:
-        _emit_error(str(exc), json_output)
-    emit(result, json_output)
+        _emit_error(str(exc), json_output=json_output)
+    emit(result, json_output=json_output)
     if result.get("status") not in {"ok", "empty"}:
         raise typer.Exit(2)
 
 
 @app.command("doctor")
 def doctor(
-    json_output: bool = typer.Option(False, "--json"),
+    *,
+    json_output: bool = typer.Option(False, JSON_OPTION),
     strict: bool = typer.Option(False, "--strict", help="Exit non-zero when any doctor check fails"),
 ) -> None:
     runtime_platform = platform.system().lower()
@@ -276,7 +285,7 @@ def doctor(
         "platform": runtime_platform,
         "errors": {"config": config_error} if config_error else {},
     }
-    emit(payload, json_output)
+    emit(payload, json_output=json_output)
     if strict and not all(payload["checks"].values()):
         raise typer.Exit(2)
 

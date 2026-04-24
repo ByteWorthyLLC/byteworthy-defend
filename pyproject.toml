@@ -36,7 +36,8 @@ ai = [
 ]
 dev = [
   "pytest>=8.2.0",
-  "pytest-cov>=5.0.0"
+  "pytest-cov>=5.0.0",
+  "skylos>=4.5.0"
 ]
 
 [project.scripts]
@@ -52,3 +53,28 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.skylos]
+complexity = 12
+nesting = 4
+max_lines = 70
+duplicate_strings = 6
+ignore = [
+  "SKY-C304",
+  "SKY-C401",
+  "SKY-D222",
+  "SKY-L007",
+  "SKY-L021",
+  "SKY-L027",
+  "SKY-L028",
+  "SKY-P401",
+  "SKY-Q301",
+  "SKY-Q302",
+  "SKY-Q306",
+]
+
+[tool.skylos.gate]
+fail_on_critical = true
+max_security = 0
+max_quality = 0
+strict = true

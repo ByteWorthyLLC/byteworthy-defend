@@ -3,14 +3,17 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 
-from bw_defend.core.fs import atomic_write_json
-from bw_defend.core.paths import monitor_state_path, state_dir
+from ..core.fs import atomic_write_json
+from ..core.paths import monitor_state_path, state_dir
+
+KEY_RUNNING = "running"
+KEY_LAST_TRANSITION = "last_transition"
 
 
 def _read_state() -> dict:
     path = monitor_state_path()
     if not path.exists():
-        return {"running": False, "started_at": None}
+        return {KEY_RUNNING: False, "started_at": None}
     return json.loads(path.read_text())
 
 
@@ -22,14 +25,14 @@ def _write_state(state: dict) -> dict:
 
 def start_monitor() -> dict:
     state = _read_state()
-    if state.get("running"):
-        state["last_transition"] = "noop_already_running"
+    if state.get(KEY_RUNNING):
+        state[KEY_LAST_TRANSITION] = "noop_already_running"
         return _write_state(state)
     state.update(
         {
-            "running": True,
+            KEY_RUNNING: True,
             "started_at": datetime.now(timezone.utc).isoformat(),
-            "last_transition": "started",
+            KEY_LAST_TRANSITION: "started",
         }
     )
     return _write_state(state)
@@ -37,12 +40,12 @@ def start_monitor() -> dict:
 
 def stop_monitor() -> dict:
     state = _read_state()
-    if not state.get("running"):
-        state["last_transition"] = "noop_already_stopped"
+    if not state.get(KEY_RUNNING):
+        state[KEY_LAST_TRANSITION] = "noop_already_stopped"
         return _write_state(state)
-    state["running"] = False
+    state[KEY_RUNNING] = False
     state["stopped_at"] = datetime.now(timezone.utc).isoformat()
-    state["last_transition"] = "stopped"
+    state[KEY_LAST_TRANSITION] = "stopped"
     return _write_state(state)
 
 

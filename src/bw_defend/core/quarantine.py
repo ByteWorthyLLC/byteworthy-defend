@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from bw_defend.core.errors import QuarantineError
-from bw_defend.core.fs import atomic_write_json
-from bw_defend.core.paths import quarantine_dir, state_dir
+from .errors import QuarantineError
+from .fs import atomic_write_json
+from .paths import quarantine_dir, state_dir
 
 
 @dataclass(slots=True)
@@ -21,18 +21,47 @@ class QuarantineItem:
 
     def to_dict(self) -> dict[str, str]:
         return {
-            "id": self.id,
-            "original_path": self.original_path,
-            "quarantined_path": self.quarantined_path,
-            "timestamp": self.timestamp,
+            KEY_ID: self.id,
+            KEY_ORIGINAL_PATH: self.original_path,
+            KEY_QUARANTINED_PATH: self.quarantined_path,
+            KEY_TIMESTAMP: self.timestamp,
         }
 
 
 MANIFEST = "manifest.json"
+KEY_ID = "id"
+KEY_ORIGINAL_PATH = "original_path"
+KEY_QUARANTINED_PATH = "quarantined_path"
+KEY_TIMESTAMP = "timestamp"
+REQUIRED_ENTRY_KEYS = (KEY_ID, KEY_ORIGINAL_PATH, KEY_QUARANTINED_PATH, KEY_TIMESTAMP)
+
+
+def _path_within(parent: Path, candidate: Path) -> bool:
+    try:
+        candidate.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def _move_file_into_quarantine(src: Path, dst: Path) -> None:
+    with src.open("rb") as src_handle, dst.open("xb") as dst_handle:
+        shutil.copyfileobj(src_handle, dst_handle, length=1024 * 64)
+    src.unlink()
 
 
 def _manifest_path() -> Path:
     return quarantine_dir() / MANIFEST
+
+
+def _validate_manifest_entry(entry: object, index: int) -> dict[str, str]:
+    if not isinstance(entry, dict):
+        raise QuarantineError(f"quarantine manifest entry {index} must be object")
+    for key in REQUIRED_ENTRY_KEYS:
+        value = entry.get(key)
+        if not isinstance(value, str):
+            raise QuarantineError(f"quarantine manifest entry {index} missing '{key}'")
+    return entry  # type: ignore[return-value]
 
 
 def _load_manifest() -> list[dict[str, str]]:
@@ -42,13 +71,7 @@ def _load_manifest() -> list[dict[str, str]]:
     data = json.loads(path.read_text())
     if not isinstance(data, list):
         raise QuarantineError("quarantine manifest must be a list")
-    for index, entry in enumerate(data):
-        if not isinstance(entry, dict):
-            raise QuarantineError(f"quarantine manifest entry {index} must be object")
-        for key in ("id", "original_path", "quarantined_path", "timestamp"):
-            if key not in entry or not isinstance(entry[key], str):
-                raise QuarantineError(f"quarantine manifest entry {index} missing '{key}'")
-    return data
+    return [_validate_manifest_entry(entry, index) for index, entry in enumerate(data)]
 
 
 def _save_manifest(entries: list[dict[str, str]]) -> None:
@@ -69,9 +92,9 @@ def quarantine_file(path: str) -> QuarantineItem:
     if q_dir in src.parents:
         raise QuarantineError("artifact is already under quarantine directory")
 
-    item_id = f"q-{uuid.uuid4().hex[:12]}-{src.name}"
+    item_id = f"q-{uuid.uuid4().hex[:12]}"
     dst = q_dir / item_id
-    shutil.move(str(src), str(dst))
+    _move_file_into_quarantine(src, dst)
 
     item = QuarantineItem(
         id=item_id,
@@ -91,12 +114,17 @@ def list_quarantine() -> list[dict[str, str]]:
 
 def restore_item(item_id: str) -> dict[str, str]:
     entries = _load_manifest()
+    q_root = quarantine_dir().resolve()
     for entry in entries:
-        if entry["id"] == item_id:
-            src = Path(entry["quarantined_path"])
+        if entry[KEY_ID] == item_id:
+            src = Path(entry[KEY_QUARANTINED_PATH]).expanduser().resolve()
+            if not _path_within(q_root, src):
+                raise QuarantineError(f"quarantined artifact path escapes quarantine directory: {src}")
             if not src.exists():
                 raise QuarantineError(f"quarantined artifact no longer exists: {src}")
-            dst = Path(entry["original_path"])
+            dst = Path(entry[KEY_ORIGINAL_PATH]).expanduser().resolve(strict=False)
+            if _path_within(q_root, dst):
+                raise QuarantineError("refusing to restore into quarantine directory")
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(src), str(dst))
             entries.remove(entry)
@@ -109,7 +137,7 @@ def purge_quarantine() -> int:
     entries = _load_manifest()
     removed = 0
     for entry in entries:
-        q_path = Path(entry["quarantined_path"])
+        q_path = Path(entry[KEY_QUARANTINED_PATH]).expanduser().resolve()
         if q_path.exists():
             q_path.unlink()
             removed += 1

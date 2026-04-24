@@ -12,6 +12,7 @@ $env:BW_DEFEND_RULES_SIGNING_KEY = "ci-signing-key"
 python -c "import hashlib,hmac,os; from bw_defend.core.rules import ensure_rules; p=ensure_rules(); s=hmac.new(os.environ['BW_DEFEND_RULES_SIGNING_KEY'].encode('utf-8'), p.read_bytes(), hashlib.sha256).hexdigest(); p.with_suffix(p.suffix + '.sig').write_text(f'{s}  {p.name}\n', encoding='utf-8')"
 
 python -m pytest
+skylos src --all --gate --no-upload
 
 $doctorJson = bw-defend doctor --strict --json
 $doctor = $doctorJson | ConvertFrom-Json

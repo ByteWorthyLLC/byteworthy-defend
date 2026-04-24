@@ -7,8 +7,8 @@ import os
 from pathlib import Path
 from typing import Iterable
 
-from bw_defend.core.errors import ScanTargetError
-from bw_defend.core.rules import list_rules
+from .errors import ScanTargetError
+from .rules import list_rules
 
 
 @dataclass(slots=True)
@@ -42,13 +42,16 @@ def _system_scan_roots() -> list[Path]:
     return _default_system_roots()
 
 
+def _iter_files_in_root(root: Path) -> Iterable[Path]:
+    if not root.exists():
+        return
+    yield from (path for path in root.rglob("*") if path.is_file())
+
+
 def _iter_paths(target: str) -> Iterable[Path]:
     if target == "system":
         for root in _system_scan_roots():
-            if root.exists():
-                for path in root.rglob("*"):
-                    if path.is_file():
-                        yield path
+            yield from _iter_files_in_root(root)
         return
 
     start = Path(target).expanduser()
@@ -63,64 +66,87 @@ def _iter_paths(target: str) -> Iterable[Path]:
     raise ScanTargetError(f"scan target does not exist: {start}")
 
 
+def _scan_file(path: Path) -> tuple[str | None, str | None]:
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return None, "unreadable"
+    if size > MAX_SCAN_BYTES:
+        return None, "large"
+
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None, "unreadable"
+    if b"\x00" in raw:
+        return None, "binary"
+    return raw.decode(errors="ignore"), None
+
+
+def _match_file_against_rules(
+    *,
+    path: Path,
+    data: str,
+    rules: list[dict],
+    seen: set[tuple[str, str]],
+) -> list[dict]:
+    findings: list[dict] = []
+    path_text = str(path)
+    for rule in rules:
+        pattern = str(rule.get("pattern", ""))
+        rule_id = str(rule.get("id", "unknown"))
+        key = (path_text, rule_id)
+        if pattern and pattern in data and key not in seen:
+            seen.add(key)
+            findings.append(
+                asdict(
+                    Detection(
+                        artifact=path_text,
+                        rule_id=rule_id,
+                        detection_type="signature",
+                        severity=str(rule.get("severity", "medium")),
+                        confidence=0.99,
+                    )
+                )
+            )
+    return findings
+
+
 def scan_target(target: str) -> dict:
     started = perf_counter()
     rules_blob = list_rules()
     rules = rules_blob.get("rules", [])
     if not rules:
         raise ScanTargetError("no active rules available for scanning")
+
     findings: list[dict] = []
     seen: set[tuple[str, str]] = set()
-    scanned = 0
-    skipped_unreadable = 0
-    skipped_large = 0
-    skipped_binary = 0
+    counters = {
+        "scanned_files": 0,
+        "skipped_unreadable": 0,
+        "skipped_large": 0,
+        "skipped_binary": 0,
+    }
 
     for path in _iter_paths(target):
-        scanned += 1
-        try:
-            size = path.stat().st_size
-        except OSError:
-            skipped_unreadable += 1
+        counters["scanned_files"] += 1
+        data, skip_reason = _scan_file(path)
+        if skip_reason == "unreadable":
+            counters["skipped_unreadable"] += 1
             continue
-        if size > MAX_SCAN_BYTES:
-            skipped_large += 1
+        if skip_reason == "large":
+            counters["skipped_large"] += 1
             continue
-
-        try:
-            raw = path.read_bytes()
-        except OSError:
-            skipped_unreadable += 1
+        if skip_reason == "binary":
+            counters["skipped_binary"] += 1
             continue
-        if b"\x00" in raw:
-            skipped_binary += 1
+        if data is None:
             continue
-        data = raw.decode(errors="ignore")
-
-        for rule in rules:
-            pattern = str(rule.get("pattern", ""))
-            rule_id = str(rule.get("id", "unknown"))
-            key = (str(path), rule_id)
-            if pattern and pattern in data and key not in seen:
-                seen.add(key)
-                findings.append(
-                    asdict(
-                        Detection(
-                            artifact=str(path),
-                            rule_id=rule_id,
-                            detection_type="signature",
-                            severity=str(rule.get("severity", "medium")),
-                            confidence=0.99,
-                        )
-                    )
-                )
+        findings.extend(_match_file_against_rules(path=path, data=data, rules=rules, seen=seen))
 
     return {
         "target": target,
-        "scanned_files": scanned,
-        "skipped_unreadable": skipped_unreadable,
-        "skipped_large": skipped_large,
-        "skipped_binary": skipped_binary,
+        **counters,
         "detection_count": len(findings),
         "findings": findings,
         "elapsed_ms": round((perf_counter() - started) * 1000, 2),

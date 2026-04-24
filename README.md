@@ -172,7 +172,8 @@ Discoverability and answer-engine assets ship in-repo:
 
 - Strict health gate: `bw-defend doctor --strict --json`
 - Machine-readable exit codes for CI and automation
-- Documentation validation gate: `./scripts/validate-docs.sh`
+- Skylos SAST gate (production code): `skylos src --all --gate --no-upload`
+- Documentation validation gate: `python scripts/validate-docs.py`
 - Release-readiness workflows on GitHub Actions for Windows and Linux
 - Windows development gate on `windows-latest`: `scripts/windows-gate.ps1`
 

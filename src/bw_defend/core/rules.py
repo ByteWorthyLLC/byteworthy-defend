@@ -8,9 +8,9 @@ import shutil
 from pathlib import Path
 from typing import Any
 
-from bw_defend.core.errors import RuleValidationError
-from bw_defend.core.fs import atomic_write_json, atomic_write_text
-from bw_defend.core.paths import active_rules_file, rules_dir
+from .errors import RuleValidationError
+from .fs import atomic_write_json, atomic_write_text
+from .paths import active_rules_file, rules_dir
 
 DEFAULT_RULES = {
     "version": "2026.04.0",
@@ -24,6 +24,19 @@ VALID_SEVERITIES = {"low", "medium", "high", "critical"}
 RULES_SIGNATURE_REQUIRED_ENV = "BW_DEFEND_RULES_SIGNATURE_REQUIRED"
 RULES_SIGNING_KEY_ENV = "BW_DEFEND_RULES_SIGNING_KEY"
 
+KEY_VERSION = "version"
+KEY_RULES = "rules"
+KEY_RULE_ID = "id"
+KEY_PATTERN = "pattern"
+KEY_SEVERITY = "severity"
+KEY_REASON = "reason"
+KEY_VERIFIED = "verified"
+KEY_EXPECTED = "expected"
+KEY_ACTUAL = "actual"
+KEY_UPDATED = "updated"
+CHECKSUM_SUFFIX = ".sha256"
+SIGNATURE_SUFFIX = ".sig"
+
 
 def ensure_rules() -> Path:
     r_dir = rules_dir()
@@ -31,7 +44,7 @@ def ensure_rules() -> Path:
     path = active_rules_file()
     if not path.exists():
         atomic_write_json(path, DEFAULT_RULES)
-    checksum_file = path.with_suffix(path.suffix + ".sha256")
+    checksum_file = path.with_suffix(path.suffix + CHECKSUM_SUFFIX)
     if not checksum_file.exists():
         atomic_write_text(checksum_file, f"{_sha256(path)}  {path.name}\n")
     return path
@@ -52,26 +65,39 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _hmac_sha256(path: Path, key: str) -> str:
+    digest = hmac.new(key.encode("utf-8"), digestmod=hashlib.sha256)
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(8192), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _validate_rule(rule: Any, *, index: int) -> None:
+    if not isinstance(rule, dict):
+        raise RuleValidationError(f"rules[{index}] must be an object")
+    required = (KEY_RULE_ID, KEY_PATTERN, KEY_SEVERITY)
+    missing = [key for key in required if not isinstance(rule.get(key), str) or not str(rule.get(key)).strip()]
+    if missing:
+        raise RuleValidationError(f"rules[{index}] missing valid string '{missing[0]}'")
+    severity = str(rule[KEY_SEVERITY]).lower()
+    if severity not in VALID_SEVERITIES:
+        raise RuleValidationError(
+            f"rules[{index}] severity '{rule[KEY_SEVERITY]}' is invalid; "
+            f"allowed={', '.join(sorted(VALID_SEVERITIES))}"
+        )
+
+
 def _validate_rules_bundle(bundle: dict[str, Any]) -> None:
     if not isinstance(bundle, dict):
         raise RuleValidationError("rules bundle must be a JSON object")
-    if not isinstance(bundle.get("version"), str) or not bundle["version"].strip():
+    if not isinstance(bundle.get(KEY_VERSION), str) or not str(bundle[KEY_VERSION]).strip():
         raise RuleValidationError("rules bundle must contain non-empty string 'version'")
-    rules = bundle.get("rules")
+    rules = bundle.get(KEY_RULES)
     if not isinstance(rules, list):
         raise RuleValidationError("rules bundle must contain list 'rules'")
     for index, rule in enumerate(rules):
-        if not isinstance(rule, dict):
-            raise RuleValidationError(f"rules[{index}] must be an object")
-        for key in ("id", "pattern", "severity"):
-            if key not in rule or not isinstance(rule[key], str) or not rule[key].strip():
-                raise RuleValidationError(f"rules[{index}] missing valid string '{key}'")
-        severity = rule["severity"].lower()
-        if severity not in VALID_SEVERITIES:
-            raise RuleValidationError(
-                f"rules[{index}] severity '{rule['severity']}' is invalid; "
-                f"allowed={', '.join(sorted(VALID_SEVERITIES))}"
-            )
+        _validate_rule(rule, index=index)
 
 
 def _signature_is_required() -> bool:
@@ -79,60 +105,57 @@ def _signature_is_required() -> bool:
 
 
 def _verify_detached_signature(path: Path, *, required: bool) -> tuple[bool, dict[str, str]]:
-    signature_file = path.with_suffix(path.suffix + ".sig")
+    signature_file = path.with_suffix(path.suffix + SIGNATURE_SUFFIX)
+    ok = True
+    payload: dict[str, str] = {}
     if not signature_file.exists():
         if required:
-            return False, {"reason": "missing signature file"}
-        return True, {}
+            ok = False
+            payload = {KEY_REASON: "missing signature file"}
+        return ok, payload
 
     signing_key = os.getenv(RULES_SIGNING_KEY_ENV, "").strip()
     if not signing_key:
-        return False, {"reason": f"missing signing key env '{RULES_SIGNING_KEY_ENV}'"}
+        return False, {KEY_REASON: f"missing signing key env '{RULES_SIGNING_KEY_ENV}'"}
 
     signature_text = signature_file.read_text().strip()
     if not signature_text:
-        return False, {"reason": "signature file is empty"}
+        return False, {KEY_REASON: "signature file is empty"}
 
     expected = signature_text.split()[0]
-    actual = hmac.new(signing_key.encode("utf-8"), path.read_bytes(), hashlib.sha256).hexdigest()
+    actual = _hmac_sha256(path, signing_key)
     if not hmac.compare_digest(expected.lower(), actual.lower()):
-        return False, {"reason": "signature mismatch", "expected": expected, "actual": actual}
-    return True, {}
+        return False, {KEY_REASON: "signature mismatch", KEY_EXPECTED: expected, KEY_ACTUAL: actual}
+    return True, payload
 
 
 def verify_rules(path: Path | None = None) -> dict[str, str | bool]:
     target = path or ensure_rules()
-    hash_file = target.with_suffix(target.suffix + ".sha256")
+    hash_file = target.with_suffix(target.suffix + CHECKSUM_SUFFIX)
     actual = _sha256(target)
     if not hash_file.exists():
-        return {"verified": False, "reason": "missing checksum file", "sha256": actual}
+        return {KEY_VERIFIED: False, KEY_REASON: "missing checksum file", "sha256": actual}
     expected = hash_file.read_text().strip().split()[0]
-    if expected == actual:
-        try:
-            _validate_rules_bundle(json.loads(target.read_text()))
-        except (json.JSONDecodeError, RuleValidationError) as exc:
-            return {
-                "verified": False,
-                "expected": expected,
-                "actual": actual,
-                "reason": f"schema validation failed: {exc}",
-            }
-        signature_ok, signature_payload = _verify_detached_signature(target, required=_signature_is_required())
-        if not signature_ok:
-            payload: dict[str, str | bool] = {"verified": False, "expected": expected, "actual": actual}
-            payload.update(signature_payload)
-            return payload
-    return {
-        "verified": expected == actual,
-        "expected": expected,
-        "actual": actual,
-        "reason": "ok" if expected == actual else "checksum mismatch",
-    }
+    if expected != actual:
+        return {KEY_VERIFIED: False, KEY_EXPECTED: expected, KEY_ACTUAL: actual, KEY_REASON: "checksum mismatch"}
+
+    try:
+        _validate_rules_bundle(json.loads(target.read_text()))
+    except (json.JSONDecodeError, RuleValidationError):
+        return {KEY_VERIFIED: False, KEY_EXPECTED: expected, KEY_ACTUAL: actual, KEY_REASON: "schema validation failed"}
+
+    signature_ok, signature_payload = _verify_detached_signature(target, required=_signature_is_required())
+    if not signature_ok:
+        payload: dict[str, str | bool] = {KEY_VERIFIED: False, KEY_EXPECTED: expected, KEY_ACTUAL: actual}
+        payload.update(signature_payload)
+        return payload
+
+    return {KEY_VERIFIED: True, KEY_EXPECTED: expected, KEY_ACTUAL: actual, KEY_REASON: "ok"}
 
 
 def update_rules(bundle_path: str) -> dict[str, str | bool]:
-    src = Path(bundle_path).expanduser().resolve()
-    checksum = src.with_suffix(src.suffix + ".sha256")
+    src = Path(bundle_path.strip()).expanduser().resolve()
+    checksum = src.with_suffix(src.suffix + CHECKSUM_SUFFIX)
     if not src.exists():
         raise FileNotFoundError(f"bundle not found: {src}")
     if not checksum.exists():
@@ -141,35 +164,30 @@ def update_rules(bundle_path: str) -> dict[str, str | bool]:
     actual = _sha256(src)
     expected = checksum.read_text().strip().split()[0]
     if actual != expected:
-        return {
-            "updated": False,
-            "reason": "bundle integrity verification failed",
-            "expected": expected,
-            "actual": actual,
-        }
+        return {KEY_UPDATED: False, KEY_REASON: "bundle integrity verification failed", KEY_EXPECTED: expected, KEY_ACTUAL: actual}
 
     try:
         payload = json.loads(src.read_text())
-    except json.JSONDecodeError as exc:
-        return {"updated": False, "reason": f"bundle is not valid JSON: {exc}"}
+    except json.JSONDecodeError:
+        return {KEY_UPDATED: False, KEY_REASON: "bundle is not valid JSON"}
     try:
         _validate_rules_bundle(payload)
     except RuleValidationError as exc:
-        return {"updated": False, "reason": str(exc)}
+        return {KEY_UPDATED: False, KEY_REASON: str(exc)}
 
     signature_ok, signature_payload = _verify_detached_signature(src, required=_signature_is_required())
     if not signature_ok:
-        payload = {"updated": False}
+        payload = {KEY_UPDATED: False}
         payload.update(signature_payload)
         return payload
 
     dst = ensure_rules()
     shutil.copyfile(src, dst)
-    atomic_write_text(dst.with_suffix(dst.suffix + ".sha256"), f"{actual}  {dst.name}\n")
-    src_signature = src.with_suffix(src.suffix + ".sig")
-    dst_signature = dst.with_suffix(dst.suffix + ".sig")
+    atomic_write_text(dst.with_suffix(dst.suffix + CHECKSUM_SUFFIX), f"{actual}  {dst.name}\n")
+    src_signature = src.with_suffix(src.suffix + SIGNATURE_SUFFIX)
+    dst_signature = dst.with_suffix(dst.suffix + SIGNATURE_SUFFIX)
     if src_signature.exists():
         shutil.copyfile(src_signature, dst_signature)
     elif dst_signature.exists():
         dst_signature.unlink()
-    return {"updated": True, "reason": "rules updated and verified", "sha256": actual}
+    return {KEY_UPDATED: True, KEY_REASON: "rules updated and verified", "sha256": actual}

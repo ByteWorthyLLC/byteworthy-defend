@@ -19,6 +19,17 @@ Windows:
 pwsh -File scripts/windows-gate.ps1
 ```
 
+Static analysis policy (run in CI gates):
+
+```bash
+skylos src --all --gate --no-upload
+```
+
+Notes:
+
+- Scope is `src/` (production code) to avoid dead-code noise from test harnesses.
+- Rule suppressions and thresholds are centrally documented in `[tool.skylos]` in `pyproject.toml`.
+
 ## Versioning
 
 - Follow semantic versioning (`MAJOR.MINOR.PATCH`).

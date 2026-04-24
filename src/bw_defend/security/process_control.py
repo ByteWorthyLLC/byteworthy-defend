@@ -6,6 +6,11 @@ import os
 import signal
 import subprocess
 
+KEY_KILLED = "killed"
+KEY_APPROVAL_REQUIRED = "approval_required"
+KEY_REASON = "reason"
+KEY_PID = "pid"
+
 
 def _list_processes_unix(limit: int) -> list[dict[str, str]]:
     try:
@@ -62,34 +67,25 @@ def list_processes(limit: int = 20) -> list[dict[str, str]]:
     return _list_processes_unix(limit)
 
 
-def kill_process(pid: int, approve: bool) -> dict:
+def kill_process(pid: int, *, approve: bool) -> dict:
+    base = {KEY_PID: pid}
     if pid <= 0:
-        return {
-            "killed": False,
-            "approval_required": False,
-            "reason": "pid must be a positive integer",
-            "pid": pid,
-        }
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "pid must be a positive integer"}
     if pid == os.getpid():
         return {
-            "killed": False,
-            "approval_required": False,
-            "reason": "refusing to terminate current bw-defend process",
-            "pid": pid,
+            **base,
+            KEY_KILLED: False,
+            KEY_APPROVAL_REQUIRED: False,
+            KEY_REASON: "refusing to terminate current bw-defend process",
         }
     if not approve:
-        return {
-            "killed": False,
-            "approval_required": True,
-            "reason": "destructive kill requires --approve",
-            "pid": pid,
-        }
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: True, KEY_REASON: "destructive kill requires --approve"}
     try:
         os.kill(pid, signal.SIGTERM)
     except ProcessLookupError:
-        return {"killed": False, "approval_required": False, "pid": pid, "reason": "process not found"}
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "process not found"}
     except PermissionError:
-        return {"killed": False, "approval_required": False, "pid": pid, "reason": "permission denied"}
-    except OSError as exc:
-        return {"killed": False, "approval_required": False, "pid": pid, "reason": str(exc)}
-    return {"killed": True, "approval_required": False, "pid": pid}
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "permission denied"}
+    except OSError:
+        return {**base, KEY_KILLED: False, KEY_APPROVAL_REQUIRED: False, KEY_REASON: "process termination failed"}
+    return {**base, KEY_KILLED: True, KEY_APPROVAL_REQUIRED: False}

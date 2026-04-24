@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+APP_NAME = "bw-defend"
+
 
 def _is_windows() -> bool:
     return os.name == "nt"
@@ -14,8 +16,8 @@ def config_dir() -> Path:
     if _is_windows():
         appdata = os.getenv("APPDATA")
         if appdata:
-            return Path(appdata) / "bw-defend"
-    return Path.home() / ".config" / "bw-defend"
+            return Path(appdata) / APP_NAME
+    return Path.home() / ".config" / APP_NAME
 
 
 def config_file() -> Path:
@@ -28,8 +30,8 @@ def state_dir() -> Path:
     if _is_windows():
         local_appdata = os.getenv("LOCALAPPDATA")
         if local_appdata:
-            return Path(local_appdata) / "bw-defend" / "state"
-    return Path.home() / ".local" / "state" / "bw-defend"
+            return Path(local_appdata) / APP_NAME / "state"
+    return Path.home() / ".local" / "state" / APP_NAME
 
 
 def quarantine_dir() -> Path:

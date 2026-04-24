@@ -4,11 +4,11 @@ import json
 import uuid
 from typing import Any
 
-from bw_defend.core.audit import log_audit
-from bw_defend.core.fs import append_jsonl, atomic_write_text
-from bw_defend.core.models import IncidentRecord
-from bw_defend.core.models import validate_incident_record
-from bw_defend.core.paths import incidents_path, state_dir
+from .audit import log_audit
+from .fs import append_jsonl, atomic_write_text
+from .models import IncidentRecord
+from .models import validate_incident_record
+from .paths import incidents_path, state_dir
 
 
 def create_incident(

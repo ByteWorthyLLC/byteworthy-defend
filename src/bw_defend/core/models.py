@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 INCIDENT_SCHEMA_VERSION = "v1"
+KEY_CONFIDENCE = "confidence"
+KEY_APPROVAL_REQUIRED = "approval_required"
+KEY_REMEDIATION_PLAN = "remediation_plan"
 INCIDENT_REQUIRED_FIELDS = {
     "id",
     "timestamp",
@@ -12,10 +15,10 @@ INCIDENT_REQUIRED_FIELDS = {
     "artifact",
     "detection_type",
     "severity",
-    "confidence",
+    KEY_CONFIDENCE,
     "action_state",
-    "approval_required",
-    "remediation_plan",
+    KEY_APPROVAL_REQUIRED,
+    KEY_REMEDIATION_PLAN,
     "final_outcome",
 }
 
@@ -81,18 +84,21 @@ class IncidentRecord:
 
 
 def validate_incident_record(payload: dict[str, Any]) -> tuple[bool, str]:
+    def fail(reason: str) -> tuple[bool, str]:
+        return False, reason
+
     missing = [field for field in INCIDENT_REQUIRED_FIELDS if field not in payload]
     if missing:
-        return False, f"missing required fields: {', '.join(sorted(missing))}"
+        return fail(f"missing required fields: {', '.join(sorted(missing))}")
     if not isinstance(payload["id"], str) or not payload["id"].startswith("inc-"):
-        return False, "incident id must be a string prefixed with 'inc-'"
-    if not isinstance(payload["confidence"], (float, int)):
-        return False, "incident confidence must be numeric"
-    confidence = float(payload["confidence"])
-    if confidence < 0 or confidence > 1:
-        return False, "incident confidence must be between 0 and 1"
-    if not isinstance(payload["approval_required"], bool):
-        return False, "approval_required must be boolean"
-    if not isinstance(payload["remediation_plan"], list):
-        return False, "remediation_plan must be a list"
+        return fail("incident id must be a string prefixed with 'inc-'")
+    if not isinstance(payload[KEY_CONFIDENCE], (float, int)):
+        return fail("incident confidence must be numeric")
+    confidence = float(payload[KEY_CONFIDENCE])
+    if not 0 <= confidence <= 1:
+        return fail("incident confidence must be between 0 and 1")
+    if not isinstance(payload[KEY_APPROVAL_REQUIRED], bool):
+        return fail("approval_required must be boolean")
+    if not isinstance(payload[KEY_REMEDIATION_PLAN], list):
+        return fail("remediation_plan must be a list")
     return True, "ok"
