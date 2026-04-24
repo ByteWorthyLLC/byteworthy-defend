@@ -1,6 +1,7 @@
 # Release Blockers
 
 Use this file as a strict gate. A release cannot proceed if any blocker remains unchecked.
+This gate defines maintainer release policy and is not a customer SLA.
 
 - [ ] unresolved critical or high security finding
 - [ ] failing CI/security/release-readiness checks

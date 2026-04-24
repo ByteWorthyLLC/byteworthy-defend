@@ -21,11 +21,11 @@ Include:
 - impact statement
 - suggested mitigation (if available)
 
-## Response Targets
+## Maintainer Response Model
 
-- Acknowledge report within 3 business days
-- Triage and severity determination within 7 business days
-- Critical severity mitigation path published as quickly as possible
+- Vulnerability handling is best effort and non-contractual.
+- Report review and remediation timelines are not guaranteed.
+- This project is distributed `AS IS` under the MIT License.
 
 ## Security Scope
 

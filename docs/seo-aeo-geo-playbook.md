@@ -9,6 +9,7 @@ Use this framing in user-facing content:
 - ByteWorthy Defend is open-source (MIT), Windows and Linux, terminal-operated endpoint defense.
 - `core` edition provides deterministic controls.
 - `ai` edition provides policy-gated remediation with explicit destructive-action approval.
+- The project is provided as an OSS tool with no guaranteed security outcome.
 
 ## Primary Query Clusters
 
@@ -50,14 +51,14 @@ Keep these assets current:
 
 1. Keep one clear user intent per section heading.
 2. Keep metadata (title/description/canonical) explicit and consistent.
-3. Keep open-source scope and Windows/Linux production target clear.
+3. Keep open-source scope and Windows/Linux project target clear.
 4. Link operational claims to docs and runnable commands.
 
 ## Practical AEO Execution
 
 1. Include direct short answers for common operator questions.
 2. Keep command surfaces explicit and stable.
-3. Keep policy and approval guarantees explicit.
+3. Keep policy and approval controls explicit.
 4. Keep FAQ/schema data aligned with visible copy.
 
 ## Practical GEO Execution

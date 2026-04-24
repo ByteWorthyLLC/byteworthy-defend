@@ -6,8 +6,6 @@ ByteWorthy Defend is an open-source Windows and Linux terminal antivirus by Byte
 - Product site: https://byteworthyllc.github.io/byteworthy-defend/
 - Trust center: https://byteworthyllc.github.io/byteworthy-defend/trust.html
 - Website retrieval index: https://byteworthyllc.github.io/byteworthy-defend/llms.txt
-- Services: https://byteworthy.io/services
-- Contact: https://byteworthy.io/contact
 
 ## Canonical Docs
 
@@ -26,6 +24,12 @@ ByteWorthy Defend is an open-source Windows and Linux terminal antivirus by Byte
 - License (MIT): https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/LICENSE
 - Security policy: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SECURITY.md
 - Support: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SUPPORT.md
+
+## Disclaimer
+
+- Open-source project/tool, not a managed security service.
+- Use at your own discretion and risk.
+- No security outcome is guaranteed.
 
 ## Product Context
 

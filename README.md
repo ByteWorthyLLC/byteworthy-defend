@@ -14,11 +14,11 @@
 </p>
 
 <p align="center">
-  <sub>A <a href="https://byteworthy.io"><b>ByteWorthy</b></a> open-source security product · <a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub</a></sub>
+  <sub>A <a href="https://byteworthy.io"><b>ByteWorthy</b></a> open-source security project · <a href="https://github.com/ByteWorthyLLC/byteworthy-defend">GitHub</a></sub>
 </p>
 
 <p align="center">
-  <sub>Built by the ByteWorthy software studio and dev shop · <a href="https://byteworthy.io/services">custom builds</a> · <a href="https://byteworthy.io/services/consulting">AI consulting</a></sub>
+  <sub>Maintained in public by the ByteWorthy open-source community.</sub>
 </p>
 
 <p align="center">
@@ -47,6 +47,13 @@
 > Open source, MIT-licensed, Windows-and-Linux.
 
 <br/>
+
+## ⚠️ Disclaimer
+
+- This repository is an open-source security project and research tool, not a managed antivirus service.
+- Use is at your own discretion and risk.
+- No detection/prevention outcome is guaranteed.
+- The software is provided under the MIT License on an `AS IS` basis, without warranty or liability.
 
 ## 🚀 Quick Start
 
@@ -111,8 +118,7 @@ Canonical routes:
 - Repository: https://github.com/ByteWorthyLLC/byteworthy-defend
 - GitHub Pages site: https://byteworthyllc.github.io/byteworthy-defend/
 - Trust center: https://byteworthyllc.github.io/byteworthy-defend/trust.html
-- ByteWorthy services: https://byteworthy.io/services
-- ByteWorthy contact: https://byteworthy.io/contact
+- Project support policy: https://github.com/ByteWorthyLLC/byteworthy-defend/blob/main/SUPPORT.md
 
 <br/>
 
@@ -124,15 +130,15 @@ For Windows and Linux security operators, platform teams, and engineering-led se
 - Reversible quarantine and firewall actions
 - Policy-gated remediation that requires approval on destructive actions
 - Stable JSON contracts for CI/CD and SOC automation
-- Open-source transparency with enterprise-grade process rigor
+- Open-source transparency with maintainer quality gates
 
 ### ByteWorthy Product Context
 
 ByteWorthy ships a clear product continuum:
 
 1. **Sovra**: open-source AI SaaS baseline
-2. **Klienta**: paid white-label agency baseline
-3. **Clynova**: paid healthcare launch baseline
+2. **Klienta**: AI workflow project reference
+3. **Clynova**: healthcare project reference
 4. **ByteWorthy Defend**: open-source Windows and Linux endpoint defense CLI
 
 <br/>
@@ -169,7 +175,7 @@ Discoverability and answer-engine assets ship in-repo:
 - Mandatory explicit approval for destructive operations
 - Audit records for proposed and executed actions
 
-### Production Operations Layer
+### Project Quality Layer
 
 - Strict health gate: `bw-defend doctor --strict --json`
 - Machine-readable exit codes for CI and automation
@@ -249,9 +255,9 @@ Required fields:
 - [Support and Release Cadence](docs/support-and-release-cadence.md)
 - [Docs Index](docs/index.md)
 
-## Production Gate
+## Release Gate (Maintainer Quality)
 
-A production tag must not be created until all checks in:
+A release tag must not be created until all checks in:
 
 - [`docs/release-readiness-checklist.md`](docs/release-readiness-checklist.md)
 - [`docs/ga-readiness-criteria.md`](docs/ga-readiness-criteria.md)

@@ -20,4 +20,10 @@ Windows and Linux terminal antivirus with policy-gated AI remediation.
 
 - one CLI (`bw-defend`) for scan, monitor, quarantine, control, and remediation
 - non-destructive automation with explicit guardrails
-- enterprise-grade auditability and release governance
+- auditable controls with public release governance
+
+## Required Disclaimer
+
+- open-source project/tool, not a managed antivirus service
+- use at user discretion and risk
+- no security outcome is guaranteed

@@ -1,27 +1,21 @@
 # Support
 
-ByteWorthy Defend is open-source (MIT) with community-first support.
+ByteWorthy Defend is open-source (MIT) with best-effort community support.
 
 ## Community Channels
 
 - GitHub Issues for reproducible defects
 - GitHub Discussions for questions and architecture guidance
 
-## Commercial Support
+## Maintainer Posture
 
-ByteWorthy can provide optional enterprise support:
+- No contractual SLA is provided.
+- Maintainer responses are best effort and non-guaranteed.
+- This project is provided `AS IS` under the MIT License.
+- Users are responsible for their own risk assessment, deployment, and incident response.
 
-- incident response guidance
-- architecture/security review
-- migration and hardening assistance
+## Security Reports
 
-Contact: `support@byteworthy.io`
-
-## Incident Priorities
-
-| Priority | Typical impact | Initial response target |
-|---|---|---|
-| `P1` | active security incident, severe production impact | same business day |
-| `P2` | major degradation without full outage | 1 business day |
-| `P3` | degraded behavior with workaround | 2 business days |
-| `P4` | low-impact defect or docs request | best effort |
+Use private disclosure per `SECURITY.md`:
+- GitHub Security Advisories
+- `security@byteworthy.io`
