@@ -37,7 +37,10 @@ ai = [
 dev = [
   "pytest>=8.2.0",
   "pytest-cov>=5.0.0",
-  "skylos>=4.5.0"
+  "skylos>=4.5.0",
+  "pip-audit>=2.7.0",
+  "cyclonedx-bom>=4.0.0",
+  "build>=1.2.0"
 ]
 
 [project.scripts]

@@ -13,6 +13,7 @@ python -c "import hashlib,hmac,os; from bw_defend.core.rules import ensure_rules
 
 python -m pytest
 skylos src --all --gate --no-upload
+python scripts/reliability-drill.py --monitor-cycles 20 --firewall-cycles 5 --output .artifacts/windows-gate-reliability.json
 
 $doctorJson = bw-defend doctor --strict --json
 $doctor = $doctorJson | ConvertFrom-Json

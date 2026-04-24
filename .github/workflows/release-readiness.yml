@@ -19,6 +19,13 @@ jobs:
           pip install -e '.[dev]'
       - name: Linux Gate
         run: ./scripts/linux-gate.sh
+      - name: Linux Reliability Drill
+        run: python scripts/reliability-drill.py --monitor-cycles 40 --firewall-cycles 8 --output .artifacts/linux-reliability.json
+      - name: Upload Linux Reliability Evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-reliability
+          path: .artifacts/linux-reliability.json
 
   gate-windows:
     runs-on: windows-latest
@@ -34,3 +41,10 @@ jobs:
       - name: Windows Gate
         shell: pwsh
         run: ./scripts/windows-gate.ps1
+      - name: Windows Reliability Drill
+        run: python scripts/reliability-drill.py --monitor-cycles 40 --firewall-cycles 8 --output .artifacts/windows-reliability.json
+      - name: Upload Windows Reliability Evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-reliability
+          path: .artifacts/windows-reliability.json

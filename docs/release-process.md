@@ -30,6 +30,19 @@ Notes:
 - Scope is `src/` (production code) to avoid dead-code noise from test harnesses.
 - Rule suppressions and thresholds are centrally documented in `[tool.skylos]` in `pyproject.toml`.
 
+## Supply Chain Controls
+
+- `supply-chain.yml` must pass before release sign-off.
+- Artifacts must include:
+  - `SHA256SUMS`
+  - `sbom.cdx.json`
+  - build provenance attestation
+- Verify artifacts with:
+
+```bash
+python scripts/verify-release-artifacts.py --dist dist
+```
+
 ## Versioning
 
 - Follow semantic versioning (`MAJOR.MINOR.PATCH`).

@@ -173,6 +173,8 @@ Discoverability and answer-engine assets ship in-repo:
 - Strict health gate: `bw-defend doctor --strict --json`
 - Machine-readable exit codes for CI and automation
 - Skylos SAST gate (production code): `skylos src --all --gate --no-upload`
+- Dependency audit gate: `pip-audit` policy check in Security workflow
+- Supply-chain gate: build artifacts + checksums + SBOM + provenance attestation
 - Documentation validation gate: `python scripts/validate-docs.py`
 - Release-readiness workflows on GitHub Actions for Windows and Linux
 - Windows development gate on `windows-latest`: `scripts/windows-gate.ps1`
@@ -237,6 +239,9 @@ Required fields:
 - [GA Readiness Criteria](docs/ga-readiness-criteria.md)
 - [Security Architecture](docs/security.md)
 - [Threat Model](docs/threat-model.md)
+- [SLO and Reliability Targets](docs/slo-and-reliability.md)
+- [CLI Contract v1](docs/contracts/cli-contract-v1.md)
+- [Incident Record Schema v1](docs/contracts/incident-record-v1.schema.json)
 - [SEO/AEO/GEO Playbook](docs/seo-aeo-geo-playbook.md)
 - [Marketing Editorial Guidelines](docs/marketing-editorial-guidelines.md)
 - [GitHub Hardening](docs/github-hardening.md)

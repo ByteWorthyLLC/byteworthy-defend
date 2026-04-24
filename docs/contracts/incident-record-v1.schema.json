@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://byteworthyllc.github.io/byteworthy-defend/contracts/incident-record-v1.schema.json",
+  "title": "ByteWorthy Defend Incident Record v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "timestamp",
+    "source",
+    "artifact",
+    "detection_type",
+    "severity",
+    "confidence",
+    "action_state",
+    "approval_required",
+    "remediation_plan",
+    "final_outcome"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "v1"},
+    "id": {"type": "string", "pattern": "^inc-"},
+    "timestamp": {"type": "string"},
+    "source": {"type": "string"},
+    "artifact": {"type": "string"},
+    "detection_type": {"type": "string"},
+    "severity": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "action_state": {"type": "string"},
+    "approval_required": {"type": "boolean"},
+    "remediation_plan": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "final_outcome": {"type": "string"}
+  },
+  "additionalProperties": true
+}

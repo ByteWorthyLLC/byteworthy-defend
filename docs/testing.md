@@ -6,6 +6,7 @@
 - quarantine state transitions
 - policy decision logic and approval gates
 - CLI contract argument behavior (implicitly via integration flows)
+- versioned contract coverage for command surface and incident schema (`tests/contracts/test_contracts_v1.py`)
 
 ## Integration Coverage
 
@@ -38,6 +39,7 @@ pwsh -File scripts/windows-gate.ps1
 ## Reliability and Regression Scenarios
 
 - repeated monitor cycles
+- scripted reliability drills (`scripts/reliability-drill.py`) for Linux and Windows
 - restart recovery on state files
 - corrupted config handling
 - offline mode behavior for rules updates

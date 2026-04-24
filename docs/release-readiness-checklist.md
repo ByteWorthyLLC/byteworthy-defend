@@ -4,6 +4,9 @@
 
 - [ ] Linux package/install instructions verified on clean host
 - [ ] Windows package/install instructions verified on clean host
+- [ ] release artifacts generated (wheel + sdist + checksum file)
+- [ ] SBOM generated and attached for release candidate
+- [ ] provenance attestation generated for release artifacts
 - [ ] rollback instructions validated in dry-run and live-safe test
 - [ ] command completion and help text verified for all required commands
 - [ ] `bw-defend doctor --strict --json` passes on Linux release candidate host
@@ -23,6 +26,7 @@
 ## Performance and Reliability
 
 - [ ] monitor mode survives repeated start/stop cycles
+- [ ] reliability drill script passes (`scripts/reliability-drill.py`) on Linux and Windows
 - [ ] restart recovery of state files verified
 - [ ] corrupted config behavior handled with actionable error
 - [ ] offline mode tested for rule operations
@@ -40,3 +44,5 @@
 - [ ] CI/test run URL or terminal logs captured
 - [ ] release notes include known limitations
 - [ ] rollback owner and on-call owner assigned
+- [ ] dependency audit artifact attached
+- [ ] third-party independent review report attached

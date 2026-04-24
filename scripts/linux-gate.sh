@@ -23,6 +23,7 @@ PY
 
 "${PYTHON_BIN}" -m pytest
 "${SKYLOS_BIN}" src --all --gate --no-upload
+"${PYTHON_BIN}" scripts/reliability-drill.py --monitor-cycles 20 --firewall-cycles 5 --output .artifacts/linux-gate-reliability.json
 bw-defend doctor --strict --json
 bw-defend rules verify --json
 bw-defend audit verify --json

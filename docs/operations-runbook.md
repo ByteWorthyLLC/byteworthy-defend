@@ -25,6 +25,10 @@
 1. Run production readiness checklist
 2. Run recovery drill for monitor and firewall state resets
 3. Rotate operator access credentials and shell permissions
+4. Run reliability drill and archive output:
+   - `python scripts/reliability-drill.py --monitor-cycles 40 --firewall-cycles 8 --output reliability.json`
+5. Review dependency audit artifact from latest Security workflow
+6. Confirm latest SBOM and checksum evidence from Supply Chain workflow
 
 ## Incident Response
 
