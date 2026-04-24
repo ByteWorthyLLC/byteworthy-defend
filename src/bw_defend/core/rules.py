@@ -4,7 +4,10 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
+from typing import Any
 
+from bw_defend.core.errors import RuleValidationError
+from bw_defend.core.fs import atomic_write_json, atomic_write_text
 from bw_defend.core.paths import active_rules_file, rules_dir
 
 DEFAULT_RULES = {
@@ -14,6 +17,7 @@ DEFAULT_RULES = {
         {"id": "SUS-DANG-002", "pattern": "rm -rf /", "severity": "critical"},
     ],
 }
+VALID_SEVERITIES = {"low", "medium", "high", "critical"}
 
 
 def ensure_rules() -> Path:
@@ -21,16 +25,18 @@ def ensure_rules() -> Path:
     r_dir.mkdir(parents=True, exist_ok=True)
     path = active_rules_file()
     if not path.exists():
-        path.write_text(json.dumps(DEFAULT_RULES, indent=2, sort_keys=True))
+        atomic_write_json(path, DEFAULT_RULES)
     checksum_file = path.with_suffix(path.suffix + ".sha256")
     if not checksum_file.exists():
-        checksum_file.write_text(f"{_sha256(path)}  {path.name}\n")
+        atomic_write_text(checksum_file, f"{_sha256(path)}  {path.name}\n")
     return path
 
 
 def list_rules() -> dict:
     path = ensure_rules()
-    return json.loads(path.read_text())
+    data = json.loads(path.read_text())
+    _validate_rules_bundle(data)
+    return data
 
 
 def _sha256(path: Path) -> str:
@@ -41,6 +47,28 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _validate_rules_bundle(bundle: dict[str, Any]) -> None:
+    if not isinstance(bundle, dict):
+        raise RuleValidationError("rules bundle must be a JSON object")
+    if not isinstance(bundle.get("version"), str) or not bundle["version"].strip():
+        raise RuleValidationError("rules bundle must contain non-empty string 'version'")
+    rules = bundle.get("rules")
+    if not isinstance(rules, list):
+        raise RuleValidationError("rules bundle must contain list 'rules'")
+    for index, rule in enumerate(rules):
+        if not isinstance(rule, dict):
+            raise RuleValidationError(f"rules[{index}] must be an object")
+        for key in ("id", "pattern", "severity"):
+            if key not in rule or not isinstance(rule[key], str) or not rule[key].strip():
+                raise RuleValidationError(f"rules[{index}] missing valid string '{key}'")
+        severity = rule["severity"].lower()
+        if severity not in VALID_SEVERITIES:
+            raise RuleValidationError(
+                f"rules[{index}] severity '{rule['severity']}' is invalid; "
+                f"allowed={', '.join(sorted(VALID_SEVERITIES))}"
+            )
+
+
 def verify_rules(path: Path | None = None) -> dict[str, str | bool]:
     target = path or ensure_rules()
     hash_file = target.with_suffix(target.suffix + ".sha256")
@@ -48,6 +76,16 @@ def verify_rules(path: Path | None = None) -> dict[str, str | bool]:
     if not hash_file.exists():
         return {"verified": False, "reason": "missing checksum file", "sha256": actual}
     expected = hash_file.read_text().strip().split()[0]
+    if expected == actual:
+        try:
+            _validate_rules_bundle(json.loads(target.read_text()))
+        except (json.JSONDecodeError, RuleValidationError) as exc:
+            return {
+                "verified": False,
+                "expected": expected,
+                "actual": actual,
+                "reason": f"schema validation failed: {exc}",
+            }
     return {
         "verified": expected == actual,
         "expected": expected,
@@ -74,7 +112,16 @@ def update_rules(bundle_path: str) -> dict[str, str | bool]:
             "actual": actual,
         }
 
+    try:
+        payload = json.loads(src.read_text())
+    except json.JSONDecodeError as exc:
+        return {"updated": False, "reason": f"bundle is not valid JSON: {exc}"}
+    try:
+        _validate_rules_bundle(payload)
+    except RuleValidationError as exc:
+        return {"updated": False, "reason": str(exc)}
+
     dst = ensure_rules()
     shutil.copyfile(src, dst)
-    dst.with_suffix(dst.suffix + ".sha256").write_text(f"{actual}  {dst.name}\n")
+    atomic_write_text(dst.with_suffix(dst.suffix + ".sha256"), f"{actual}  {dst.name}\n")
     return {"updated": True, "reason": "rules updated and verified", "sha256": actual}

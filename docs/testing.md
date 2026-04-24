@@ -21,12 +21,13 @@ Before production release, run:
 
 ```bash
 pytest
-bw-defend doctor --json
+bw-defend doctor --strict --json
 bw-defend scan /tmp --json
 bw-defend monitor start --json
 bw-defend firewall apply --json
 bw-defend firewall revert --json
 bw-defend monitor stop --json
+bw-defend rules verify --json
 ```
 
 ## Reliability and Regression Scenarios
@@ -35,3 +36,5 @@ bw-defend monitor stop --json
 - restart recovery on state files
 - corrupted config handling
 - offline mode behavior for rules updates
+- invalid rules schema rejection
+- unknown remediation action policy denial

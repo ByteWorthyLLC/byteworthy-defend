@@ -55,3 +55,24 @@ def test_approved_destructive_action_executes(tmp_path: Path, monkeypatch) -> No
     result = remediate_incident(incident.id, _config(), approve=True)
     assert result["ok"] is True
     assert result["actions"][0]["executed"] is True
+
+
+def test_unknown_remediation_action_is_blocked(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    sample = tmp_path / "artifact.bin"
+    sample.write_text("bad")
+
+    incident = create_incident(
+        source="scan",
+        artifact=str(sample),
+        detection_type="behavior",
+        severity="critical",
+        confidence=0.99,
+        approval_required=True,
+        remediation_plan=[{"action": "self_destruct"}],
+    )
+
+    result = remediate_incident(incident.id, _config(), approve=True)
+    assert result["ok"] is True
+    assert result["actions"][0]["executed"] is False
+    assert "unknown action" in result["actions"][0]["reason"]

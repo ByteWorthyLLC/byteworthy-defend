@@ -28,13 +28,14 @@ Run these before opening or updating a PR:
 
 ```bash
 pytest
-python -m bw_defend.cli.main doctor --json
+bw-defend doctor --strict --json
+./scripts/validate-docs.sh
 ```
 
 For release-bound changes, also ensure:
 
 ```bash
-python -m bw_defend.cli.main rules verify --json
+bw-defend rules verify --json
 ```
 
 ## Pull Request Requirements

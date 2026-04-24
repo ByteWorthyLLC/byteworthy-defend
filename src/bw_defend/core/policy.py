@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from bw_defend.core.config import RemediationPolicy
 
 DESTRUCTIVE_ACTIONS = {"delete", "kill", "network_block"}
+NON_DESTRUCTIVE_ACTIONS = {"quarantine", "temp_isolation"}
 
 
 @dataclass(slots=True)
@@ -21,7 +22,14 @@ def evaluate_action(
     policy: RemediationPolicy,
     approve: bool,
 ) -> PolicyDecision:
-    is_destructive = action in DESTRUCTIVE_ACTIONS
+    normalized_action = action.strip().lower()
+    if normalized_action not in DESTRUCTIVE_ACTIONS | NON_DESTRUCTIVE_ACTIONS:
+        return PolicyDecision(
+            allowed=False,
+            approval_required=True,
+            reason="unknown action is not allowed by policy",
+        )
+    is_destructive = normalized_action in DESTRUCTIVE_ACTIONS
     if is_destructive and policy.destructive_requires_approval and not approve:
         return PolicyDecision(
             allowed=False,
@@ -34,13 +42,13 @@ def evaluate_action(
             approval_required=True,
             reason="confidence below auto-execution threshold",
         )
-    if action == "quarantine" and not policy.allow_auto_quarantine and not approve:
+    if normalized_action == "quarantine" and not policy.allow_auto_quarantine and not approve:
         return PolicyDecision(
             allowed=False,
             approval_required=True,
             reason="policy blocks automatic quarantine",
         )
-    if action == "temp_isolation" and not policy.allow_auto_temp_isolation and not approve:
+    if normalized_action == "temp_isolation" and not policy.allow_auto_temp_isolation and not approve:
         return PolicyDecision(
             allowed=False,
             approval_required=True,

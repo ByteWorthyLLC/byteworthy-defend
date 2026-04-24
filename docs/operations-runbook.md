@@ -4,8 +4,9 @@
 
 1. Check monitor status: `bw-defend monitor status --json`
 2. Verify firewall is in expected state: `bw-defend firewall status --json`
-3. Review new incidents and remediation outcomes
-4. Review audit log growth and archive policy
+3. Run health check: `bw-defend doctor --strict --json`
+4. Review new incidents and remediation outcomes
+5. Review audit log growth and archive policy
 
 ## Weekly
 

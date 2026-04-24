@@ -4,7 +4,10 @@ import json
 import uuid
 from typing import Any
 
+from bw_defend.core.audit import log_audit
+from bw_defend.core.fs import append_jsonl, atomic_write_text
 from bw_defend.core.models import IncidentRecord
+from bw_defend.core.models import validate_incident_record
 from bw_defend.core.paths import incidents_path, state_dir
 
 
@@ -29,8 +32,7 @@ def create_incident(
         remediation_plan=remediation_plan,
     )
     state_dir().mkdir(parents=True, exist_ok=True)
-    with incidents_path().open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(incident.to_dict(), sort_keys=True) + "\n")
+    append_jsonl(incidents_path(), incident.to_dict())
     return incident
 
 
@@ -38,7 +40,27 @@ def list_incidents() -> list[dict[str, Any]]:
     path = incidents_path()
     if not path.exists():
         return []
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    incidents: list[dict[str, Any]] = []
+    for line_no, line in enumerate(path.read_text().splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            log_audit(
+                "incident_parse_error",
+                {"line": line_no, "reason": "invalid json", "path": str(path)},
+            )
+            continue
+        valid, reason = validate_incident_record(payload)
+        if not valid:
+            log_audit(
+                "incident_parse_error",
+                {"line": line_no, "reason": reason, "path": str(path)},
+            )
+            continue
+        incidents.append(payload)
+    return incidents
 
 
 def get_incident(incident_id: str) -> dict[str, Any] | None:
@@ -50,9 +72,12 @@ def get_incident(incident_id: str) -> dict[str, Any] | None:
 
 def overwrite_incidents(incidents: list[dict[str, Any]]) -> None:
     state_dir().mkdir(parents=True, exist_ok=True)
-    with incidents_path().open("w", encoding="utf-8") as handle:
-        for incident in incidents:
-            handle.write(json.dumps(incident, sort_keys=True) + "\n")
+    for incident in incidents:
+        valid, reason = validate_incident_record(incident)
+        if not valid:
+            raise ValueError(f"refusing to write invalid incident record: {reason}")
+    content = "".join(json.dumps(incident, sort_keys=True) + "\n" for incident in incidents)
+    atomic_write_text(incidents_path(), content)
 
 
 def update_incident(incident_id: str, **updates: Any) -> dict[str, Any] | None:
@@ -61,6 +86,9 @@ def update_incident(incident_id: str, **updates: Any) -> dict[str, Any] | None:
     for incident in incidents:
         if incident.get("id") == incident_id:
             incident.update(updates)
+            valid, reason = validate_incident_record(incident)
+            if not valid:
+                raise ValueError(f"incident update produced invalid record: {reason}")
             updated = incident
             break
     if updated:

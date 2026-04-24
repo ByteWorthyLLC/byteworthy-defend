@@ -22,3 +22,15 @@ def test_update_rules_integrity_success(tmp_path: Path, monkeypatch) -> None:
 
     result = update_rules(str(bundle))
     assert result["updated"] is True
+
+
+def test_update_rules_rejects_invalid_schema(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("BW_DEFEND_STATE_DIR", str(tmp_path / "state"))
+    bundle = tmp_path / "rules.json"
+    bundle.write_text(json.dumps({"version": "x", "rules": [{"id": "bad", "pattern": "x", "severity": "urgent"}]}))
+    digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+    bundle.with_suffix(".json.sha256").write_text(f"{digest}  rules.json\n")
+
+    result = update_rules(str(bundle))
+    assert result["updated"] is False
+    assert "severity" in str(result["reason"])

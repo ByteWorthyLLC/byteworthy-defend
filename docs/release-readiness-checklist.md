@@ -5,6 +5,7 @@
 - [ ] Linux package/install instructions verified on clean host
 - [ ] rollback instructions validated in dry-run and live-safe test
 - [ ] command completion and help text verified for all required commands
+- [ ] `bw-defend doctor --strict --json` passes on release candidate host
 
 ## Security and Safety Gates
 
@@ -28,6 +29,7 @@
 - [ ] architecture, runbook, testing, security docs reviewed
 - [ ] CONTRIBUTING, SECURITY, CODEOWNERS, issue/PR templates present and current
 - [ ] threat model and security review completed
+- [ ] `./scripts/validate-docs.sh` passes on release candidate commit
 
 ## Final Sign-Off Evidence
 

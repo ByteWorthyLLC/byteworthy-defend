@@ -10,9 +10,11 @@
 ## Control Model
 
 - deny-by-default policy for unapproved destructive actions
+- deny-by-default for unknown remediation action types
 - confidence thresholds for auto-remediation
 - explicit approval path for dangerous operations
-- append-only audit records for proposed/executed actions
+- append-only audit records for proposed/executed actions with unique audit event IDs
+- rules bundle checksum validation plus schema validation before activation
 
 ## Destructive Actions
 

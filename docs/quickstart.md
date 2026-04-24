@@ -18,7 +18,7 @@ pip install -e '.[dev]'
 ## First Health Check
 
 ```bash
-bw-defend doctor --json
+bw-defend doctor --strict --json
 ```
 
 ## First Scan

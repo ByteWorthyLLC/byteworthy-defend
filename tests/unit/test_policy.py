@@ -20,3 +20,10 @@ def test_confidence_gate_requires_approval() -> None:
     decision = evaluate_action(action="quarantine", confidence=0.5, policy=policy, approve=False)
     assert decision.allowed is False
     assert "confidence" in decision.reason
+
+
+def test_unknown_action_is_denied() -> None:
+    policy = RemediationPolicy()
+    decision = evaluate_action(action="self_destruct", confidence=0.99, policy=policy, approve=True)
+    assert decision.allowed is False
+    assert "unknown action" in decision.reason

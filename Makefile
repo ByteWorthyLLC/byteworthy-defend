@@ -8,7 +8,7 @@ test:
 	pytest
 
 doctor:
-	bw-defend doctor --json
+	bw-defend doctor --strict --json
 
 docs-validate:
 	./scripts/validate-docs.sh

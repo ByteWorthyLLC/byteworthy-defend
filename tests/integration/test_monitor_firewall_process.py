@@ -21,3 +21,9 @@ def test_process_kill_requires_approval() -> None:
     result = kill_process(999999, approve=False)
     assert result["killed"] is False
     assert result["approval_required"] is True
+
+
+def test_process_kill_invalid_pid() -> None:
+    result = kill_process(-1, approve=True)
+    assert result["killed"] is False
+    assert "positive integer" in result["reason"]

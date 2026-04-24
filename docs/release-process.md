@@ -9,8 +9,9 @@
 
 ```bash
 pytest
-bw-defend doctor --json
+bw-defend doctor --strict --json
 bw-defend rules verify --json
+./scripts/validate-docs.sh
 ```
 
 ## Versioning

@@ -5,6 +5,19 @@ from datetime import datetime, timezone
 from typing import Any
 
 INCIDENT_SCHEMA_VERSION = "v1"
+INCIDENT_REQUIRED_FIELDS = {
+    "id",
+    "timestamp",
+    "source",
+    "artifact",
+    "detection_type",
+    "severity",
+    "confidence",
+    "action_state",
+    "approval_required",
+    "remediation_plan",
+    "final_outcome",
+}
 
 
 @dataclass(slots=True)
@@ -34,6 +47,8 @@ class IncidentRecord:
         approval_required: bool,
         remediation_plan: list[dict[str, Any]] | None = None,
     ) -> "IncidentRecord":
+        if confidence < 0 or confidence > 1:
+            raise ValueError("incident confidence must be between 0 and 1")
         return cls(
             id=incident_id,
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -63,3 +78,21 @@ class IncidentRecord:
             "remediation_plan": self.remediation_plan,
             "final_outcome": self.final_outcome,
         }
+
+
+def validate_incident_record(payload: dict[str, Any]) -> tuple[bool, str]:
+    missing = [field for field in INCIDENT_REQUIRED_FIELDS if field not in payload]
+    if missing:
+        return False, f"missing required fields: {', '.join(sorted(missing))}"
+    if not isinstance(payload["id"], str) or not payload["id"].startswith("inc-"):
+        return False, "incident id must be a string prefixed with 'inc-'"
+    if not isinstance(payload["confidence"], (float, int)):
+        return False, "incident confidence must be numeric"
+    confidence = float(payload["confidence"])
+    if confidence < 0 or confidence > 1:
+        return False, "incident confidence must be between 0 and 1"
+    if not isinstance(payload["approval_required"], bool):
+        return False, "approval_required must be boolean"
+    if not isinstance(payload["remediation_plan"], list):
+        return False, "remediation_plan must be a list"
+    return True, "ok"

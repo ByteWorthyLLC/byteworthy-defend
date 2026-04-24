@@ -33,7 +33,7 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
-bw-defend doctor --json
+bw-defend doctor --strict --json
 ```
 
 Enable AI edition:

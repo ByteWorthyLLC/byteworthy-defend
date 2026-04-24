@@ -6,21 +6,43 @@ import subprocess
 
 
 def list_processes(limit: int = 20) -> list[dict[str, str]]:
-    proc = subprocess.run(
-        ["ps", "-eo", "pid=,comm=,etime="],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    if limit < 1:
+        raise ValueError("process list limit must be at least 1")
+    try:
+        proc = subprocess.run(
+            ["ps", "-eo", "pid=,comm=,etime="],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.SubprocessError as exc:
+        raise ValueError(f"unable to list processes: {exc}") from exc
     rows = [row.strip() for row in proc.stdout.splitlines() if row.strip()]
     items = []
     for row in rows[:limit]:
-        pid, command, etime = row.split(maxsplit=2)
+        parts = row.split(maxsplit=2)
+        if len(parts) != 3:
+            continue
+        pid, command, etime = parts
         items.append({"pid": pid, "command": command, "etime": etime})
     return items
 
 
 def kill_process(pid: int, approve: bool) -> dict:
+    if pid <= 0:
+        return {
+            "killed": False,
+            "approval_required": False,
+            "reason": "pid must be a positive integer",
+            "pid": pid,
+        }
+    if pid == os.getpid():
+        return {
+            "killed": False,
+            "approval_required": False,
+            "reason": "refusing to terminate current bw-defend process",
+            "pid": pid,
+        }
     if not approve:
         return {
             "killed": False,
@@ -28,5 +50,12 @@ def kill_process(pid: int, approve: bool) -> dict:
             "reason": "destructive kill requires --approve",
             "pid": pid,
         }
-    os.kill(pid, signal.SIGTERM)
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except ProcessLookupError:
+        return {"killed": False, "approval_required": False, "pid": pid, "reason": "process not found"}
+    except PermissionError:
+        return {"killed": False, "approval_required": False, "pid": pid, "reason": "permission denied"}
+    except OSError as exc:
+        return {"killed": False, "approval_required": False, "pid": pid, "reason": str(exc)}
     return {"killed": True, "approval_required": False, "pid": pid}
