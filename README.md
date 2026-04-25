@@ -18,9 +18,12 @@
 
 </div>
 
+> [!IMPORTANT]
+> **Pre-launch — public beta.** This is early-access source. The product is being built in public. Star to follow new releases, [join Discord](https://discord.gg/byteworthy) for the inside view, and lock [Pioneer pricing ($49/mo for life)](https://byteworthy.io/pioneer) — first 100 customers, ever, no exceptions.
+
 ---
 
-> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, quarantine lifecycle with policy gates, and machine-readable everything. DevOps and security teams use it to wire threat response into existing pipelines. Open source — get it at [byteworthy.io/defend](https://byteworthy.io/defend?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=positioning).
+> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, quarantine lifecycle with policy gates, and machine-readable everything. DevOps and security teams can use it to wire threat response into existing pipelines. Open source — get it at [byteworthy.io/defend](https://byteworthy.io/defend?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=positioning).
 
 <br/>
 
@@ -159,7 +162,7 @@ Crowdstrike and SentinelOne are excellent enterprise products but closed-source,
 </details>
 
 <details><summary><b>Is Defend production-ready?</b></summary>
-Yes — Defend is dogfooded internally on ByteWorthy infrastructure and used in production by sponsoring teams. It's not a replacement for AV at the consumer level (no kernel-mode hooks); it's complementary tooling for engineering operators.
+Yes — Defend is dogfooded internally on ByteWorthy infrastructure. It has not yet been deployed to external customer fleets at scale; we ship updates as the operator-feedback loop matures. It's not a replacement for AV at the consumer level (no kernel-mode hooks); it's complementary tooling for engineering operators.
 </details>
 
 <details><summary><b>What's the licensing?</b></summary>
