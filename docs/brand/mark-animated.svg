@@ -1,0 +1,17 @@
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Defend mark">
+  <defs>
+    <linearGradient id="g" x1="6" y1="4" x2="34" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4A4E54"/>
+      <stop offset="100%" stop-color="#2A2D31"/>
+    </linearGradient>
+    <style>
+      .a{animation:f 400ms cubic-bezier(0.16,1,0.3,1) both}
+      .a1{animation-delay:0ms}.a2{animation-delay:100ms}.a3{animation-delay:200ms}
+      @keyframes f{from{opacity:0}to{opacity:1}}
+    </style>
+  </defs>
+  <rect width="40" height="40" rx="4" fill="#0F172A"/>
+  <path class="a a1" d="M13 8h2v24h-2V8z" fill="url(#g)"/>
+  <path class="a a2" d="M15 8h6a10 12 0 0 1 0 24h-6v-3h6a7 9 0 0 0 0-18h-6z" fill="url(#g)" fill-opacity="0.7"/>
+  <path class="a a3" d="M15 14h4a6 6 0 0 1 0 12h-4v-2h4a4 4 0 0 0 0-8h-4z" fill="url(#g)" fill-opacity="0.5"/>
+</svg>

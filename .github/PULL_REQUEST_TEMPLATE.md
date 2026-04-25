@@ -1,35 +1,45 @@
-## Summary
+<!-- Thanks for contributing to ByteWorthy! Please complete this template to help us review your PR efficiently. -->
 
--
+## What does this PR do?
 
-## Change Type
+<!-- One-paragraph summary of the change. -->
 
-- [ ] Feature
-- [ ] Bug fix
-- [ ] Security hardening
-- [ ] Documentation
-- [ ] Release/process improvement
+## Why?
 
-## Validation
+<!-- Link to issue, discussion, or describe the motivation. -->
 
-- [ ] `pytest`
-- [ ] `bw-defend doctor --json`
-- [ ] `bw-defend rules verify --json`
-- [ ] Linux and Windows smoke verification completed for changed command surfaces
+Closes #
 
-## Risk and Blast Radius
+## How was this tested?
 
-- [ ] Policy engine behavior changed
-- [ ] Incident schema changed
-- [ ] Rules update behavior changed
-- [ ] Firewall/process behavior changed
-- [ ] No externally visible behavior change
+<!-- Describe how you tested this. Include automated test coverage where applicable. -->
 
-## Release Notes
+- [ ] Unit tests pass (`pnpm test` / `pytest`)
+- [ ] Type check passes (`pnpm typecheck` / `mypy`)
+- [ ] Lint passes (`pnpm lint` / `ruff`)
+- [ ] Manual smoke test on local dev
 
-- Changelog update needed: `yes` / `no`
-- Follow-up operations action needed: `yes` / `no`
+## Checklist
 
-## Rollback Plan
+- [ ] Code follows project style guide
+- [ ] Self-review completed
+- [ ] No secrets, API keys, or `.env` files committed
+- [ ] Documentation updated (README, docs/, code comments)
+- [ ] Migrations are backward-compatible (if database schema changed)
+- [ ] No breaking changes to public API (or documented if intentional)
+- [ ] PR title follows [conventional commits](https://www.conventionalcommits.org/) format
 
--
+## Screenshots / demos (if UI change)
+
+<!-- Drop screenshots, GIFs, or Loom links here. Required for any UI/UX change. -->
+
+## Additional context
+
+<!-- Anything else reviewers should know? -->
+
+---
+
+By submitting this pull request, I confirm:
+- My contributions are made under the project license
+- I have read the [Contributing Guide](./CONTRIBUTING.md)
+- I'm happy to iterate on review feedback

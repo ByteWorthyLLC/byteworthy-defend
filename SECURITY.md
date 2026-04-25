@@ -1,51 +1,55 @@
 # Security Policy
 
-## Supported Branches
+## Supported versions
 
-- `main` is the supported security branch.
-- Security fixes are published on `main` and included in tagged releases.
+We support the latest minor version on the `main` branch. Security fixes are backported to the most recent tagged release.
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-Do not open public issues for vulnerabilities.
+**Please do NOT open a public GitHub Issue for security vulnerabilities.**
 
-Use one of the following channels:
+Email **security@byteworthy.io** with:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Your contact information for follow-up
 
-1. GitHub Security Advisory (private disclosure)
-2. Email: `security@byteworthy.io`
+You'll receive an acknowledgment within 48 hours and a status update within 7 days.
 
-Include:
+## Disclosure policy
 
-- affected component and commit/version
-- clear reproduction steps or PoC
-- impact statement
-- suggested mitigation (if available)
+We follow **coordinated disclosure**:
 
-## Maintainer Response Model
+1. We acknowledge receipt within 48 hours
+2. We confirm the issue and determine severity within 7 days
+3. We develop a fix and release it (typically within 30-90 days)
+4. We disclose the issue publicly once a fix is available
+5. We credit the reporter (unless they prefer anonymity)
 
-- Vulnerability handling is best effort and non-contractual.
-- Report review and remediation timelines are not guaranteed.
-- This project is distributed `AS IS` under the MIT License.
+Critical vulnerabilities (RCE, auth bypass, PHI exposure for healthcare products) are prioritized.
 
-## Security Scope
+## Bug bounty
+
+ByteWorthy does not currently run a formal bug bounty program. We do offer:
+- Public credit (in our security advisories and release notes)
+- ByteWorthy product credits / Pioneer tier access
+- Paid bounties for impactful findings on healthcare products (Clynova) — case-by-case
+
+## Scope
 
 In scope:
-
-- rule integrity validation and update path
-- quarantine lifecycle and rollback safety
-- policy engine approval enforcement
-- audit trail integrity and forensic usability
-- process/firewall control safety and reversibility
+- Authentication and authorization issues
+- Data exposure (PHI, billing info, customer data)
+- Injection vulnerabilities (SQL, XSS, SSRF, etc.)
+- Cryptographic issues
+- Dependency vulnerabilities with active exploitation paths
 
 Out of scope:
+- Self-XSS requiring user complicity
+- Social engineering of ByteWorthy employees
+- Issues requiring physical access to a victim's device
+- Vulnerabilities in third-party services we depend on (report to those vendors)
 
-- unsupported branches
-- vulnerabilities requiring privileged host compromise before exploitation
+## Built by ByteWorthy
 
-## Operator Hardening Checklist
-
-- [ ] Restrict CLI execution to trusted operators
-- [ ] Store config at `~/.config/bw-defend/config.toml` with least-privilege permissions
-- [ ] Keep rules bundles signed/checksummed by trusted source
-- [ ] Validate rollback and incident runbooks quarterly
-- [ ] Keep Windows and Linux hosts patched and endpoint telemetry enabled
+> Maintained by [Kevin Richards](https://byteworthy.io). Security issues are P0 — they get faster responses than feature requests, even on the free tier.
