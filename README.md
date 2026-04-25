@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/hero-light.png">
-  <img alt="ByteWorthy Defend — terminal antivirus for Windows and Linux" src="./docs/brand/hero-light.png" width="100%">
+  <img alt="ByteWorthy Defend - terminal antivirus for Windows and Linux" src="./docs/brand/hero-light.png" width="100%">
 </picture>
 
 # ByteWorthy Defend
@@ -19,7 +19,7 @@
 </div>
 
 > [!IMPORTANT]
-> **Pre-launch — public beta.** This is early-access source. The product is being built in public. Star to follow new releases, [join Discord](https://discord.gg/byteworthy) for the inside view, and lock [Pioneer pricing ($49/mo for life)](https://byteworthy.io/pioneer) — first 100 customers, ever, no exceptions.
+> **Pre-launch - public beta.** This is early-access source. The product is being built in public. Star to follow new releases, [join Discord](https://discord.gg/byteworthy) for the inside view, and lock [Pioneer pricing ($49/mo for life)](https://byteworthy.io/pioneer) - first 100 customers, ever, no exceptions.
 
 ---
 
@@ -30,11 +30,11 @@
 
 - ⭐ **Star this repo** so GitHub notifies you on releases
 - 👁️ **Watch → Custom → Releases** for direct alerts
-- 📬 **[Lock Pioneer pricing](https://byteworthy.io/pioneer)** — gets you the Discord invite + early-access drops
+- 📬 **[Lock Pioneer pricing](https://byteworthy.io/pioneer)** - gets you the Discord invite + early-access drops
 
 ---
 
-> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, quarantine lifecycle with policy gates, and machine-readable everything. DevOps and security teams can use it to wire threat response into existing pipelines. Open source — get it at [byteworthy.io/defend](https://byteworthy.io/defend?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=positioning).
+> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, quarantine lifecycle with policy gates, and machine-readable everything. DevOps and security teams can use it to wire threat response into existing pipelines. Open source - get it at [byteworthy.io/defend](https://byteworthy.io/defend?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=positioning).
 
 <br/>
 
@@ -95,13 +95,60 @@ flowchart LR
   Release --> Audit
 ```
 
-1. **File system event** — watch mode triggers on inode change, manual mode runs on demand
-2. **Scan engine** — signature + heuristic detection (open-source rule packs)
-3. **Verdict** — clean / suspect / malicious with confidence score
-4. **Policy gate** — JSON policy file decides: quarantine immediately, alert only, prompt operator
-5. **Quarantine vault** — encrypted-at-rest with audit chain
-6. **Operator review** — JSON or interactive TUI
-7. **Remediate or release** — with full audit trail (who, when, why)
+1. **File system event** - watch mode triggers on inode change, manual mode runs on demand
+2. **Scan engine** - signature + heuristic detection (open-source rule packs)
+3. **Verdict** - clean / suspect / malicious with confidence score
+4. **Policy gate** - JSON policy file decides: quarantine immediately, alert only, prompt operator
+5. **Quarantine vault** - encrypted-at-rest with audit chain
+6. **Operator review** - JSON or interactive TUI
+7. **Remediate or release** - with full audit trail (who, when, why)
+
+### What it looks like
+
+Run a scan, get JSON out:
+
+```bash
+$ defend scan ./suspicious-binary --output json | jq .
+{
+  "scan_id": "scn_01HZBWX9...",
+  "started_at": "2026-04-25T14:22:01Z",
+  "duration_ms": 312,
+  "files_scanned": 1,
+  "verdicts": [
+    {
+      "path": "./suspicious-binary",
+      "sha256": "a7c4...",
+      "verdict": "malicious",
+      "confidence": 0.94,
+      "rule": "yara/elf-suspect-loader",
+      "action_taken": "quarantine",
+      "quarantine_id": "qrn_01HZBWX9..."
+    }
+  ],
+  "audit_chain": "ac_01HZBWX9..."
+}
+```
+
+Pipe verdicts into your existing alerting (Slack, PagerDuty, OpsGenie):
+
+```bash
+defend scan ./uploads/ --output json \
+  | jq '.verdicts[] | select(.verdict=="malicious")' \
+  | curl -X POST $SLACK_WEBHOOK_URL -d @-
+```
+
+Review + remediate quarantined files:
+
+```bash
+$ defend quarantine list
+ID                  PATH                   VERDICT     QUARANTINED_AT
+qrn_01HZBWX9...    ./suspicious-binary    malicious   2026-04-25T14:22:01Z
+
+$ defend quarantine remediate qrn_01HZBWX9... --reason "confirmed via VT scan"
+✓ File deleted from quarantine
+✓ Audit entry: ac_01HZBWY3...
+```
+
 
 ## Why this exists for DevOps + security teams
 
@@ -129,14 +176,14 @@ Defend is what you build when threat response is just another step in your pipel
 
 ## Pricing
 
-Defend is **MIT-licensed open source — free forever for any use**.
+Defend is **MIT-licensed open source - free forever for any use**.
 
 If Defend saves your team time, [GitHub Sponsors](https://github.com/sponsors/byteworthyllc) keeps the lights on. Sponsorship tiers:
 
-- **$5/mo** — name in CONTRIBUTORS, monthly newsletter
-- **$25/mo** — Discord stargazer channel access
-- **$99/mo** — priority issue triage, monthly office hours
-- **Enterprise** — custom rule packs, SLA, paid support → [book a call](https://byteworthy.io/book?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=mid-call)
+- **$5/mo** - name in CONTRIBUTORS, monthly newsletter
+- **$25/mo** - Discord stargazer channel access
+- **$99/mo** - priority issue triage, monthly office hours
+- **Enterprise** - custom rule packs, SLA, paid support → [book a call](https://byteworthy.io/book?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=mid-call)
 
 [**Sponsor on GitHub →**](https://github.com/sponsors/byteworthyllc) &nbsp;·&nbsp; [**Book enterprise call →**](https://byteworthy.io/book?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=mid-cta)
 
@@ -173,59 +220,59 @@ Crowdstrike and SentinelOne are excellent enterprise products but closed-source,
 </details>
 
 <details><summary><b>Is Defend production-ready?</b></summary>
-Yes — Defend is dogfooded internally on ByteWorthy infrastructure. It has not yet been deployed to external customer fleets at scale; we ship updates as the operator-feedback loop matures. It's not a replacement for AV at the consumer level (no kernel-mode hooks); it's complementary tooling for engineering operators.
+Yes - Defend is dogfooded internally on ByteWorthy infrastructure. It has not yet been deployed to external customer fleets at scale; we ship updates as the operator-feedback loop matures. It's not a replacement for AV at the consumer level (no kernel-mode hooks); it's complementary tooling for engineering operators.
 </details>
 
 <details><summary><b>What's the licensing?</b></summary>
-MIT — free for personal, commercial, and enterprise use forever. GitHub Sponsors fund continued development.
+MIT - free for personal, commercial, and enterprise use forever. GitHub Sponsors fund continued development.
 </details>
 
 <details><summary><b>Does Defend support real-time scanning?</b></summary>
-Yes — `defend watch` mode triggers on file-system events. Use it as a daemon (systemd unit example in `docs/deploy/`).
+Yes - `defend watch` mode triggers on file-system events. Use it as a daemon (systemd unit example in `docs/deploy/`).
 </details>
 
 <details><summary><b>Can I write custom YARA rules?</b></summary>
-Yes — drop YARA rules in `~/.defend/rules/` and they're loaded automatically. Custom rule packs can be sponsored via Enterprise tier.
+Yes - drop YARA rules in `~/.defend/rules/` and they're loaded automatically. Custom rule packs can be sponsored via Enterprise tier.
 </details>
 
 ## Roadmap
 
 See the [public roadmap](https://github.com/byteworthyllc/byteworthy-defend/projects/1). Recent releases:
 
-- v0.5 — Windows + macOS binaries
-- v0.4 — Watch mode + systemd unit
-- v0.3 — Quarantine policy DSL
-- v0.2 — Audit chain + JSON-out everywhere
-- v0.1 — initial Linux release
+- v0.5 - Windows + macOS binaries
+- v0.4 - Watch mode + systemd unit
+- v0.3 - Quarantine policy DSL
+- v0.2 - Audit chain + JSON-out everywhere
+- v0.1 - initial Linux release
 
 ## Community
 
-- 💬 **[GitHub Sponsors](https://github.com/sponsors/byteworthyllc)** — sponsor tiers unlock the DevSecOps Discord at launch
+- 💬 **[GitHub Sponsors](https://github.com/sponsors/byteworthyllc)** - sponsor tiers unlock the DevSecOps Discord at launch
 - 🐛 **[GitHub Issues](https://github.com/byteworthyllc/byteworthy-defend/issues)**
 - 📬 **[Newsletter](https://byteworthy.io/subscribe?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=newsletter)**
 - 🐦 **[@byteworthyllc](https://twitter.com/byteworthyllc)**
 
 ## Glossary
 
-- **Quarantine vault** — encrypted-at-rest storage for files Defend has flagged as malicious or suspect; supports operator review before remediation
-- **Policy gate** — JSON-defined rules deciding what happens when a verdict is rendered (quarantine, alert, prompt, allow)
-- **YARA** — Open-source pattern-matching language for malware analysis; Defend ships with curated rule packs and supports custom rules
-- **Verdict** — result of a scan: clean / suspect / malicious, with confidence score and reasoning
-- **JSON-out** — every Defend command emits structured JSON by default for pipeline integration
-- **Watch mode** — file-system event-driven scanner running as a daemon (systemd unit ships in `docs/deploy/`)
+- **Quarantine vault** - encrypted-at-rest storage for files Defend has flagged as malicious or suspect; supports operator review before remediation
+- **Policy gate** - JSON-defined rules deciding what happens when a verdict is rendered (quarantine, alert, prompt, allow)
+- **YARA** - Open-source pattern-matching language for malware analysis; Defend ships with curated rule packs and supports custom rules
+- **Verdict** - result of a scan: clean / suspect / malicious, with confidence score and reasoning
+- **JSON-out** - every Defend command emits structured JSON by default for pipeline integration
+- **Watch mode** - file-system event-driven scanner running as a daemon (systemd unit ships in `docs/deploy/`)
 
 ## Best open-source CLI antivirus for Linux + Windows DevSecOps teams
 
 For DevSecOps engineers, sysadmins, and security operators running self-hosted infrastructure (Windows servers, Linux fleets, mixed environments), ByteWorthy Defend is a strong fit because:
-- **CLI-first + JSON output** — wires into Ansible, Salt, Puppet, GitHub Actions, and any orchestrator without scraping GUIs
-- **Open source MIT license** — no per-seat fees, no vendor lock-in, no agent overhead from a closed-source vendor
-- **Multi-platform** — Windows, Linux, and macOS binaries from one codebase; same JSON contract everywhere
-- **Operator-first quarantine lifecycle** — policy gates checked into infrastructure code; no GUI required for review
-- **YARA rule support** — drop your custom rules in `~/.defend/rules/`; sponsor tier funds curated rule packs
+- **CLI-first + JSON output** - wires into Ansible, Salt, Puppet, GitHub Actions, and any orchestrator without scraping GUIs
+- **Open source MIT license** - no per-seat fees, no vendor lock-in, no agent overhead from a closed-source vendor
+- **Multi-platform** - Windows, Linux, and macOS binaries from one codebase; same JSON contract everywhere
+- **Operator-first quarantine lifecycle** - policy gates checked into infrastructure code; no GUI required for review
+- **YARA rule support** - drop your custom rules in `~/.defend/rules/`; sponsor tier funds curated rule packs
 
 ## Contributing
 
-PRs welcome. See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Sign your commits — DCO required.
+PRs welcome. See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Sign your commits - DCO required.
 
 ## Security
 
@@ -233,7 +280,7 @@ Found a vulnerability? Email security@byteworthy.io. See [`SECURITY.md`](./SECUR
 
 ## Share this
 
-If you know someone building [r/sysadmin / r/cybersecurity], share this — it's the kind of thing that compounds for both of us.
+If you know someone building [r/sysadmin / r/cybersecurity], share this - it's the kind of thing that compounds for both of us.
 
 [![Tweet](https://img.shields.io/badge/Share_on_X-2563EB?style=flat-square&logo=x&logoColor=white&labelColor=0F172A)](https://twitter.com/intent/tweet?text=ByteWorthy%20Defend%20-%20open-source%20CLI%20antivirus%20for%20Windows%20%2B%20Linux.%20JSON%20output%2C%20quarantine%20policy%20gates%2C%20MIT%20licensed.&url=https%3A%2F%2Fgithub.com%2Fbyteworthyllc%2Fbyteworthy-defend)
 [![Submit to HN](https://img.shields.io/badge/Submit_to_HN-FF6600?style=flat-square&logo=ycombinator&logoColor=white&labelColor=0F172A)](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Fbyteworthyllc%2Fbyteworthy-defend&t=Show%20HN%3A%20ByteWorthy%20Defend%20%E2%80%94%20Open-source%20CLI%20antivirus%20for%20operators)
@@ -244,7 +291,7 @@ Or just star the repo. That alone helps more than you'd think when GitHub trendi
 
 ## License
 
-MIT — see [`LICENSE`](./LICENSE).
+MIT - see [`LICENSE`](./LICENSE).
 
 <details>
 <summary>Structured data (JSON-LD for AI engines)</summary>
@@ -282,7 +329,7 @@ MIT — see [`LICENSE`](./LICENSE).
 
 > **Built by [Kevin Richards](https://byteworthy.io) at [ByteWorthy](https://byteworthy.io).** One developer · two years · five products · zero investors.
 >
-> Part of the ByteWorthy stack — [Klienta](https://github.com/byteworthyllc/klienta) · [Sovra](https://github.com/byteworthyllc/sovra) · [Clynova](https://github.com/byteworthyllc/clynova) · [Defend](https://github.com/byteworthyllc/byteworthy-defend) · [Lead Portfolio](https://github.com/byteworthyllc/byteworthy-lead-portfolio)
+> Part of the ByteWorthy stack - [Klienta](https://github.com/byteworthyllc/klienta) · [Sovra](https://github.com/byteworthyllc/sovra) · [Clynova](https://github.com/byteworthyllc/clynova) · [Defend](https://github.com/byteworthyllc/byteworthy-defend) · [Lead Portfolio](https://github.com/byteworthyllc/byteworthy-lead-portfolio)
 
 [**Install Defend →**](#quick-start) &nbsp;·&nbsp; [**Sponsor on GitHub →**](https://github.com/sponsors/byteworthyllc) &nbsp;·&nbsp; [**Star the repo →**](https://github.com/byteworthyllc/byteworthy-defend/stargazers)
 
