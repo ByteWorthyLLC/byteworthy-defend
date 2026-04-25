@@ -1,0 +1,44 @@
+name: 💬 Support / Question
+description: Get help using this product.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Looking for help?
+
+        - **Free community support** — Ask in [GitHub Discussions](../discussions) or join our [Discord](https://discord.gg/byteworthy)
+        - **Paid priority support** — Available with Professional+ tiers. [Book a setup call](https://byteworthy.io/book?utm_source=github&utm_medium=issue-template)
+        - **Documentation** — Check [byteworthy.io/docs](https://byteworthy.io) first
+
+        If you still need to file a question issue, fill out the form below.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What are you trying to accomplish?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: List approaches you've already tried.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Are you on a paid tier?
+      description: Paid-tier customers get priority responses.
+      options:
+        - "No — open source / free"
+        - "Pioneer (BETA)"
+        - "Starter / Practice / Indie"
+        - "Professional / Group / Agency"
+        - "Group / Network / Enterprise"
+    validations:
+      required: true

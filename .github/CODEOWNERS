@@ -1,15 +1,16 @@
-# Default owners
-* @byteworthy/maintainers
+# ByteWorthy repos are maintained by Kevin Richards (founder, solo developer).
+# Brand kit + product configs require kit maintainer approval.
 
-# Security-critical surfaces
-/src/bw_defend/core/policy.py                @byteworthy/security @byteworthy/maintainers
-/src/bw_defend/ai/**                         @byteworthy/security @byteworthy/maintainers
-/src/bw_defend/security/**                   @byteworthy/security @byteworthy/maintainers
-/src/bw_defend/core/rules.py                 @byteworthy/security @byteworthy/maintainers
-/docs/security.md                            @byteworthy/security @byteworthy/maintainers
-/SECURITY.md                                 @byteworthy/security @byteworthy/maintainers
-/.github/workflows/**                        @byteworthy/security @byteworthy/maintainers
+# Default owner for everything
+*                       @byteworthyllc/founders
 
-# Documentation ownership
-/docs/**                                     @byteworthy/maintainers
-/README.md                                   @byteworthy/maintainers
+# Brand assets require kit consistency review
+/public/brand/          @byteworthyllc/founders
+/docs/brand/            @byteworthyllc/founders
+/.github/               @byteworthyllc/founders
+README.md               @byteworthyllc/founders
+byteworthy.config.yaml  @byteworthyllc/founders
+
+# Security-sensitive paths
+/SECURITY.md            @byteworthyllc/founders
+/security/              @byteworthyllc/founders
