@@ -1,9 +1,6 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/hero-light.png">
-  <img alt="ByteWorthy Defend - terminal antivirus for Windows and Linux" src="./docs/brand/hero-light.png" width="100%">
-</picture>
+<img alt="ByteWorthy Defend - terminal antivirus for Windows and Linux" src="./docs/brand/hero-light.png" width="100%">
 
 # ByteWorthy Defend
 
@@ -42,10 +39,7 @@
 
 ## Quick Start
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/sections/quickstart.png">
-  <img alt="Quick Start illustration" src="./docs/brand/sections/quickstart.png" width="100%">
-</picture>
+<img alt="Quick Start illustration" src="./docs/brand/sections/quickstart.png" width="100%">
 
 ```bash
 # Install (Linux / macOS via pipx)
@@ -72,10 +66,7 @@ Built for pipelines: every command emits structured JSON. Wire it into Ansible, 
 
 ## How it works
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/diagram-architecture.webp">
-  <img alt="Defend quarantine lifecycle" src="./docs/brand/diagram-architecture.webp" width="100%">
-</picture>
+<img alt="Defend quarantine lifecycle" src="./docs/brand/diagram-architecture.webp" width="100%">
 
 ```mermaid
 flowchart LR
