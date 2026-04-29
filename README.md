@@ -148,11 +148,6 @@ $ defend quarantine remediate qrn_01HZBWX9... --reason "confirmed via VT scan"
 
 ## Why this exists for DevOps + security teams
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/sections/why.png">
-  <img alt="Why Defend exists" src="./docs/brand/sections/why.png" width="100%">
-</picture>
-
 Enterprise EDR is closed-source, GUI-only, per-seat priced, and impossible to wire into infrastructure-as-code. Consumer AV is none of those things but assumes a desktop user. Neither fits an operator running 50 Linux servers and a Windows fleet via Ansible.
 
 Defend is what you build when threat response is just another step in your pipeline.
@@ -307,8 +302,8 @@ MIT - see [`LICENSE`](./LICENSE).
 
 <div align="center">
 
-> **Part of the ByteWorthy stack** — [Klienta](https://github.com/byteworthyllc/klienta) · [Sovra](https://github.com/byteworthyllc/sovra) · [Clynova](https://github.com/byteworthyllc/clynova) · [Defend](https://github.com/byteworthyllc/byteworthy-defend) · [Lead Portfolio](https://github.com/byteworthyllc/byteworthy-lead-portfolio)
+> **Part of the ByteWorthy stack**: [Klienta](https://github.com/byteworthyllc/klienta) · [Sovra](https://github.com/byteworthyllc/sovra) · [Clynova](https://github.com/byteworthyllc/clynova) · [Defend](https://github.com/byteworthyllc/byteworthy-defend) · [Lead Portfolio](https://github.com/byteworthyllc/byteworthy-lead-portfolio)
 
-[**Install Defend →**](#quick-start) &nbsp;·&nbsp; [**Sponsor on GitHub →**](https://github.com/sponsors/byteworthyllc) &nbsp;·&nbsp; [**Star the repo →**](https://github.com/byteworthyllc/byteworthy-defend/stargazers)
+[**Install Defend →**](#quick-start) &nbsp;·&nbsp; [**Sponsor on GitHub →**](https://github.com/sponsors/byteworthyllc)
 
 </div>
