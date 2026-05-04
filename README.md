@@ -305,7 +305,7 @@ MIT - see [`LICENSE`](./LICENSE).
 
 <div align="center">
 
-> **Part of the ByteWorthy stack**: [Klienta](https://github.com/byteworthyllc/klienta) · [Sovra](https://github.com/byteworthyllc/sovra) · [Clynova](https://github.com/byteworthyllc/clynova) · [Defend](https://github.com/byteworthyllc/byteworthy-defend) · [Lead Portfolio](https://github.com/byteworthyllc/byteworthy-lead-portfolio)
+> **Part of the ByteWorthy ecosystem**: [Sovra](https://github.com/ByteWorthyLLC/sovra) · [Klienta](https://github.com/ByteWorthyLLC/klienta) · [Clynova](https://github.com/ByteWorthyLLC/clynova) · [honeypot-med](https://github.com/ByteWorthyLLC/honeypot-med) · [vqol](https://github.com/ByteWorthyLLC/vqol) · [hightimized](https://github.com/ByteWorthyLLC/hightimized) · [outbreaktinder](https://github.com/ByteWorthyLLC/outbreaktinder)
 
 [**Install Defend →**](#quick-start) &nbsp;·&nbsp; [**Sponsor on GitHub →**](https://github.com/sponsors/byteworthyllc)
 
