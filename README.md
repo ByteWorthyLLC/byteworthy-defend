@@ -13,21 +13,12 @@
 
 </div>
 
-> [!IMPORTANT]
-> **Pre-launch - public beta.** This is early-access source. The product is being built in public. Star to follow new releases, [join Discord](https://discord.gg/byteworthy) for the inside view, and lock [Pioneer pricing ($49/mo for life)](https://byteworthy.io/pioneer) - first 100 customers, ever, no exceptions.
+> [!NOTE]
+> **MIT-licensed and free forever for any use.** Defend is part of the ByteWorthy open-source security family — see [related projects](#related-projects--the-byteworthy-ecosystem) for the full list. Sponsorship via [GitHub Sponsors](https://github.com/sponsors/byteworthyllc) keeps the lights on; no paid tier is required to use any feature.
 
 ---
 
-## Get launch access
-
-> **First 100 customers get $49/mo locked for life.** No exceptions.
-> The other 99 will pay 3-7× that for the same product. The cap exists; the math doesn't bend.
-
-- **[Lock Pioneer pricing](https://byteworthy.io/pioneer)** - gets you the Discord invite + early-access drops
-
----
-
-> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, quarantine lifecycle with policy gates, and machine-readable everything. DevOps and security teams can use it to wire threat response into existing pipelines. Open source - get it at [byteworthy.io/defend](https://byteworthy.io/defend?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=positioning).
+> **ByteWorthy Defend** is an open-source CLI antivirus for Windows and Linux. Unlike enterprise EDR suites (closed-source, GUI-only) or consumer AV, it's operator-first: JSON output by default, a quarantine lifecycle with policy gates, and machine-readable output for every command. DevOps and security teams use it to wire threat response into existing pipelines instead of bolting on a vendor agent.
 
 <br/>
 
@@ -229,10 +220,11 @@ See the [public roadmap](https://github.com/byteworthyllc/byteworthy-defend/proj
 
 ## Community
 
-- → **[GitHub Sponsors](https://github.com/sponsors/byteworthyllc)** - sponsor tiers unlock the DevSecOps Discord at launch
-- → **[GitHub Issues](https://github.com/byteworthyllc/byteworthy-defend/issues)**
-- → **[Newsletter](https://byteworthy.io/subscribe?utm_source=github&utm_medium=readme&utm_campaign=defend&utm_content=newsletter)**
-- → **[@byteworthyllc](https://twitter.com/byteworthyllc)**
+- → **[GitHub Sponsors](https://github.com/sponsors/byteworthyllc)** — fund continued development
+- → **[GitHub Discussions](https://github.com/ByteWorthyLLC/byteworthy-defend/discussions)** — questions, design chat
+- → **[GitHub Issues](https://github.com/ByteWorthyLLC/byteworthy-defend/issues)** — bug reports + feature requests
+- → **[Newsletter](https://byteworthy.io/newsletter)** — release notes by email
+- → **[@byteworthyllc](https://twitter.com/byteworthyllc)** — release-day pings
 
 ## Glossary
 
@@ -252,9 +244,29 @@ For DevSecOps engineers, sysadmins, and security operators running self-hosted i
 - **Operator-first quarantine lifecycle** - policy gates checked into infrastructure code; no GUI required for review
 - **YARA rule support** - drop your custom rules in `~/.defend/rules/`; sponsor tier funds curated rule packs
 
+## Related projects · the ByteWorthy ecosystem
+
+Defend is part of a small, open-source family of operator-first tools from [ByteWorthy LLC](https://byteworthy.io). Same posture across all of them: **local-first, no telemetry, plain output a human can read in seconds**.
+
+**For AI / security builders**
+
+- **[honeypot-med](https://github.com/ByteWorthyLLC/honeypot-med)** — prompt-injection evidence for healthcare AI workflows. OWASP LLM01 + NIST AI 600-1 anchored.
+- **[sovra](https://github.com/ByteWorthyLLC/sovra)** — open-source multi-tenant infrastructure for AI products. Auth, billing, MCP tools, pgvector search.
+
+**For healthcare consumers and curious humans**
+
+- **[vqol](https://github.com/ByteWorthyLLC/vqol)** — patient-owned VEINES-QOL/Sym tracker. Static local-first PWA, no telemetry.
+- **[hightimized](https://github.com/ByteWorthyLLC/hightimized)** — audit a hospital bill, generate a dispute letter. Browser-only.
+- **[outbreaktinder](https://github.com/ByteWorthyLLC/outbreaktinder)** — historic public-health events as a swipe deck. CC0 dataset.
+
+**Commercial boilerplates** (same multi-tenant lineage as Sovra)
+
+- **[Klienta](https://github.com/ByteWorthyLLC/klienta)** — white-label client portals for AI agencies
+- **[Clynova](https://github.com/ByteWorthyLLC/clynova)** — HIPAA-ready healthcare AI boilerplate
+
 ## Contributing
 
-PRs welcome. See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Sign your commits - DCO required.
+PRs welcome. See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Sign your commits — DCO required.
 
 ## Security
 
